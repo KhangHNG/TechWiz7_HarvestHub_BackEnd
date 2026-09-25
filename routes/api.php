@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogApiController;
+use App\Http\Controllers\Api\CustomerApiController;
 use App\Http\Controllers\Api\FarmerApiController;
 use App\Http\Controllers\Api\ProductsApiController;
 use App\Models\Product;
@@ -24,6 +25,11 @@ Route::middleware(['role:CUSTOMER,FARMER,ADMIN'])->group(function () {
 
 Route::middleware(['role:CUSTOMER'])->group(function () {
     Route::get('/customer/ping', [AuthController::class, 'me']);
+    Route::get('/customer/profile', [CustomerApiController::class, 'profile']);
+    Route::get('/customer/orders', [CustomerApiController::class, 'orders']);
+    Route::get('/customer/cart', [CustomerApiController::class, 'cart']);
+    Route::get('/customer/wishlist', [CustomerApiController::class, 'wishlist']);
+    Route::get('/customer/following', [CustomerApiController::class, 'following']);
 });
 
 Route::middleware(['role:FARMER'])->group(function () {
