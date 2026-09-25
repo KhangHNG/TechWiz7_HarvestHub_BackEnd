@@ -17,7 +17,7 @@ class ProductResource extends JsonResource
             'id'          => $this->id,
             'name'        => $this->name,
             'price'       => $this->price,
-            'image_url'   => $this->image ? asset('storage/' . $this->image) : null,
+            'image_url'   => $this->image_url,
             'description' => $this->description,
             'farmer_id'   => $this->farmer_id,
             'category_id' => $this->category_id,
@@ -26,9 +26,9 @@ class ProductResource extends JsonResource
             'created_at'  => $this->created_at?->toIso8601String(),
             'updated_at'  => $this->updated_at?->toIso8601String(),
             'deleted_at' => $this->deleted_at?->toIso8601String(),
-            'created_by' => $this->created_by?->toIso8601String(),
-            'deleted_by' => $this->deleted_by?->toIso8601String(),
-            'updated_by' => $this->updated_by?->toIso8601String(),
+            'created_by' => $this->created_by,
+            'deleted_by' => $this->deleted_by,
+            'updated_by' => $this->updated_by,
         ];
     }
 }

@@ -159,7 +159,10 @@ class DatabaseSeeder extends Seeder
         OrderItem::create([
             'order_id' => $cartOrder->id,
             'product_id' => $caChua->id,
+            'product_name' => $caChua->name,
+            'unit_price' => $caChua->price,
             'quantity' => 3,
+            'line_total' => $caChua->price * 3,
         ]);
 
         // Đơn hàng đã đặt (PENDING) của customer1 từ farmer1

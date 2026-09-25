@@ -78,6 +78,50 @@ class CategoryController extends Controller
     }
 
     /**
+     * GET /api/categories/{id}
+     */
+    public function findById($id): JsonResponse
+    {
+        $category = Category::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy danh mục thành công.',
+            'data' => new CategoryResource($category),
+        ], 200);
+    }
+
+    /**
+     * PUT /api/categories/{id}
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        $category = Category::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'name' => 'sometimes|required|string|max:255|unique:categories,name,' . $category->id,
+        ], [
+            'name.required' => 'Tên danh mục không được để trống.',
+            'name.unique' => 'Tên danh mục này đã tồn tại.',
+        ]);
+
+        try {
+            $category = $this->categoryService->updateCategory($category, $validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật danh mục thành công.',
+                'data' => new CategoryResource($category),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cập nhật danh mục thất bại: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * DELETE /api/categories/{id}
      * Xóa một danh mục sản phẩm.
      */

@@ -65,6 +65,53 @@ class ProductController extends Controller
     }
 
     /**
+     * GET /api/products/{id}
+     */
+    public function findById($id): JsonResponse
+    {
+        $product = Product::with(['farmer', 'category'])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy sản phẩm thành công.',
+            'data' => new ProductResource($product),
+        ], 200);
+    }
+
+    /**
+     * PUT /api/products/{id}
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'sometimes|required|numeric|min:1',
+            'farmer_id' => 'sometimes|required|exists:farmers,id',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'stock_qty' => 'sometimes|required|numeric|min:1',
+            'image_url' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $product = $this->productService->updateProduct($product, $validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật sản phẩm thành công.',
+                'data' => new ProductResource($product),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cập nhật sản phẩm thất bại: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * DELETE /api/products/{id}
      * Xóa một sản phẩm.
      */
