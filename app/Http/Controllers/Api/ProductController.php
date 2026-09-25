@@ -3,70 +3,131 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(): JsonResponse
+    protected $productService;
+
+    public function __construct(ProductService $productService)
     {
-        $products = Product::query()
-            ->with(['category', 'farmer.market'])
-            ->orderByDesc('id')
-            ->get();
+        $this->productService = $productService;
+    }
+
+    /**
+     * GET /api/products
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $products = $this->productService->getPaginatedProducts($request);
 
         return response()->json([
             'success' => true,
-            'data' => $products->map(fn (Product $product) => $this->transform($product))->values(),
-        ]);
+            'message' => 'Lấy danh sách sản phẩm thành công.',
+            'data' => ProductResource::collection($products),
+            'meta' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'has_more' => $products->hasMorePages(),
+            ],
+        ], 200);
     }
 
-    public function show(int $id): JsonResponse
+    /**
+     * POST /api/products
+     */
+    public function store(Request $request): JsonResponse
     {
-        $product = Product::query()
-            ->with(['category', 'farmer.market'])
-            ->find($id);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:1',
+            'farmer_id' => 'required|exists:farmers,id',
+            'category_id' => 'required|exists:categories,id',
+            'stock_qty' => 'required|numeric|min:1',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-        if ($product === null) {
+        $product = $this->productService->createProduct($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tạo sản phẩm thành công.',
+            'data' => new ProductResource($product),
+        ], 201);
+    }
+
+    /**
+     * GET /api/products/{id}
+     */
+    public function findById($id): JsonResponse
+    {
+        $product = Product::with(['farmer.market', 'category'])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy sản phẩm thành công.',
+            'data' => new ProductResource($product),
+        ], 200);
+    }
+
+    /**
+     * PUT /api/products/{id}
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'sometimes|required|numeric|min:1',
+            'farmer_id' => 'sometimes|required|exists:farmers,id',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'stock_qty' => 'sometimes|required|numeric|min:1',
+            'image_url' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $product = $this->productService->updateProduct($product, $validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật sản phẩm thành công.',
+                'data' => new ProductResource($product),
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy sản phẩm.',
-            ], 404);
+                'message' => 'Cập nhật sản phẩm thất bại: '.$e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $this->transform($product),
-        ]);
     }
 
-    private function transform(Product $product): array
+    /**
+     * DELETE /api/products/{id}
+     */
+    public function destroy($id): JsonResponse
     {
-        $farmer = $product->farmer;
-        $market = $farmer?->market;
+        try {
+            $product = Product::findOrFail($id);
+            $this->productService->deleteProduct($product);
 
-        return [
-            'id' => $product->id,
-            'name' => $product->name,
-            'description' => $product->description,
-            'price' => (float) $product->price,
-            'stock_qty' => $product->stock_qty,
-            'image_url' => $product->image_url,
-            'created_at' => $product->created_at?->toIso8601String(),
-            'category' => $product->category === null ? null : [
-                'id' => $product->category->id,
-                'name' => $product->category->name,
-            ],
-            'farmer' => $farmer === null ? null : [
-                'id' => $farmer->id,
-                'business_name' => $farmer->business_name,
-                'rating' => $farmer->rating === null ? null : (float) $farmer->rating,
-                'market' => $market === null ? null : [
-                    'id' => $market->id,
-                    'name' => $market->name,
-                    'address' => $market->address,
-                ],
-            ],
-        ];
+            return response()->json([
+                'success' => true,
+                'message' => 'Xóa sản phẩm thành công.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Xóa sản phẩm thất bại: '.$e->getMessage(),
+            ], 500);
+        }
     }
 }

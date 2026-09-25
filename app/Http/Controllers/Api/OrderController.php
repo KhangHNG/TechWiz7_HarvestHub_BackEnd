@@ -1,0 +1,155 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
+use App\Models\Order;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class OrderController extends Controller
+{
+    protected $orderService;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
+    /**
+     * GET /api/orders
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $orders = $this->orderService->getOrders($request);
+
+        if ($request->boolean('all')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lấy tất cả đơn hàng thành công.',
+                'data' => OrderResource::collection($orders),
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy danh sách đơn hàng thành công.',
+            'data' => OrderResource::collection($orders),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+            ],
+        ], 200);
+    }
+
+    /**
+     * POST /api/orders
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validatedData = $request->validate([
+            'customer_id' => 'required|exists:users,id',
+            'farmer_id' => 'nullable|exists:farmers,id',
+            'delivery_address' => 'nullable|string',
+            'status' => 'nullable|in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED',
+            'total_price' => 'nullable|numeric|min:0',
+            'items' => 'nullable|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.product_name' => 'required|string|max:255',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.line_total' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            $order = $this->orderService->createOrder($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tạo đơn hàng thành công.',
+                'data' => new OrderResource($order),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tạo đơn hàng thất bại: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * GET /api/orders/{id}
+     */
+    public function findById($id): JsonResponse
+    {
+        $order = Order::with('items')->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy đơn hàng thành công.',
+            'data' => new OrderResource($order),
+        ], 200);
+    }
+
+    /**
+     * PUT /api/orders/{id}
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        $order = Order::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'customer_id' => 'sometimes|required|exists:users,id',
+            'farmer_id' => 'nullable|exists:farmers,id',
+            'delivery_address' => 'nullable|string',
+            'status' => 'nullable|in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED',
+            'total_price' => 'nullable|numeric|min:0',
+            'items' => 'nullable|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.product_name' => 'required|string|max:255',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.line_total' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            $order = $this->orderService->updateOrder($order, $validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật đơn hàng thành công.',
+                'data' => new OrderResource($order),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cập nhật đơn hàng thất bại: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * DELETE /api/orders/{id}
+     */
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $order = Order::findOrFail($id);
+            $this->orderService->deleteOrder($order);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Xóa đơn hàng thành công.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Xóa đơn hàng thất bại: ' . $e->getMessage(),
+            ], 400);
+        }
+    }
+}

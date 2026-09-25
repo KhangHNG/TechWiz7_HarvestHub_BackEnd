@@ -1,0 +1,53 @@
+<?php
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProductResource extends JsonResource
+{
+    /**
+     * Transform resource thành một mảng JSON.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'          => $this->id,
+            'name'        => $this->name,
+            'price'       => $this->price,
+            'image_url'   => $this->image_url,
+            'description' => $this->description,
+            'farmer_id'   => $this->farmer_id,
+            'category_id' => $this->category_id,
+            'stock_qty' => $this->stock_qty,
+            'category' => $this->whenLoaded('category', fn () => $this->category === null ? null : [
+                'id' => $this->category->id,
+                'name' => $this->category->name,
+            ]),
+            'farmer' => $this->whenLoaded('farmer', function () {
+                $farmer = $this->farmer;
+                $market = $farmer?->relationLoaded('market') ? $farmer->market : null;
+
+                return $farmer === null ? null : [
+                    'id' => $farmer->id,
+                    'business_name' => $farmer->business_name,
+                    'rating' => $farmer->rating === null ? null : (float) $farmer->rating,
+                    'market' => $market === null ? null : [
+                        'id' => $market->id,
+                        'name' => $market->name,
+                        'address' => $market->address,
+                    ],
+                ];
+            }),
+
+            'created_at'  => $this->created_at?->toIso8601String(),
+            'updated_at'  => $this->updated_at?->toIso8601String(),
+            'deleted_at' => $this->deleted_at?->toIso8601String(),
+            'created_by' => $this->created_by,
+            'deleted_by' => $this->deleted_by,
+            'updated_by' => $this->updated_by,
+        ];
+    }
+}

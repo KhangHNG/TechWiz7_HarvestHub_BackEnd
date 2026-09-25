@@ -62,4 +62,9 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
             'role' => $this->role,
         ];
     }
+
+    public function farmer()
+    {
+        return $this->hasOne(Farmer::class);
+    }
 }
