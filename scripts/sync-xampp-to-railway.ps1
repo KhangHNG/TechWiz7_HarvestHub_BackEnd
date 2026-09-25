@@ -21,15 +21,33 @@ if ($MysqlPassword -ne "") { $dumpArgs = @("-u", $MysqlUser, "-p$MysqlPassword")
 & $mysqldump @dumpArgs -r $dump
 if ($LASTEXITCODE -ne 0) { throw "Export XAMPP that bai" }
 
-$tunnel = Start-Process -FilePath "railway" -ArgumentList @("connect", "MySQL", "--tunnel-only", "-P", "$LocalPort") -PassThru -WindowStyle Hidden
+$railwayJs = Join-Path $env:APPDATA "npm\node_modules\@railway\cli\bin\railway.js"
+$node = (Get-Command node.exe -ErrorAction Stop).Source
+if (-not (Test-Path $railwayJs)) { throw "Khong tim thay Railway CLI tai $railwayJs" }
+
+$projectRoot = Split-Path $PSScriptRoot -Parent
+$tunnelLog = Join-Path $env:TEMP "railway-mysql-tunnel.log"
+$tunnelErr = Join-Path $env:TEMP "railway-mysql-tunnel.err"
+if (Test-Path $tunnelLog) { Remove-Item $tunnelLog -Force }
+if (Test-Path $tunnelErr) { Remove-Item $tunnelErr -Force }
+$tunnel = Start-Process -FilePath $node -ArgumentList @($railwayJs, "connect", "MySQL", "--tunnel-only", "-P", "$LocalPort") -PassThru -WindowStyle Hidden -WorkingDirectory $projectRoot -RedirectStandardOutput $tunnelLog -RedirectStandardError $tunnelErr
 try {
     $ready = $false
-    for ($i = 0; $i -lt 30; $i++) {
+    for ($i = 0; $i -lt 40; $i++) {
         Start-Sleep -Seconds 1
-        $probe = Test-NetConnection -ComputerName 127.0.0.1 -Port $LocalPort -WarningAction SilentlyContinue
-        if ($probe.TcpTestSucceeded) { $ready = $true; break }
+        if ($tunnel.HasExited) { break }
+        $opened = ((Test-Path $tunnelLog) -and (Select-String -Path $tunnelLog -Pattern "tunnel open" -Quiet)) -or ((Test-Path $tunnelErr) -and (Select-String -Path $tunnelErr -Pattern "tunnel open" -Quiet))
+        if ($opened) {
+            $ready = $true
+            break
+        }
     }
-    if (-not $ready) { throw "Khong mo duoc tunnel Railway" }
+    if (-not $ready) {
+        $detail = ""
+        if (Test-Path $tunnelLog) { $detail += Get-Content $tunnelLog -Raw }
+        if (Test-Path $tunnelErr) { $detail += Get-Content $tunnelErr -Raw }
+        throw "Khong mo duoc tunnel Railway. $detail"
+    }
 
     $vars = railway variables --service MySQL --json | ConvertFrom-Json
     $env:MYSQL_PWD = $vars.MYSQLPASSWORD
