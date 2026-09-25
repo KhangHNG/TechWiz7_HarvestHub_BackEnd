@@ -35,7 +35,6 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
-            $table->unique(['email', 'deleted_at'], 'uk_users_email_deleted');
         });
     }
 
