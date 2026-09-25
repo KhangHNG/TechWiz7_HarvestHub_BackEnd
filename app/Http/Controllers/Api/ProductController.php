@@ -1,18 +1,18 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\ProductService;
-use App\Http\Resources\ProductResource;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     protected $productService;
 
-    // Inject ProductService vào Controller thông qua Dependency Injection
     public function __construct(ProductService $productService)
     {
         $this->productService = $productService;
@@ -28,14 +28,14 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Lấy danh sách sản phẩm thành công.',
-            'data'    => ProductResource::collection($products),
-            'meta'    => [
+            'data' => ProductResource::collection($products),
+            'meta' => [
                 'current_page' => $products->currentPage(),
-                'last_page'    => $products->lastPage(),
-                'per_page'     => $products->perPage(),
-                'total'        => $products->total(),
-                'has_more'     => $products->hasMorePages(),
-            ]
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'has_more' => $products->hasMorePages(),
+            ],
         ], 200);
     }
 
@@ -44,15 +44,14 @@ class ProductController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // Bạn có thể validate ở đây hoặc dùng FormRequest riêng trong app/Http/Requests/Api/
         $validatedData = $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:1',
-            'farmer_id'   => 'required|exists:farmers,id',
+            'price' => 'required|numeric|min:1',
+            'farmer_id' => 'required|exists:farmers,id',
             'category_id' => 'required|exists:categories,id',
-            'stock_qty'   => 'required|numeric|min:1',
-            'image_url'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stock_qty' => 'required|numeric|min:1',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $product = $this->productService->createProduct($validatedData);
@@ -60,7 +59,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Tạo sản phẩm thành công.',
-            'data'    => new ProductResource($product),
+            'data' => new ProductResource($product),
         ], 201);
     }
 
@@ -69,7 +68,7 @@ class ProductController extends Controller
      */
     public function findById($id): JsonResponse
     {
-        $product = Product::with(['farmer', 'category'])->findOrFail($id);
+        $product = Product::with(['farmer.market', 'category'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -106,35 +105,28 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật sản phẩm thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật sản phẩm thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * DELETE /api/products/{id}
-     * Xóa một sản phẩm.
      */
     public function destroy($id): JsonResponse
     {
         try {
-            // 1. Tìm sản phẩm theo ID, nếu không thấy sẽ tự động trả về lỗi 404
             $product = Product::findOrFail($id);
-
-            // 2. Gọi ProductService để xử lý logic xóa (bao gồm cả xóa file ảnh vật lý trên storage)
             $this->productService->deleteProduct($product);
 
-            // 3. Trả về kết quả thành công
             return response()->json([
                 'success' => true,
                 'message' => 'Xóa sản phẩm thành công.',
             ], 200);
-
         } catch (\Exception $e) {
-            // Bắt lỗi ngoại lệ nếu có sự cố phát sinh trong quá trình xóa
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa sản phẩm thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa sản phẩm thất bại: '.$e->getMessage(),
             ], 500);
         }
     }

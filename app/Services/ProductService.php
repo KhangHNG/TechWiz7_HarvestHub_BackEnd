@@ -15,7 +15,7 @@ class ProductService
      */
     public function getPaginatedProducts(Request $request)
     {
-        $query = Product::query()->with(['farmer', 'category']);
+        $query = Product::query()->with(['farmer.market', 'category']);
 
         // 1. Tìm kiếm theo keyword (name hoặc description)
         if ($request->filled('keyword')) {
