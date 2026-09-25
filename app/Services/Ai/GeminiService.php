@@ -17,14 +17,17 @@ class GeminiService
      */
     public function ask(string $userPrompt, array $history = []): string
     {
+        $vietnamese = $this->vietnamese($userPrompt);
         $apiKey = config('services.gemini.api_key');
         if (! is_string($apiKey) || $apiKey === '') {
-            return 'Chưa cấu hình GEMINI_API_KEY.';
+            return $vietnamese
+                ? 'Chưa cấu hình GEMINI_API_KEY.'
+                : 'GEMINI_API_KEY is not configured.';
         }
 
         $systemInstruction = [
             'parts' => [[
-                'text' => 'Bạn là trợ lý chợ nông sản HarvestHub. Trả lời tiếng Việt, ngắn và đúng dữ liệu. Khi người dùng hỏi về sản phẩm, giá, tồn kho, danh mục hoặc trang trại, bắt buộc gọi searchProducts trước. Chỉ nêu sản phẩm có trong kết quả công cụ, không bịa thêm. Nếu không tìm thấy thì nói rõ là không có.',
+                'text' => 'You are the HarvestHub farm-market assistant. Reply briefly in the language of the current user message. Only answer about products, price, stock, farms, markets, addresses, and pickup hours that come from tool results. For price or stock, call get_product_stock. For market hours, pickup time, or market address, call get_pickup_slots. Do not use general knowledge. Catalog names are Vietnamese. Before calling a tool, pass the Vietnamese catalog name (water spinach = rau muống, cherry tomato = cà chua bi). If the first call returns not_found, call once more with another Vietnamese name. Do not invent products. Keep stored product names, farm names, addresses, hours, and prices unchanged. The tool result includes reply_language. Write the sentence in that language even when product names are Vietnamese. If the result is not_found, say so in reply_language. If the question is outside this scope, such as weather, recipes, news, or small talk, do not call any tool. Reply with exactly "Hệ thống đang trong quá trình phát triển." when reply_language would be vi, or exactly "The system is still under development." otherwise.',
             ]],
         ];
 
@@ -42,21 +45,34 @@ class GeminiService
 
         $response = $this->post($payload);
         if ($response->failed()) {
-            return $this->failureMessage($response, 'lượt hỏi');
+            return $this->failureMessage($response, 'ask', $vietnamese);
         }
 
         for ($round = 0; $round < 2; $round++) {
             $parts = $response->json('candidates.0.content.parts') ?? [];
-            $functionCall = $this->functionCall($parts);
+            $functionCalls = $this->functionCalls($parts);
 
-            if ($functionCall === null) {
-                return $this->textFromParts($parts) ?? 'Rất tiếc, tôi chưa hiểu ý của bạn.';
+            if ($functionCalls === []) {
+                return $this->textFromParts($parts) ?? ($vietnamese
+                    ? 'Rất tiếc, tôi chưa hiểu ý của bạn.'
+                    : 'Sorry, I did not understand that.');
             }
 
-            $dbResult = $this->toolResolver->execute(
-                $functionCall['name'],
-                $functionCall['args'] ?? [],
-            );
+            $responseParts = [];
+            foreach ($functionCalls as $functionCall) {
+                $dbResult = $this->toolResolver->execute(
+                    $functionCall['name'],
+                    $functionCall['args'] ?? [],
+                );
+                $responseParts[] = [
+                    'functionResponse' => [
+                        'name' => $functionCall['name'],
+                        'response' => array_merge($dbResult, [
+                            'reply_language' => $vietnamese ? 'vi' : 'en',
+                        ]),
+                    ],
+                ];
+            }
 
             $contents[] = [
                 'role' => 'model',
@@ -64,12 +80,7 @@ class GeminiService
             ];
             $contents[] = [
                 'role' => 'user',
-                'parts' => [[
-                    'functionResponse' => [
-                        'name' => $functionCall['name'],
-                        'response' => $dbResult,
-                    ],
-                ]],
+                'parts' => $responseParts,
             ];
 
             $response = $this->post([
@@ -79,13 +90,20 @@ class GeminiService
             ]);
 
             if ($response->failed()) {
-                return $this->failureMessage($response, 'lượt tổng hợp');
+                return $this->failureMessage($response, 'synthesize', $vietnamese);
             }
         }
 
         $parts = $response->json('candidates.0.content.parts') ?? [];
 
-        return $this->textFromParts($parts) ?? 'Đã kiểm tra thông tin nông sản.';
+        return $this->textFromParts($parts) ?? ($vietnamese
+            ? 'Đã kiểm tra thông tin nông sản.'
+            : 'Checked the product information.');
+    }
+
+    private function vietnamese(string $text): bool
+    {
+        return (bool) preg_match('/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/iu', $text);
     }
 
     /**
@@ -114,17 +132,19 @@ class GeminiService
 
     /**
      * @param  array<int, array<string, mixed>>  $parts
-     * @return array<string, mixed>|null
+     * @return array<int, array<string, mixed>>
      */
-    private function functionCall(array $parts): ?array
+    private function functionCalls(array $parts): array
     {
+        $calls = [];
+
         foreach ($parts as $part) {
             if (isset($part['functionCall']['name'])) {
-                return $part['functionCall'];
+                $calls[] = $part['functionCall'];
             }
         }
 
-        return null;
+        return $calls;
     }
 
     /**
@@ -169,7 +189,7 @@ class GeminiService
         return $response;
     }
 
-    private function failureMessage(Response $response, string $step): string
+    private function failureMessage(Response $response, string $step, bool $vietnamese): string
     {
         Log::error("Gemini {$step}", [
             'status' => $response->status(),
@@ -177,9 +197,13 @@ class GeminiService
         ]);
 
         if (in_array($response->status(), [429, 503], true)) {
-            return 'Trợ lý AI đang quá tải, vui lòng thử lại sau một lát.';
+            return $vietnamese
+                ? 'Trợ lý AI đang quá tải, vui lòng thử lại sau một lát.'
+                : 'The assistant is busy. Please try again in a moment.';
         }
 
-        return 'Xin lỗi, hiện tại không thể kết nối tới trợ lý AI.';
+        return $vietnamese
+            ? 'Xin lỗi, hiện tại không thể kết nối tới trợ lý AI.'
+            : 'Sorry, the assistant is unavailable right now.';
     }
 }

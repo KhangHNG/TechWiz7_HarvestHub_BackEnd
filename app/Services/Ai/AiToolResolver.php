@@ -2,6 +2,7 @@
 
 namespace App\Services\Ai;
 
+use App\Models\Farmer;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
@@ -14,24 +15,35 @@ class AiToolResolver
             [
                 'function_declarations' => [
                     [
-                        'name' => 'searchProducts',
-                        'description' => 'Tra cứu nông sản trong cơ sở dữ liệu HarvestHub: tên, mô tả, giá, tồn kho, danh mục và trang trại. Gọi công cụ này trước khi trả lời mọi câu hỏi về sản phẩm.',
+                        'name' => 'get_product_stock',
+                        'description' => 'Look up HarvestHub product price and stock by Vietnamese catalog name and, if given, farm name.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'product_name' => [
+                                'product' => [
                                     'type' => 'STRING',
-                                    'description' => 'Tên hoặc một phần tên nông sản, ví dụ Cà chua, Rau muống, Xoài. Bỏ trống nếu người dùng hỏi chung.',
+                                    'description' => 'Vietnamese catalog name, for example cà chua bi, rau muống, xoài. Do not pass an English name.',
                                 ],
-                                'farmer_name' => [
+                                'farmer' => [
                                     'type' => 'STRING',
-                                    'description' => 'Tên trang trại hoặc nông dân, nếu người dùng nhắc tới.',
-                                ],
-                                'category_name' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Danh mục, ví dụ Vegetables, Fruits, nếu người dùng nhắc tới.',
+                                    'description' => 'Farm or farmer name, only when the user mentions one.',
                                 ],
                             ],
+                            'required' => ['product'],
+                        ],
+                    ],
+                    [
+                        'name' => 'get_pickup_slots',
+                        'description' => 'Look up the market, address, and opening hours for picking up goods from a farm.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'farmer' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Vietnamese farm or farmer name to look up pickup hours.',
+                                ],
+                            ],
+                            'required' => ['farmer'],
                         ],
                     ],
                 ],
@@ -44,38 +56,36 @@ class AiToolResolver
         Log::info("Gemini function: {$functionName}", $args);
 
         return match ($functionName) {
-            'searchProducts' => $this->searchProducts(
-                $args['product_name'] ?? null,
-                $args['farmer_name'] ?? null,
-                $args['category_name'] ?? null,
+            'get_product_stock' => $this->getProductStock(
+                (string) ($args['product'] ?? ''),
+                $args['farmer'] ?? null,
             ),
+            'get_pickup_slots' => $this->getPickupSlots((string) ($args['farmer'] ?? '')),
             default => ['error' => 'Function not found'],
         };
     }
 
-    private function searchProducts(?string $productName, ?string $farmerName, ?string $categoryName): array
+    private function getProductStock(string $productName, ?string $farmerName): array
     {
-        $query = Product::query()->with(['farmer', 'category']);
+        if (! $this->filled($productName)) {
+            return [
+                'status' => 'error',
+                'message' => 'missing_product',
+            ];
+        }
 
-        if ($this->filled($productName)) {
-            $like = $this->like($productName);
-            $query->where(function (Builder $inner) use ($like) {
+        $like = $this->like($productName);
+        $query = Product::query()
+            ->with('farmer')
+            ->where(function (Builder $inner) use ($like) {
                 $inner->where('name', 'like', $like)
                     ->orWhere('description', 'like', $like);
             });
-        }
 
         if ($this->filled($farmerName)) {
-            $like = $this->like($farmerName);
-            $query->whereHas('farmer', function (Builder $farmer) use ($like) {
-                $farmer->where('business_name', 'like', $like);
-            });
-        }
-
-        if ($this->filled($categoryName)) {
-            $like = $this->like($categoryName);
-            $query->whereHas('category', function (Builder $category) use ($like) {
-                $category->where('name', 'like', $like);
+            $farmerLike = $this->like($farmerName);
+            $query->whereHas('farmer', function (Builder $farmer) use ($farmerLike) {
+                $farmer->where('business_name', 'like', $farmerLike);
             });
         }
 
@@ -84,7 +94,7 @@ class AiToolResolver
         if ($products->isEmpty()) {
             return [
                 'status' => 'not_found',
-                'message' => 'Không có sản phẩm khớp với yêu cầu.',
+                'message' => 'not_found',
             ];
         }
 
@@ -93,12 +103,47 @@ class AiToolResolver
             'data' => $products->map(function (Product $product) {
                 return [
                     'product_name' => $product->name,
-                    'description' => $product->description,
-                    'category' => $product->category->name ?? null,
                     'farmer_name' => $product->farmer->business_name ?? null,
-                    'price' => number_format((float) $product->price).' VNĐ',
+                    'price' => number_format((float) $product->price).' VND',
                     'stock_qty' => $product->stock_qty,
                     'in_stock' => $product->stock_qty > 0,
+                ];
+            })->all(),
+        ];
+    }
+
+    private function getPickupSlots(string $farmerName): array
+    {
+        if (! $this->filled($farmerName)) {
+            return [
+                'status' => 'error',
+                'message' => 'missing_farmer',
+            ];
+        }
+
+        $like = $this->like($farmerName);
+        $farmers = Farmer::query()
+            ->with('market')
+            ->where('business_name', 'like', $like)
+            ->orderBy('business_name')
+            ->limit(5)
+            ->get();
+
+        if ($farmers->isEmpty()) {
+            return [
+                'status' => 'not_found',
+                'message' => 'not_found',
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'data' => $farmers->map(function (Farmer $farmer) {
+                return [
+                    'farmer_name' => $farmer->business_name,
+                    'market_name' => $farmer->market->name ?? null,
+                    'address' => $farmer->market->address ?? null,
+                    'operating_hours' => $farmer->market->operating_hours ?? null,
                 ];
             })->all(),
         ];
