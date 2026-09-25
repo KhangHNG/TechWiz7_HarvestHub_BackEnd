@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements FilamentUser, HasName
+class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
 {
     use HasFactory, Notifiable, SoftDeletes;
 
@@ -48,5 +49,17 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
+    {
+        return [
+            'role' => $this->role,
+        ];
     }
 }
