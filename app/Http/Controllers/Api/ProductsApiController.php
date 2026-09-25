@@ -17,7 +17,7 @@ class ProductsApiController extends Controller
     public function index(Request $request): JsonResponse
     {
         // 1. Khởi tạo query kèm eager loading để tránh N+1 query
-        $query = Product::query()->with(['farmer', 'category']);
+        $query = Product::query()->with(['farmer.market', 'category']);
 
         // 2. Lọc theo keyword (name hoặc description)
         if ($request->filled('keyword')) {
@@ -71,6 +71,30 @@ class ProductsApiController extends Controller
                 'total'        => $products->total(),
                 'has_more'     => $products->hasMorePages(),
             ]
+        ], 200);
+    }
+
+    /**
+     * Chi tiết 1 sản phẩm kèm nông dân, chợ, danh mục.
+     *
+     * GET /products/{id}
+     */
+    public function show(int $id): JsonResponse
+    {
+        $product = Product::query()
+            ->with(['farmer.market', 'farmer.user:id,full_name,phone', 'category'])
+            ->find($id);
+
+        if (! $product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy sản phẩm.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $product,
         ], 200);
     }
 }
