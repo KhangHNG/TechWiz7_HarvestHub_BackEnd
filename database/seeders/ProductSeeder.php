@@ -46,10 +46,13 @@ class ProductSeeder extends Seeder
                 'farmer_id' => $farmer->id,
                 'category_id' => $category->id,
                 'name' => $name,
-                'description' => $name . ' tươi, thu hoạch trong ngày từ ' . $farmer->business_name . '.',
+                'description' => $name.' tươi, thu hoạch trong ngày từ '.$farmer->business_name.'.',
                 'price' => $price,
                 'stock_qty' => 20 + ($index % 80),
-                'image_url' => 'https://example.com/images/product-' . ($index + 1) . '.jpg',
+                'image_url' => [
+                    'https://example.com/images/product-'.($index + 1).'-1.jpg',
+                    'https://example.com/images/product-'.($index + 1).'-2.jpg',
+                ],
             ]);
         }
     }

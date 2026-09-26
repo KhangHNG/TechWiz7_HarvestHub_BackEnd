@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class UserForm
@@ -25,6 +26,18 @@ class UserForm
                     ->required(),
                 TextInput::make('address')
                     ->default(null),
+                TextInput::make('city')
+                    ->label('Thành phố')
+                    ->maxLength(255)
+                    ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
+                TextInput::make('district')
+                    ->label('Quận / huyện')
+                    ->maxLength(255)
+                    ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
+                TextInput::make('capital')
+                    ->label('Tỉnh / thành')
+                    ->maxLength(255)
+                    ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
                 TextInput::make('role')
                     ->required()
                     ->default('CUSTOMER'),

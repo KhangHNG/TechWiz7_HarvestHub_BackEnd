@@ -6,10 +6,11 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     /**
      * Lấy danh sách sản phẩm có phân trang, tìm kiếm, lọc.
      */
@@ -64,11 +65,19 @@ class ProductService
      */
     public function createProduct(array $data)
     {
-        return DB::transaction(function () use ($data) {
-            $data = $this->storeUploadedImage($data);
+        $uploaded = [];
 
-            return Product::create($data);
-        });
+        try {
+            return DB::transaction(function () use ($data, &$uploaded) {
+                $data = $this->storeUploadedImages($data, $uploaded);
+
+                return Product::create($data);
+            });
+        } catch (\Throwable $exception) {
+            $this->cloudinary->deleteUrls($uploaded);
+
+            throw $exception;
+        }
     }
 
     /**
@@ -76,13 +85,21 @@ class ProductService
      */
     public function updateProduct(Product $product, array $data)
     {
-        return DB::transaction(function () use ($product, $data) {
-            $data = $this->storeUploadedImage($data, $product->image_url);
+        $uploaded = [];
 
-            $product->update($data);
+        try {
+            return DB::transaction(function () use ($product, $data, &$uploaded) {
+                $data = $this->storeUploadedImages($data, $uploaded);
 
-            return $product->fresh(['farmer', 'category']);
-        });
+                $product->update($data);
+
+                return $product->fresh(['farmer', 'category']);
+            });
+        } catch (\Throwable $exception) {
+            $this->cloudinary->deleteUrls($uploaded);
+
+            throw $exception;
+        }
     }
 
     /**
@@ -90,35 +107,36 @@ class ProductService
      */
     public function deleteProduct(Product $product)
     {
-        return DB::transaction(function () use ($product) {
-            $this->deleteStoredImage($product->image_url);
-
-            return $product->delete();
-        });
+        return DB::transaction(fn () => $product->delete());
     }
 
-    private function storeUploadedImage(array $data, ?string $previousPath = null): array
+    /**
+     * @param  array<int, string>  $uploaded
+     */
+    private function storeUploadedImages(array $data, array &$uploaded): array
     {
-        if (! isset($data['image_url']) || ! $data['image_url'] instanceof UploadedFile) {
+        if (! array_key_exists('image_url', $data) || ! is_array($data['image_url'])) {
             return $data;
         }
 
-        if (! $data['image_url']->isValid()) {
-            unset($data['image_url']);
+        $stored = [];
 
-            return $data;
+        foreach ($data['image_url'] as $image) {
+            if ($image instanceof UploadedFile) {
+                $url = $this->cloudinary->upload($image);
+                $uploaded[] = $url;
+                $stored[] = $url;
+
+                continue;
+            }
+
+            if (is_string($image) && $image !== '') {
+                $stored[] = $image;
+            }
         }
 
-        $this->deleteStoredImage($previousPath);
-        $data['image_url'] = $data['image_url']->store('products', 'public');
+        $data['image_url'] = array_values($stored);
 
         return $data;
-    }
-
-    private function deleteStoredImage(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
-        }
     }
 }
