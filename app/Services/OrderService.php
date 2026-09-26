@@ -11,7 +11,20 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    /**
+     * @var array<int, Order>
+     */
+    private array $placedOrders = [];
+
     public function __construct(private NotificationService $notifications) {}
+
+    /**
+     * @return array<int, Order>
+     */
+    public function placedOrders(): array
+    {
+        return $this->placedOrders;
+    }
 
     public function getOrders(Request $request)
     {
@@ -81,8 +94,9 @@ class OrderService
     {
         $previousStatus = $order->status;
         $stockChanges = [];
+        $placedOrders = [];
 
-        $order = DB::transaction(function () use ($order, $data, $previousStatus, &$stockChanges) {
+        $order = DB::transaction(function () use ($order, $data, $previousStatus, &$stockChanges, &$placedOrders) {
             $items = $data['items'] ?? null;
             unset($data['items']);
 
@@ -105,7 +119,8 @@ class OrderService
             $order = $order->fresh('items');
 
             if ($previousStatus === 'CART' && $order->status === 'PENDING') {
-                $stockChanges = $this->adjustStock($order, -1);
+                $placedOrders = $this->splitPendingByFarmer($order, $stockChanges);
+                $order = $placedOrders[0];
             }
 
             if (
@@ -120,18 +135,87 @@ class OrderService
                 $order = $order->fresh('items');
             }
 
+            if ($placedOrders === []) {
+                $placedOrders = [$order->fresh('items')];
+            }
+
             return $order;
         });
+
+        $this->placedOrders = $placedOrders;
 
         foreach ($stockChanges as [$product, $previous, $current]) {
             $this->notifications->stockChanged($product, $previous, $current);
         }
 
-        if (array_key_exists('status', $data) && $order->status !== $previousStatus) {
+        if ($previousStatus === 'CART' && $order->status === 'PENDING') {
+            foreach ($placedOrders as $placed) {
+                $this->notifications->orderStatusChanged($placed, 'CART');
+            }
+        } elseif (array_key_exists('status', $data) && $order->status !== $previousStatus) {
             $this->notifications->orderStatusChanged($order, $previousStatus);
         }
 
         return $order;
+    }
+
+    /**
+     * @param  array<int, array{0: Product, 1: int, 2: int}>  $stockChanges
+     * @return array<int, Order>
+     */
+    private function splitPendingByFarmer(Order $order, array &$stockChanges): array
+    {
+        $order->load(['items.product']);
+        $groups = $order->items->groupBy(function (OrderItem $item): int {
+            $product = $item->product;
+
+            if (! $product) {
+                throw new InsufficientStockException('Sản phẩm trong đơn không còn để cập nhật kho.');
+            }
+
+            return (int) $product->farmer_id;
+        });
+
+        if ($order->items->isEmpty()) {
+            throw new InsufficientStockException('Sản phẩm trong đơn không còn để cập nhật kho.');
+        }
+
+        $placed = [];
+        $firstFarmerId = (int) $groups->keys()->first();
+
+        foreach ($groups as $farmerId => $items) {
+            $farmerId = (int) $farmerId;
+
+            if ($farmerId === $firstFarmerId) {
+                continue;
+            }
+
+            $sibling = Order::query()->create([
+                'customer_id' => $order->customer_id,
+                'farmer_id' => $farmerId,
+                'delivery_address' => $order->delivery_address,
+                'status' => 'PENDING',
+                'total_price' => $items->sum('line_total'),
+            ]);
+
+            foreach ($items as $item) {
+                $item->update(['order_id' => $sibling->id]);
+            }
+
+            $sibling = $sibling->fresh('items');
+            $stockChanges = array_merge($stockChanges, $this->adjustStock($sibling, -1));
+            $placed[] = $sibling;
+        }
+
+        $kept = $groups->get($firstFarmerId) ?? $groups->first();
+        $order->update([
+            'farmer_id' => $firstFarmerId,
+            'total_price' => $kept->sum('line_total'),
+        ]);
+        $current = $order->fresh('items');
+        $stockChanges = array_merge($stockChanges, $this->adjustStock($current, -1));
+
+        return array_merge([$current], $placed);
     }
 
     /**

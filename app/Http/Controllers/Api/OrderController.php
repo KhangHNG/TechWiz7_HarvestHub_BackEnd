@@ -106,11 +106,14 @@ class OrderController extends Controller
 
         try {
             $order = $this->orderService->updateOrder($order, $validatedData);
+            $orders = collect($this->orderService->placedOrders())
+                ->each(fn (Order $placed) => $placed->loadMissing('items'));
 
             return response()->json([
                 'success' => true,
                 'message' => 'Cập nhật đơn hàng thành công.',
-                'data' => new OrderResource($order),
+                'data' => new OrderResource($order->loadMissing('items')),
+                'orders' => OrderResource::collection($orders),
             ], 200);
         } catch (InsufficientStockException $e) {
             return response()->json([

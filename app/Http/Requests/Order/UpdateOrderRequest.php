@@ -139,6 +139,6 @@ class UpdateOrderRequest extends ApiFormRequest
             return;
         }
 
-        $this->validateOrderLines($validator, $order->farmer_id);
+        $this->validateOrderLines($validator, null, false);
     }
 }

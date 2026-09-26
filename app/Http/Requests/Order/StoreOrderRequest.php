@@ -33,13 +33,15 @@ class StoreOrderRequest extends ApiFormRequest
         if ($user && $user->role === 'CUSTOMER') {
             $this->merge(['customer_id' => $user->id]);
         }
+
+        $this->merge(['farmer_id' => null]);
     }
 
     public function rules(): array
     {
         return [
             'customer_id' => ['required', $this->livingCustomer()],
-            'farmer_id' => ['required', $this->livingExists('farmers')],
+            'farmer_id' => ['nullable', $this->livingExists('farmers')],
             'delivery_address' => ['nullable', 'string'],
             'status' => ['required', 'in:CART'],
             'total_price' => ['nullable', 'numeric', 'min:0'],
@@ -89,7 +91,7 @@ class StoreOrderRequest extends ApiFormRequest
                 return;
             }
 
-            $this->validateOrderLines($validator, $this->input('farmer_id'));
+            $this->validateOrderLines($validator, null, false);
         });
     }
 }

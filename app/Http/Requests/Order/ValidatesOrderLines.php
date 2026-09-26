@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 
 trait ValidatesOrderLines
 {
-    protected function validateOrderLines(Validator $validator, mixed $farmerId): void
+    protected function validateOrderLines(Validator $validator, mixed $farmerId, bool $enforceFarmer = true): void
     {
         $items = $this->input('items', []);
         if (! is_array($items) || $items === []) {
@@ -31,7 +31,7 @@ trait ValidatesOrderLines
                 continue;
             }
 
-            if ((int) $product->farmer_id !== (int) $farmerId) {
+            if ($enforceFarmer && (int) $product->farmer_id !== (int) $farmerId) {
                 $validator->errors()->add(
                     "items.$index.product_id",
                     'Sản phẩm không thuộc nông dân của đơn hàng.',

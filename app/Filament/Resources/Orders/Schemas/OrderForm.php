@@ -8,7 +8,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -50,10 +49,15 @@ class OrderForm
     {
         $payload = [
             'customer_id' => $data['customer_id'],
-            'farmer_id' => $data['farmer_id'] ?: null,
             'delivery_address' => $data['delivery_address'] ?? null,
             'status' => $data['status'] ?? 'CART',
         ];
+
+        if ($withItems || $payload['status'] === 'CART') {
+            $payload['farmer_id'] = null;
+        } elseif (array_key_exists('farmer_id', $data)) {
+            $payload['farmer_id'] = $data['farmer_id'] ?: null;
+        }
 
         if (! $withItems) {
             return $payload;
@@ -94,8 +98,10 @@ class OrderForm
                     ->relationship('farmer', 'business_name')
                     ->searchable()
                     ->preload()
-                    ->live()
-                    ->required(),
+                    ->hidden(fn (?Order $record): bool => $record === null || $record->status === 'CART')
+                    ->required(fn (?Order $record): bool => $record !== null && $record->status !== 'CART')
+                    ->disabled(fn (?Order $record): bool => $record !== null && $record->status !== 'CART')
+                    ->dehydrated(fn (?Order $record): bool => $record !== null && $record->status !== 'CART'),
                 Textarea::make('delivery_address')
                     ->label('Địa chỉ giao hàng')
                     ->columnSpanFull(),
@@ -109,20 +115,28 @@ class OrderForm
                     ->schema([
                         Select::make('product_id')
                             ->label('Sản phẩm')
-                            ->options(function (Get $get): array {
-                                $farmerId = $get('../../farmer_id');
+                            ->options(fn (): array => Product::query()
+                                ->with('farmer')
+                                ->orderBy('name')
+                                ->get()
+                                ->mapWithKeys(function (Product $product): array {
+                                    $farmer = $product->farmer?->business_name;
+                                    $label = $farmer ? $product->name.' — '.$farmer : $product->name;
 
-                                if (! $farmerId) {
-                                    return [];
+                                    return [$product->id => $label];
+                                })
+                                ->all())
+                            ->getOptionLabelUsing(function ($value): ?string {
+                                $product = Product::withTrashed()->with('farmer')->find($value);
+
+                                if (! $product) {
+                                    return null;
                                 }
 
-                                return Product::query()
-                                    ->where('farmer_id', $farmerId)
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->all();
+                                $farmer = $product->farmer?->business_name;
+
+                                return $farmer ? $product->name.' — '.$farmer : $product->name;
                             })
-                            ->getOptionLabelUsing(fn ($value): ?string => Product::withTrashed()->find($value)?->name)
                             ->searchable()
                             ->required(),
                         TextInput::make('quantity')
