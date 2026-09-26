@@ -14,7 +14,10 @@ class OrdersChart extends ChartWidget
         $days = collect(range(6, 0))->map(fn ($i) => now()->subDays($i));
 
         $revenue = $days->map(function ($day) {
-            return Order::whereDate('created_at', $day->toDateString())->sum('total_price');
+            return Order::query()
+                ->where('status', 'COMPLETED')
+                ->whereRaw('DATE(COALESCE(completed_at, updated_at)) = ?', [$day->toDateString()])
+                ->sum('total_price');
         });
 
         return [

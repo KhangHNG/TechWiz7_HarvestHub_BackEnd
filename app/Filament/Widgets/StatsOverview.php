@@ -24,8 +24,8 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-clipboard-document-list')
                 ->color('warning'),
 
-            Stat::make('Tổng doanh thu', number_format(Order::sum('total_price')) . ' đ')
-                ->description('Tổng giá trị đơn hàng')
+            Stat::make('Tổng doanh thu', number_format(Order::query()->where('status', 'COMPLETED')->sum('total_price')).' đ')
+                ->description('Đơn đã hoàn thành')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('primary'),
 

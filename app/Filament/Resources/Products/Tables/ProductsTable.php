@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Filament\Tables\Filters\CreatedBetweenFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -10,8 +11,11 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductsTable
 {
@@ -57,6 +61,25 @@ class ProductsTable
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('farmer')
+                    ->label('Nông dân')
+                    ->relationship('farmer', 'business_name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('category')
+                    ->label('Danh mục')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
+                TernaryFilter::make('in_stock')
+                    ->label('Tồn kho')
+                    ->trueLabel('Còn hàng')
+                    ->falseLabel('Hết hàng')
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->where('stock_qty', '>', 0),
+                        false: fn (Builder $query): Builder => $query->where('stock_qty', '<=', 0),
+                    ),
+                CreatedBetweenFilter::make(),
                 TrashedFilter::make(),
             ])
             ->recordActions([

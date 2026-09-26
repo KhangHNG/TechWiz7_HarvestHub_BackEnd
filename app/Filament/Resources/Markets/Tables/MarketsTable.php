@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Markets\Tables;
 
+use App\Filament\Tables\Filters\CreatedBetweenFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -10,6 +11,7 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -54,6 +56,11 @@ class MarketsTable
                     ->sortable(),
             ])
             ->filters([
+                TernaryFilter::make('is_active')
+                    ->label('Đang hoạt động')
+                    ->trueLabel('Đang hoạt động')
+                    ->falseLabel('Ngừng hoạt động'),
+                CreatedBetweenFilter::make(),
                 TrashedFilter::make(),
             ])
             ->recordActions([

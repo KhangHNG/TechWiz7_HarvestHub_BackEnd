@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -41,6 +42,8 @@ class UserForm
                 TextInput::make('role')
                     ->required()
                     ->default('CUSTOMER'),
+                DateTimePicker::make('email_verified_at')
+                    ->label('Email đã xác thực lúc'),
                 TextInput::make('created_by')
                     ->numeric()
                     ->default(null),

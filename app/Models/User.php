@@ -6,6 +6,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,6 +26,7 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
         'district',
         'capital',
         'role',
+        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -70,5 +72,10 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
     public function farmer()
     {
         return $this->hasOne(Farmer::class);
+    }
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(FilamentDatabaseNotification::class, 'notifiable')->latest();
     }
 }

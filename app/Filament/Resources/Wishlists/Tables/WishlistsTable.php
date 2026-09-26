@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Tables;
+namespace App\Filament\Resources\Wishlists\Tables;
 
 use App\Filament\Tables\Filters\CreatedBetweenFilter;
 use Filament\Actions\BulkActionGroup;
@@ -10,40 +10,43 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
-class CategoriesTable
+class WishlistsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('customer.full_name')
+                    ->label('Khách hàng')
+                    ->searchable(),
+                TextColumn::make('product.name')
+                    ->label('Sản phẩm')
                     ->searchable(),
                 TextColumn::make('created_at')
+                    ->label('Ngày tạo')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('updated_by')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('deleted_by')
-                    ->numeric()
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('customer')
+                    ->label('Khách hàng')
+                    ->relationship(
+                        'customer',
+                        'full_name',
+                        fn (Builder $query): Builder => $query->where('role', 'CUSTOMER'),
+                    )
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('product')
+                    ->label('Sản phẩm')
+                    ->relationship('product', 'name')
+                    ->searchable()
+                    ->preload(),
                 CreatedBetweenFilter::make(),
                 TrashedFilter::make(),
             ])

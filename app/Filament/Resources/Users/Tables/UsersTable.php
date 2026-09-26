@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Tables\Filters\CreatedBetweenFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -28,6 +31,11 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('role')
                     ->searchable(),
+                TextColumn::make('email_verified_at')
+                    ->label('Email xác thực')
+                    ->dateTime()
+                    ->placeholder('Chưa xác thực')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -51,6 +59,19 @@ class UsersTable
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('role')
+                    ->label('Vai trò')
+                    ->options([
+                        'CUSTOMER' => 'Khách hàng',
+                        'FARMER' => 'Nông dân',
+                        'ADMIN' => 'Quản trị',
+                    ]),
+                TernaryFilter::make('email_verified_at')
+                    ->label('Email xác thực')
+                    ->nullable()
+                    ->trueLabel('Đã xác thực')
+                    ->falseLabel('Chưa xác thực'),
+                CreatedBetweenFilter::make(),
                 TrashedFilter::make(),
             ])
             ->recordActions([
