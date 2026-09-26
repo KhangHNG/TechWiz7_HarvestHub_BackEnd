@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('farmers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('market_id')->constrained('markets')->onDelete('set null');
+            $table->foreignId('market_id')->nullable()->constrained('markets')->nullOnDelete();
             $table->string('business_name');
             $table->text('description')->nullable();
             $table->float('rating')->default(0);

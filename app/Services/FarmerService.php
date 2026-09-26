@@ -10,7 +10,7 @@ class FarmerService
 {
     public function getFarmers(Request $request)
     {
-        $query = Farmer::query();
+        $query = Farmer::query()->with('user');
 
         if ($request->filled('keyword')) {
             $keyword = $request->keyword;

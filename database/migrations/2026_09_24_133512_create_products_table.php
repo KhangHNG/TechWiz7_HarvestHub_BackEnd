@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->double('price');
             $table->integer('stock_qty')->default(0);
-            $table->string('image_url', 500)->nullable();
+            $table->json('image_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedBigInteger('created_by')->nullable();

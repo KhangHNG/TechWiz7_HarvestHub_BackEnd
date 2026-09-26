@@ -76,7 +76,7 @@ class FarmerController extends Controller
      */
     public function findById($id): JsonResponse
     {
-        $farmer = Farmer::findOrFail($id);
+        $farmer = Farmer::with('user')->findOrFail($id);
 
         return response()->json([
             'success' => true,

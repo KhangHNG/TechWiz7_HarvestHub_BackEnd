@@ -15,7 +15,8 @@ class StoreProductRequest extends ApiFormRequest
             'farmer_id' => ['required', $this->livingExists('farmers')],
             'category_id' => ['required', $this->livingExists('categories')],
             'stock_qty' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'image_url' => ['required', 'array', 'min:1', 'max:10'],
+            'image_url.*' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
         ];
     }
 
@@ -29,6 +30,7 @@ class StoreProductRequest extends ApiFormRequest
             'category_id' => 'Danh mục',
             'stock_qty' => 'Số lượng tồn',
             'image_url' => 'Ảnh sản phẩm',
+            'image_url.*' => 'Ảnh sản phẩm',
         ];
     }
 
@@ -37,6 +39,8 @@ class StoreProductRequest extends ApiFormRequest
         return array_merge(parent::messages(), [
             'farmer_id.exists' => 'Nông dân không tồn tại.',
             'category_id.exists' => 'Danh mục không tồn tại.',
+            'image_url.min' => 'Sản phẩm cần ít nhất một ảnh.',
+            'image_url.max' => 'Sản phẩm chỉ được tối đa :max ảnh.',
         ]);
     }
 }

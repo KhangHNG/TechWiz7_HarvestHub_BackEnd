@@ -9,6 +9,7 @@
         "php": "^8.2",
         "ext-intl": "*",
         "ext-zip": "*",
+        "cloudinary/cloudinary_php": "^3.1",
         "filament/filament": "^4.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",

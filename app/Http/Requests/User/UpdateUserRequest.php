@@ -3,6 +3,8 @@
 namespace App\Http\Requests\User;
 
 use App\Http\Requests\ApiFormRequest;
+use App\Models\User;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends ApiFormRequest
@@ -24,6 +26,9 @@ class UpdateUserRequest extends ApiFormRequest
             'phone' => ['sometimes', 'required', 'digits:10'],
             'password' => ['sometimes', 'nullable', 'string', 'min:6'],
             'address' => ['sometimes', 'required', 'string'],
+            'city' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'district' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'capital' => ['sometimes', 'nullable', 'string', 'max:255'],
             'role' => ['sometimes', Rule::in(['CUSTOMER', 'FARMER', 'ADMIN'])],
         ];
     }
@@ -36,6 +41,9 @@ class UpdateUserRequest extends ApiFormRequest
             'phone' => 'Số điện thoại',
             'password' => 'Mật khẩu',
             'address' => 'Địa chỉ',
+            'city' => 'Thành phố',
+            'district' => 'Quận / huyện',
+            'capital' => 'Tỉnh / thành',
             'role' => 'Vai trò',
         ];
     }
@@ -47,5 +55,29 @@ class UpdateUserRequest extends ApiFormRequest
             'email.unique' => 'Email này đã tồn tại.',
             'phone.digits' => 'Số điện thoại phải là số và đủ 10 chữ số.',
         ]);
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $user = User::query()->find($this->route('id'));
+            $role = $this->input('role', $user?->role ?? 'CUSTOMER');
+
+            if (! in_array($role, ['CUSTOMER', 'FARMER'], true)) {
+                return;
+            }
+
+            foreach ([
+                'city' => 'Thành phố không được để trống.',
+                'district' => 'Quận / huyện không được để trống.',
+                'capital' => 'Tỉnh / thành không được để trống.',
+            ] as $field => $message) {
+                $value = $this->exists($field) ? $this->input($field) : $user?->{$field};
+
+                if (blank(is_string($value) ? trim($value) : $value)) {
+                    $validator->errors()->add($field, $message);
+                }
+            }
+        });
     }
 }
