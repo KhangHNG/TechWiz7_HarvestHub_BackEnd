@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserService;
@@ -49,16 +51,9 @@ class UserController extends Controller
     /**
      * POST /api/users
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:50',
-            'password' => 'required|string|min:6',
-            'address' => 'nullable|string',
-            'role' => 'nullable|in:CUSTOMER,FARMER,ADMIN',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $user = $this->userService->createUser($validatedData);
@@ -71,7 +66,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo người dùng thất bại: ' . $e->getMessage(),
+                'message' => 'Tạo người dùng thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -93,18 +88,11 @@ class UserController extends Controller
     /**
      * PUT /api/users/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateUserRequest $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'full_name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:50',
-            'password' => 'nullable|string|min:6',
-            'address' => 'nullable|string',
-            'role' => 'nullable|in:CUSTOMER,FARMER,ADMIN',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $user = $this->userService->updateUser($user, $validatedData);
@@ -117,7 +105,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật người dùng thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật người dùng thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -138,7 +126,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa người dùng thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa người dùng thất bại: '.$e->getMessage(),
             ], 400);
         }
     }

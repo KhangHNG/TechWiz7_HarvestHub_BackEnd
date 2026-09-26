@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
-        ]);
+        $credentials = $request->validated();
 
         if (! $token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Order\StoreOrderRequest;
+use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
@@ -49,21 +51,9 @@ class OrderController extends Controller
     /**
      * POST /api/orders
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreOrderRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'customer_id' => 'required|exists:users,id',
-            'farmer_id' => 'nullable|exists:farmers,id',
-            'delivery_address' => 'nullable|string',
-            'status' => 'nullable|in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED',
-            'total_price' => 'nullable|numeric|min:0',
-            'items' => 'nullable|array',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.product_name' => 'required|string|max:255',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.line_total' => 'required|numeric|min:0',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $order = $this->orderService->createOrder($validatedData);
@@ -76,7 +66,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo đơn hàng thất bại: ' . $e->getMessage(),
+                'message' => 'Tạo đơn hàng thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -98,23 +88,11 @@ class OrderController extends Controller
     /**
      * PUT /api/orders/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateOrderRequest $request, $id): JsonResponse
     {
         $order = Order::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'customer_id' => 'sometimes|required|exists:users,id',
-            'farmer_id' => 'nullable|exists:farmers,id',
-            'delivery_address' => 'nullable|string',
-            'status' => 'nullable|in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED',
-            'total_price' => 'nullable|numeric|min:0',
-            'items' => 'nullable|array',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.product_name' => 'required|string|max:255',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.line_total' => 'required|numeric|min:0',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $order = $this->orderService->updateOrder($order, $validatedData);
@@ -127,7 +105,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật đơn hàng thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật đơn hàng thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -148,7 +126,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa đơn hàng thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa đơn hàng thất bại: '.$e->getMessage(),
             ], 400);
         }
     }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Wishlist\StoreWishlistRequest;
+use App\Http\Requests\Wishlist\UpdateWishlistRequest;
 use App\Http\Resources\WishlistResource;
 use App\Models\Wishlist;
 use App\Services\WishlistService;
@@ -49,12 +51,9 @@ class WishlistController extends Controller
     /**
      * POST /api/wishlists
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreWishlistRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'customer_id' => 'required|exists:users,id',
-            'product_id' => 'required|exists:products,id',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $wishlist = $this->wishlistService->createWishlist($validatedData);
@@ -67,7 +66,7 @@ class WishlistController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Thêm yêu thích thất bại: ' . $e->getMessage(),
+                'message' => 'Thêm yêu thích thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -89,14 +88,11 @@ class WishlistController extends Controller
     /**
      * PUT /api/wishlists/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateWishlistRequest $request, $id): JsonResponse
     {
         $wishlist = Wishlist::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'customer_id' => 'sometimes|required|exists:users,id',
-            'product_id' => 'sometimes|required|exists:products,id',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $wishlist = $this->wishlistService->updateWishlist($wishlist, $validatedData);
@@ -109,7 +105,7 @@ class WishlistController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật yêu thích thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật yêu thích thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -130,7 +126,7 @@ class WishlistController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa yêu thích thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa yêu thích thất bại: '.$e->getMessage(),
             ], 400);
         }
     }
