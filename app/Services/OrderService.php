@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    public function __construct(private NotificationService $notifications) {}
+
     public function getOrders(Request $request)
     {
         $query = Order::query()->with('items');
@@ -42,7 +44,7 @@ class OrderService
 
     public function createOrder(array $data)
     {
-        return DB::transaction(function () use ($data) {
+        $order = DB::transaction(function () use ($data) {
             $items = $data['items'] ?? [];
             unset($data['items']);
 
@@ -67,11 +69,17 @@ class OrderService
 
             return $order->fresh('items');
         });
+
+        $this->notifications->orderCreated($order);
+
+        return $order;
     }
 
     public function updateOrder(Order $order, array $data)
     {
-        return DB::transaction(function () use ($order, $data) {
+        $previousStatus = $order->status;
+
+        $order = DB::transaction(function () use ($order, $data) {
             $items = $data['items'] ?? null;
             unset($data['items']);
 
@@ -93,6 +101,12 @@ class OrderService
 
             return $order->fresh('items');
         });
+
+        if (array_key_exists('status', $data) && $order->status !== $previousStatus) {
+            $this->notifications->orderStatusChanged($order, $previousStatus);
+        }
+
+        return $order;
     }
 
     public function deleteOrder(Order $order)

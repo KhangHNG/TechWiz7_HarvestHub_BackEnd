@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
-    public function __construct(private CloudinaryService $cloudinary) {}
+    public function __construct(
+        private CloudinaryService $cloudinary,
+        private NotificationService $notifications,
+    ) {}
 
     /**
      * Lấy danh sách sản phẩm có phân trang, tìm kiếm, lọc.
@@ -86,9 +89,10 @@ class ProductService
     public function updateProduct(Product $product, array $data)
     {
         $uploaded = [];
+        $previousStock = (int) $product->stock_qty;
 
         try {
-            return DB::transaction(function () use ($product, $data, &$uploaded) {
+            $product = DB::transaction(function () use ($product, $data, &$uploaded) {
                 $data = $this->storeUploadedImages($data, $uploaded);
 
                 $product->update($data);
@@ -100,6 +104,12 @@ class ProductService
 
             throw $exception;
         }
+
+        if (array_key_exists('stock_qty', $data)) {
+            $this->notifications->stockChanged($product, $previousStock, (int) $product->stock_qty);
+        }
+
+        return $product;
     }
 
     /**
