@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FarmerController;
 use App\Http\Controllers\Api\FarmerFollowController;
+use App\Http\Controllers\Api\FarmerRevenueController;
 use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
@@ -83,4 +84,5 @@ Route::middleware(['role:CUSTOMER'])->group(function () {
 
 Route::middleware(['role:FARMER'])->group(function () {
     Route::get('/farmer/ping', [AuthController::class, 'me']);
+    Route::get('/farmer/revenue', [FarmerRevenueController::class, 'index']);
 });
