@@ -17,7 +17,7 @@ class ProductResource extends JsonResource
             'id'          => $this->id,
             'name'        => $this->name,
             'price'       => $this->price,
-            'image_url'   => $this->image_url,
+            'image_url'   => $this->absoluteImageUrls(),
             'description' => $this->description,
             'farmer_id'   => $this->farmer_id,
             'category_id' => $this->category_id,
@@ -49,5 +49,23 @@ class ProductResource extends JsonResource
             'deleted_by' => $this->deleted_by,
             'updated_by' => $this->updated_by,
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function absoluteImageUrls(): array
+    {
+        return collect($this->image_url ?? [])
+            ->filter(fn ($url): bool => is_string($url) && $url !== '')
+            ->map(function (string $url): string {
+                if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+                    return $url;
+                }
+
+                return url($url);
+            })
+            ->values()
+            ->all();
     }
 }

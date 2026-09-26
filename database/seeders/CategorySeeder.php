@@ -7,9 +7,11 @@ use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
+    use SeedsAudit;
+
     public function run(): void
     {
-        $names = [
+        foreach ([
             'Rau củ',
             'Trái cây',
             'Ngũ cốc',
@@ -20,10 +22,8 @@ class CategorySeeder extends Seeder
             'Gia vị',
             'Nấm',
             'Mật ong',
-        ];
-
-        foreach ($names as $name) {
-            Category::create(['name' => $name]);
+        ] as $name) {
+            $this->createAudited(Category::class, ['name' => $name]);
         }
     }
 }

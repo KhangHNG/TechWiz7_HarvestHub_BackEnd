@@ -8,18 +8,29 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
+    use SeedsAudit;
+
     public function run(): void
     {
         $password = Hash::make('password123');
+        $verifiedAt = now();
 
-        User::create([
+        $admin = User::create([
             'full_name' => 'Quản trị viên',
             'email' => 'admin@example.com',
             'phone' => '0900000000',
             'password_hash' => $password,
             'address' => '1 Lê Duẩn, Quận 1, TP.HCM',
+            'city' => 'Hồ Chí Minh',
+            'district' => 'Quận 1',
+            'capital' => 'TP.HCM',
             'role' => 'ADMIN',
+            'email_verified_at' => $verifiedAt,
         ]);
+        $admin->forceFill([
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ])->save();
 
         $customers = [
             ['Nguyễn Văn An', '12 Lê Lợi, Quận 1, TP.HCM', 'Hồ Chí Minh', 'Quận 1', 'TP.HCM'],
@@ -38,7 +49,7 @@ class UserSeeder extends Seeder
 
         foreach ($customers as $index => [$name, $address, $city, $district, $capital]) {
             $n = $index + 1;
-            User::create([
+            $this->createAudited(User::class, [
                 'full_name' => $name,
                 'email' => "customer{$n}@example.com",
                 'phone' => '0901'.str_pad((string) $n, 6, '0', STR_PAD_LEFT),
@@ -48,6 +59,7 @@ class UserSeeder extends Seeder
                 'district' => $district,
                 'capital' => $capital,
                 'role' => 'CUSTOMER',
+                'email_verified_at' => $verifiedAt,
             ]);
         }
 
@@ -66,7 +78,7 @@ class UserSeeder extends Seeder
 
         foreach ($farmers as $index => [$name, $address, $city, $district, $capital]) {
             $n = $index + 1;
-            User::create([
+            $this->createAudited(User::class, [
                 'full_name' => $name,
                 'email' => "farmer{$n}@example.com",
                 'phone' => '0902'.str_pad((string) $n, 6, '0', STR_PAD_LEFT),
@@ -76,6 +88,7 @@ class UserSeeder extends Seeder
                 'district' => $district,
                 'capital' => $capital,
                 'role' => 'FARMER',
+                'email_verified_at' => $verifiedAt,
             ]);
         }
     }

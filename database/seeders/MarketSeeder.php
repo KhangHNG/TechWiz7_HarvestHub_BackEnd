@@ -7,6 +7,8 @@ use Illuminate\Database\Seeder;
 
 class MarketSeeder extends Seeder
 {
+    use SeedsAudit;
+
     public function run(): void
     {
         $markets = [
@@ -23,7 +25,7 @@ class MarketSeeder extends Seeder
         ];
 
         foreach ($markets as [$name, $address, $latitude, $longitude, $hours]) {
-            Market::create([
+            $this->createAudited(Market::class, [
                 'name' => $name,
                 'address' => $address,
                 'latitude' => $latitude,

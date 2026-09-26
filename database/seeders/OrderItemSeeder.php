@@ -9,24 +9,33 @@ use Illuminate\Database\Seeder;
 
 class OrderItemSeeder extends Seeder
 {
+    use SeedsAudit;
+
     public function run(): void
     {
         $orders = Order::query()->orderBy('id')->get();
-        $products = Product::query()->orderBy('id')->get();
 
-        foreach ($orders as $index => $order) {
-            $lineItems = [
-                $products[$index],
-                $products[$index + $orders->count()],
+        foreach ($orders as $order) {
+            $products = Product::query()
+                ->where('farmer_id', $order->farmer_id)
+                ->orderBy('id')
+                ->get();
+
+            $count = $products->count();
+            $shift = $order->status === 'CART' ? 0 : 2;
+            $start = ($order->customer_id + $shift) % $count;
+            $chosen = [
+                $products[$start],
+                $products[($start + 1) % $count],
             ];
             $total = 0;
 
-            foreach ($lineItems as $offset => $product) {
+            foreach ($chosen as $offset => $product) {
                 $quantity = $offset + 1;
-                $lineTotal = $product->price * $quantity;
+                $lineTotal = (float) $product->price * $quantity;
                 $total += $lineTotal;
 
-                OrderItem::create([
+                $this->createAudited(OrderItem::class, [
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'product_name' => $product->name,
@@ -34,6 +43,10 @@ class OrderItemSeeder extends Seeder
                     'quantity' => $quantity,
                     'line_total' => $lineTotal,
                 ]);
+
+                if (in_array($order->status, ['PENDING', 'CONFIRMED', 'READY_FOR_PICKUP', 'COMPLETED'], true)) {
+                    $product->decrement('stock_qty', $quantity);
+                }
             }
 
             $order->update(['total_price' => $total]);

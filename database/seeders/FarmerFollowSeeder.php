@@ -9,16 +9,22 @@ use Illuminate\Database\Seeder;
 
 class FarmerFollowSeeder extends Seeder
 {
+    use SeedsAudit;
+
     public function run(): void
     {
         $customers = User::query()->where('role', 'CUSTOMER')->orderBy('id')->get();
         $farmers = Farmer::query()->orderBy('id')->get();
 
-        foreach ($customers as $index => $customer) {
-            FarmerFollow::create([
-                'customer_id' => $customer->id,
-                'farmer_id' => $farmers[$index % $farmers->count()]->id,
-            ]);
+        foreach ($customers as $customerIndex => $customer) {
+            for ($slot = 0; $slot < 2; $slot++) {
+                $farmer = $farmers[($customerIndex + $slot) % $farmers->count()];
+
+                $this->createAudited(FarmerFollow::class, [
+                    'customer_id' => $customer->id,
+                    'farmer_id' => $farmer->id,
+                ]);
+            }
         }
     }
 }
