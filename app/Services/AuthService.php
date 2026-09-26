@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Mail\OtpMail;
+use App\Mail\VerifyEmailMail;
 use App\Models\EmailOtp;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class AuthService
 {
@@ -21,7 +23,7 @@ class AuthService
         $user = $this->users->createUser($data);
 
         try {
-            $this->sendOtp($user->email, 'verify');
+            $this->sendVerificationLink($user);
         } catch (\Throwable $e) {
             report($e);
             $user->delete();
@@ -32,16 +34,18 @@ class AuthService
         return $user;
     }
 
-    public function verifyEmail(string $email, string $otp): User
+    public function verifyFromSignedLink(int $id, string $hash): User
     {
-        $user = User::query()->where('email', $email)->first();
+        $user = User::query()->find($id);
 
-        if (! $user || ! $this->consumeOtp($email, 'verify', $otp)) {
-            throw new \RuntimeException('Mã OTP không đúng hoặc đã hết hạn.', 400);
+        if (! $user || ! hash_equals(sha1($user->email), $hash)) {
+            throw new \RuntimeException('Liên kết xác thực không hợp lệ hoặc đã hết hạn.', 403);
         }
 
-        $user->email_verified_at = now();
-        $user->save();
+        if ($user->email_verified_at === null) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
 
         return $user->fresh();
     }
@@ -58,7 +62,7 @@ class AuthService
             throw new \RuntimeException('Email đã được xác thực.', 400);
         }
 
-        $this->sendOtp($user->email, 'verify');
+        $this->sendVerificationLink($user);
     }
 
     public function sendResetOtp(string $email): void
@@ -102,11 +106,6 @@ class AuthService
         ];
     }
 
-    public function loginToken(User $user): string
-    {
-        return Auth::guard('api')->login($user);
-    }
-
     private function sendOtp(string $email, string $purpose): void
     {
         EmailOtp::query()
@@ -123,7 +122,21 @@ class AuthService
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        Mail::to($email)->send(new OtpMail($code, $purpose));
+        Mail::to($email)->send(new OtpMail($code));
+    }
+
+    private function sendVerificationLink(User $user): void
+    {
+        $url = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            [
+                'id' => $user->id,
+                'hash' => sha1($user->email),
+            ],
+        );
+
+        Mail::to($user->email)->send(new VerifyEmailMail($url));
     }
 
     private function consumeOtp(string $email, string $purpose, string $otp): bool

@@ -8,11 +8,11 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResendVerificationRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
-use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
@@ -28,27 +28,27 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đăng ký thành công. Mã xác thực đã được gửi tới email của bạn.',
+            'message' => 'Đăng ký thành công. Email xác thực đã được gửi. Hãy mở liên kết trong email.',
             'data' => [
                 'email' => $user->email,
             ],
         ], 201);
     }
 
-    public function verifyEmail(VerifyEmailRequest $request): JsonResponse
+    public function verifyFromLink(int $id, string $hash): View
     {
         try {
-            $user = $this->auth->verifyEmail($request->validated('email'), $request->validated('otp'));
+            $this->auth->verifyFromSignedLink($id, $hash);
         } catch (\RuntimeException $e) {
-            return $this->error($e);
+            return view('auth.email-verified', [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
         }
 
-        $token = $this->auth->loginToken($user);
-
-        return response()->json([
+        return view('auth.email-verified', [
             'success' => true,
-            'message' => 'Xác thực email thành công',
-            'data' => $this->auth->tokenPayload($user, $token),
+            'message' => 'Email đã được xác thực. Bạn có thể đăng nhập.',
         ]);
     }
 
@@ -62,7 +62,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Mã xác thực đã được gửi tới email của bạn.',
+            'message' => 'Email xác thực đã được gửi. Hãy mở liên kết trong email.',
         ]);
     }
 
@@ -123,7 +123,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Email chưa được xác thực. Vui lòng nhập mã OTP đã gửi tới email của bạn.',
+                'message' => 'Email chưa được xác thực. Hãy mở liên kết trong email xác thực.',
             ], 403);
         }
 
