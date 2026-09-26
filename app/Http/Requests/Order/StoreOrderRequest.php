@@ -3,20 +3,28 @@
 namespace App\Http\Requests\Order;
 
 use App\Http\Requests\ApiFormRequest;
-use App\Models\Order;
 use Illuminate\Contracts\Validation\Validator;
 
 class StoreOrderRequest extends ApiFormRequest
 {
+    use ValidatesOrderLines;
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('status')) {
+            $this->merge(['status' => 'CART']);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'customer_id' => ['required', $this->livingCustomer()],
-            'farmer_id' => ['nullable', $this->livingExists('farmers')],
+            'farmer_id' => ['required', $this->livingExists('farmers')],
             'delivery_address' => ['nullable', 'string'],
-            'status' => ['sometimes', 'in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED'],
+            'status' => ['required', 'in:CART'],
             'total_price' => ['nullable', 'numeric', 'min:0'],
-            'items' => ['nullable', 'array'],
+            'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'distinct', $this->livingExists('products')],
             'items.*.product_name' => ['required', 'string', 'max:255'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
@@ -47,6 +55,9 @@ class StoreOrderRequest extends ApiFormRequest
         return array_merge(parent::messages(), [
             'customer_id.exists' => 'Khách hàng không tồn tại hoặc không có vai trò CUSTOMER.',
             'farmer_id.exists' => 'Nông dân không tồn tại.',
+            'status.in' => 'Đơn mới chỉ được tạo ở trạng thái CART.',
+            'items.required' => 'Đơn hàng cần ít nhất một sản phẩm.',
+            'items.min' => 'Đơn hàng cần ít nhất một sản phẩm.',
             'items.*.product_id.exists' => 'Sản phẩm không tồn tại.',
             'items.*.product_id.distinct' => 'Sản phẩm bị trùng trong đơn hàng.',
         ]);
@@ -59,18 +70,7 @@ class StoreOrderRequest extends ApiFormRequest
                 return;
             }
 
-            $customerId = $this->input('customer_id');
-            $status = $this->input('status', 'CART');
-
-            $exists = Order::query()
-                ->where('customer_id', $customerId)
-                ->where('status', $status)
-                ->whereNull('deleted_at')
-                ->exists();
-
-            if ($exists) {
-                $validator->errors()->add('status', 'Khách hàng đã có đơn hàng với trạng thái này.');
-            }
+            $this->validateOrderLines($validator, $this->input('farmer_id'));
         });
     }
 }
