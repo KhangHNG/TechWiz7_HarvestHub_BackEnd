@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('full_name');
             $table->string('email');
-            $table->string('phone', 50)->nullable();
+            $table->string('phone', 10);
             $table->string('password_hash');
-            $table->text('address')->nullable();
+            $table->text('address');
             $table->enum('role', ['CUSTOMER', 'FARMER', 'ADMIN'])->default('CUSTOMER');
             $table->timestamps();
             $table->softDeletes();

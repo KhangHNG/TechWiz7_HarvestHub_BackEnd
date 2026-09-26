@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('markets', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('address')->nullable();
+            $table->text('address');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('operating_hours')->nullable();
