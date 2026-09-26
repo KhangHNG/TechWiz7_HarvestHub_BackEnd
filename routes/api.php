@@ -3,9 +3,11 @@
 use App\Http\Controllers\Api\AiChatController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FarmerController;
 use App\Http\Controllers\Api\FarmerFollowController;
 use App\Http\Controllers\Api\MarketController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
@@ -69,6 +71,10 @@ Route::delete('/follows/{id}', [FarmerFollowController::class, 'destroy']);
 Route::middleware(['role:CUSTOMER,FARMER,ADMIN'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/ai/chat', [AiChatController::class, 'chat']);
+    Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
+    Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'read']);
 });
 
 Route::middleware(['role:CUSTOMER'])->group(function () {

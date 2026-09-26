@@ -11,7 +11,7 @@ class StoreProductRequest extends ApiFormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'price' => ['required', 'numeric', 'min:1'],
             'farmer_id' => ['required', $this->livingExists('farmers')],
             'category_id' => ['required', $this->livingExists('categories')],
             'stock_qty' => ['required', 'integer', 'min:0'],

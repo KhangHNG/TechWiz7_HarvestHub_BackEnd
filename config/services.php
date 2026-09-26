@@ -47,4 +47,8 @@ return [
         'folder' => env('CLOUDINARY_FOLDER', 'products'),
     ],
 
+    'firebase' => [
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+    ],
+
 ];
