@@ -34,6 +34,7 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
 
     protected $casts = [
         'password_hash' => 'hashed',
+        'email_verified_at' => 'datetime',
     ];
 
     // Filament/Laravel auth đọc mật khẩu qua đây thay vì cột "password"
