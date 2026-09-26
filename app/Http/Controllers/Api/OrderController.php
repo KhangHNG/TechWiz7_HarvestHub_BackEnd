@@ -8,7 +8,10 @@ use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\User;
+use App\Services\OrderAuthorization;
 use App\Services\OrderService;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,8 +19,10 @@ class OrderController extends Controller
 {
     protected $orderService;
 
-    public function __construct(OrderService $orderService)
-    {
+    public function __construct(
+        OrderService $orderService,
+        private OrderAuthorization $orderAuthorization,
+    ) {
         $this->orderService = $orderService;
     }
 
@@ -26,6 +31,8 @@ class OrderController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $this->orderAuthorization->scopeIndex($this->actor($request), $request);
+
         $orders = $this->orderService->getOrders($request);
 
         if ($request->boolean('all')) {
@@ -75,9 +82,10 @@ class OrderController extends Controller
     /**
      * GET /api/orders/{id}
      */
-    public function findById($id): JsonResponse
+    public function findById(Request $request, $id): JsonResponse
     {
         $order = Order::with('items')->findOrFail($id);
+        $this->orderAuthorization->assertCanView($this->actor($request), $order);
 
         return response()->json([
             'success' => true,
@@ -94,6 +102,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         $validatedData = $request->validated();
+        $this->orderAuthorization->assertCanUpdate($this->actor($request), $order, $validatedData);
 
         try {
             $order = $this->orderService->updateOrder($order, $validatedData);
@@ -119,10 +128,12 @@ class OrderController extends Controller
     /**
      * DELETE /api/orders/{id}
      */
-    public function destroy($id): JsonResponse
+    public function destroy(Request $request, $id): JsonResponse
     {
+        $order = Order::findOrFail($id);
+        $this->orderAuthorization->assertCanDelete($this->actor($request), $order);
+
         try {
-            $order = Order::findOrFail($id);
             $this->orderService->deleteOrder($order);
 
             return response()->json([
@@ -135,5 +146,19 @@ class OrderController extends Controller
                 'message' => 'Xóa đơn hàng thất bại: '.$e->getMessage(),
             ], 400);
         }
+    }
+
+    private function actor(Request $request): User
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            throw new HttpResponseException(response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy thông tin người dùng.',
+            ], 404));
+        }
+
+        return $user;
     }
 }

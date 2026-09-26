@@ -4,15 +4,34 @@ namespace App\Http\Requests\Order;
 
 use App\Http\Requests\ApiFormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreOrderRequest extends ApiFormRequest
 {
     use ValidatesOrderLines;
 
+    public function authorize(): bool
+    {
+        return $this->user()?->role === 'CUSTOMER';
+    }
+
+    protected function failedAuthorization(): void
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Chỉ khách hàng mới được tạo đơn hàng.',
+        ], 403));
+    }
+
     protected function prepareForValidation(): void
     {
         if (! $this->filled('status')) {
             $this->merge(['status' => 'CART']);
+        }
+
+        $user = $this->user();
+        if ($user && $user->role === 'CUSTOMER') {
+            $this->merge(['customer_id' => $user->id]);
         }
     }
 

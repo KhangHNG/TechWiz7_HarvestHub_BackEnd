@@ -50,6 +50,8 @@ class CheckRole
             ], 401);
         }
 
+        $request->setUserResolver(static fn () => $user);
+
         return $next($request);
     }
 }

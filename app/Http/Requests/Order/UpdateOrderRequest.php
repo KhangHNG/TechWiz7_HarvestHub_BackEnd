@@ -25,8 +25,6 @@ class UpdateOrderRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['sometimes', 'required', $this->livingCustomer()],
-            'farmer_id' => ['sometimes', 'required', $this->livingExists('farmers')],
             'delivery_address' => ['nullable', 'string'],
             'status' => ['sometimes', 'in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED'],
             'total_price' => ['nullable', 'numeric', 'min:0'],
@@ -42,8 +40,6 @@ class UpdateOrderRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'customer_id' => 'Khách hàng',
-            'farmer_id' => 'Nông dân',
             'delivery_address' => 'Địa chỉ giao hàng',
             'status' => 'Trạng thái',
             'total_price' => 'Tổng tiền',
@@ -59,8 +55,6 @@ class UpdateOrderRequest extends ApiFormRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'customer_id.exists' => 'Khách hàng không tồn tại hoặc không có vai trò CUSTOMER.',
-            'farmer_id.exists' => 'Nông dân không tồn tại.',
             'items.min' => 'Đơn hàng cần ít nhất một sản phẩm.',
             'items.*.product_id.exists' => 'Sản phẩm không tồn tại.',
             'items.*.product_id.distinct' => 'Sản phẩm bị trùng trong đơn hàng.',
@@ -145,7 +139,6 @@ class UpdateOrderRequest extends ApiFormRequest
             return;
         }
 
-        $farmerId = $this->input('farmer_id', $order->farmer_id);
-        $this->validateOrderLines($validator, $farmerId);
+        $this->validateOrderLines($validator, $order->farmer_id);
     }
 }

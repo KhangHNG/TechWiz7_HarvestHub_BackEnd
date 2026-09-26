@@ -39,12 +39,6 @@ Route::get('/users/{id}', [UserController::class, 'findById']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
-Route::get('/orders', [OrderController::class, 'index']);
-Route::post('/orders', [OrderController::class, 'store']);
-Route::get('/orders/{id}', [OrderController::class, 'findById']);
-Route::put('/orders/{id}', [OrderController::class, 'update']);
-Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
-
 Route::get('/farmers', [FarmerController::class, 'index']);
 Route::post('/farmers', [FarmerController::class, 'store']);
 Route::get('/farmers/{id}', [FarmerController::class, 'findById']);
@@ -70,6 +64,12 @@ Route::put('/follows/{id}', [FarmerFollowController::class, 'update']);
 Route::delete('/follows/{id}', [FarmerFollowController::class, 'destroy']);
 
 Route::middleware(['role:CUSTOMER,FARMER,ADMIN'])->group(function () {
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{id}', [OrderController::class, 'findById']);
+    Route::put('/orders/{id}', [OrderController::class, 'update']);
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/ai/chat', [AiChatController::class, 'chat']);
     Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
