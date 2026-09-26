@@ -14,13 +14,14 @@ class UpdateUserRequest extends ApiFormRequest
             'email' => [
                 'sometimes',
                 'required',
-                'email',
+                'string',
+                'email:rfc,filter',
                 'max:255',
                 Rule::unique('users', 'email')
                     ->ignore($this->route('id'))
                     ->where(fn ($query) => $query->whereNull('deleted_at')),
             ],
-            'phone' => ['sometimes', 'required', 'string', 'regex:/^0\d{9}$/'],
+            'phone' => ['sometimes', 'required', 'digits:10'],
             'password' => ['sometimes', 'nullable', 'string', 'min:6'],
             'address' => ['sometimes', 'required', 'string'],
             'role' => ['sometimes', Rule::in(['CUSTOMER', 'FARMER', 'ADMIN'])],
@@ -42,8 +43,9 @@ class UpdateUserRequest extends ApiFormRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
+            'email.email' => 'Email không đúng định dạng.',
             'email.unique' => 'Email này đã tồn tại.',
-            'phone.regex' => 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0.',
+            'phone.digits' => 'Số điện thoại phải là số và đủ 10 chữ số.',
         ]);
     }
 }
