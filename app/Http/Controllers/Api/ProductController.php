@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -42,17 +44,9 @@ class ProductController extends Controller
     /**
      * POST /api/products
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreProductRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:1',
-            'farmer_id' => 'required|exists:farmers,id',
-            'category_id' => 'required|exists:categories,id',
-            'stock_qty' => 'required|numeric|min:1',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validatedData = $request->validated();
 
         $product = $this->productService->createProduct($validatedData);
 
@@ -80,19 +74,11 @@ class ProductController extends Controller
     /**
      * PUT /api/products/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateProductRequest $request, $id): JsonResponse
     {
         $product = Product::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'sometimes|required|numeric|min:1',
-            'farmer_id' => 'sometimes|required|exists:farmers,id',
-            'category_id' => 'sometimes|required|exists:categories,id',
-            'stock_qty' => 'sometimes|required|numeric|min:1',
-            'image_url' => 'nullable|string|max:500',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $product = $this->productService->updateProduct($product, $validatedData);

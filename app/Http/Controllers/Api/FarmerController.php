@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Farmer\StoreFarmerRequest;
+use App\Http\Requests\Farmer\UpdateFarmerRequest;
 use App\Http\Resources\FarmerResource;
 use App\Models\Farmer;
 use App\Services\FarmerService;
@@ -49,15 +51,9 @@ class FarmerController extends Controller
     /**
      * POST /api/farmers
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreFarmerRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'market_id' => 'nullable|exists:markets,id',
-            'business_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'rating' => 'nullable|numeric|min:0|max:5',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $farmer = $this->farmerService->createFarmer($validatedData);
@@ -70,7 +66,7 @@ class FarmerController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo nông dân thất bại: ' . $e->getMessage(),
+                'message' => 'Tạo nông dân thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -92,17 +88,11 @@ class FarmerController extends Controller
     /**
      * PUT /api/farmers/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateFarmerRequest $request, $id): JsonResponse
     {
         $farmer = Farmer::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'user_id' => 'sometimes|required|exists:users,id',
-            'market_id' => 'nullable|exists:markets,id',
-            'business_name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'rating' => 'nullable|numeric|min:0|max:5',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $farmer = $this->farmerService->updateFarmer($farmer, $validatedData);
@@ -115,7 +105,7 @@ class FarmerController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật nông dân thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật nông dân thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -136,7 +126,7 @@ class FarmerController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa nông dân thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa nông dân thất bại: '.$e->getMessage(),
             ], 400);
         }
     }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Market\StoreMarketRequest;
+use App\Http\Requests\Market\UpdateMarketRequest;
 use App\Http\Resources\MarketResource;
 use App\Models\Market;
 use App\Services\MarketService;
@@ -49,16 +51,9 @@ class MarketController extends Controller
     /**
      * POST /api/markets
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreMarketRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'operating_hours' => 'nullable|string|max:255',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $market = $this->marketService->createMarket($validatedData);
@@ -71,7 +66,7 @@ class MarketController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo chợ thất bại: ' . $e->getMessage(),
+                'message' => 'Tạo chợ thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -93,18 +88,11 @@ class MarketController extends Controller
     /**
      * PUT /api/markets/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateMarketRequest $request, $id): JsonResponse
     {
         $market = Market::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'address' => 'nullable|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'operating_hours' => 'nullable|string|max:255',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $market = $this->marketService->updateMarket($market, $validatedData);
@@ -117,7 +105,7 @@ class MarketController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật chợ thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật chợ thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -138,7 +126,7 @@ class MarketController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa chợ thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa chợ thất bại: '.$e->getMessage(),
             ], 400);
         }
     }

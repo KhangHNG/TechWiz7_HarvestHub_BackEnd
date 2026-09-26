@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FarmerFollow\StoreFarmerFollowRequest;
+use App\Http\Requests\FarmerFollow\UpdateFarmerFollowRequest;
 use App\Http\Resources\FarmerFollowResource;
 use App\Models\FarmerFollow;
 use App\Services\FarmerFollowService;
@@ -49,12 +51,9 @@ class FarmerFollowController extends Controller
     /**
      * POST /api/follows
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreFarmerFollowRequest $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'customer_id' => 'required|exists:users,id',
-            'farmer_id' => 'required|exists:farmers,id',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $follow = $this->farmerFollowService->createFollow($validatedData);
@@ -67,7 +66,7 @@ class FarmerFollowController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Theo dõi nông dân thất bại: ' . $e->getMessage(),
+                'message' => 'Theo dõi nông dân thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -89,14 +88,11 @@ class FarmerFollowController extends Controller
     /**
      * PUT /api/follows/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateFarmerFollowRequest $request, $id): JsonResponse
     {
         $follow = FarmerFollow::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'customer_id' => 'sometimes|required|exists:users,id',
-            'farmer_id' => 'sometimes|required|exists:farmers,id',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $follow = $this->farmerFollowService->updateFollow($follow, $validatedData);
@@ -109,7 +105,7 @@ class FarmerFollowController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật theo dõi thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật theo dõi thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -130,7 +126,7 @@ class FarmerFollowController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bỏ theo dõi thất bại: ' . $e->getMessage(),
+                'message' => 'Bỏ theo dõi thất bại: '.$e->getMessage(),
             ], 400);
         }
     }

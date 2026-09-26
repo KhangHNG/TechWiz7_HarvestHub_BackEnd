@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Exception;
 
 class ProductService
 {
@@ -55,6 +55,7 @@ class ProductService
 
         // 6. Phân trang
         $perPage = $request->get('per_page', 10);
+
         return $query->paginate($perPage);
     }
 
@@ -64,10 +65,7 @@ class ProductService
     public function createProduct(array $data)
     {
         return DB::transaction(function () use ($data) {
-            // Xử lý lưu ảnh nếu request có gửi file hình ảnh
-            if (isset($data['image']) && $data['image']->isValid()) {
-                $data['image'] = $data['image']->store('products', 'public');
-            }
+            $data = $this->storeUploadedImage($data);
 
             return Product::create($data);
         });
@@ -79,15 +77,10 @@ class ProductService
     public function updateProduct(Product $product, array $data)
     {
         return DB::transaction(function () use ($product, $data) {
-            // Nếu có ảnh mới thì xóa ảnh cũ và lưu ảnh mới
-            if (isset($data['image']) && $data['image']->isValid()) {
-                if ($product->image && Storage::disk('public')->exists($product->image)) {
-                    Storage::disk('public')->delete($product->image);
-                }
-                $data['image'] = $data['image']->store('products', 'public');
-            }
+            $data = $this->storeUploadedImage($data, $product->image_url);
 
             $product->update($data);
+
             return $product->fresh(['farmer', 'category']);
         });
     }
@@ -98,12 +91,34 @@ class ProductService
     public function deleteProduct(Product $product)
     {
         return DB::transaction(function () use ($product) {
-            // Xóa file ảnh vật lý nếu có
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
-            }
+            $this->deleteStoredImage($product->image_url);
 
             return $product->delete();
         });
+    }
+
+    private function storeUploadedImage(array $data, ?string $previousPath = null): array
+    {
+        if (! isset($data['image_url']) || ! $data['image_url'] instanceof UploadedFile) {
+            return $data;
+        }
+
+        if (! $data['image_url']->isValid()) {
+            unset($data['image_url']);
+
+            return $data;
+        }
+
+        $this->deleteStoredImage($previousPath);
+        $data['image_url'] = $data['image_url']->store('products', 'public');
+
+        return $data;
+    }
+
+    private function deleteStoredImage(?string $path): void
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }

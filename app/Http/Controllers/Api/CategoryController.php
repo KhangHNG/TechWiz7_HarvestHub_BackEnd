@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Services\CategoryService;
-use App\Http\Resources\CategoryResource;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -29,7 +32,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lấy tất cả danh mục thành công.',
-                'data'    => CategoryResource::collection($categories),
+                'data' => CategoryResource::collection($categories),
             ], 200);
         }
 
@@ -37,25 +40,19 @@ class CategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Lấy danh sách danh mục thành công.',
-            'data'    => CategoryResource::collection($categories),
-            'meta'    => [
+            'data' => CategoryResource::collection($categories),
+            'meta' => [
                 'current_page' => $categories->currentPage(),
-                'last_page'    => $categories->lastPage(),
-                'per_page'     => $categories->perPage(),
-                'total'        => $categories->total(),
-            ]
+                'last_page' => $categories->lastPage(),
+                'per_page' => $categories->perPage(),
+                'total' => $categories->total(),
+            ],
         ], 200);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
-        // 1. Validate dữ liệu đầu vào
-        $validatedData = $request->validate([
-            'name'        => 'required|string|max:255|unique:categories,name',
-        ], [
-            'name.required' => 'Tên danh mục không được để trống.',
-            'name.unique'   => 'Tên danh mục này đã tồn tại.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             // 2. Gọi Service để xử lý logic tạo mới và upload ảnh (nếu có)
@@ -65,14 +62,14 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Tạo danh mục mới thành công.',
-                'data'    => new CategoryResource($category),
+                'data' => new CategoryResource($category),
             ], 201); // HTTP Status 201 Created
 
         } catch (\Exception $e) {
             // Xử lý bắt lỗi nếu có sự cố phát sinh (ví dụ: lỗi lưu storage)
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo danh mục thất bại: ' . $e->getMessage(),
+                'message' => 'Tạo danh mục thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -94,16 +91,11 @@ class CategoryController extends Controller
     /**
      * PUT /api/categories/{id}
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateCategoryRequest $request, $id): JsonResponse
     {
         $category = Category::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255|unique:categories,name,' . $category->id,
-        ], [
-            'name.required' => 'Tên danh mục không được để trống.',
-            'name.unique' => 'Tên danh mục này đã tồn tại.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $category = $this->categoryService->updateCategory($category, $validatedData);
@@ -116,7 +108,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật danh mục thất bại: ' . $e->getMessage(),
+                'message' => 'Cập nhật danh mục thất bại: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -144,7 +136,7 @@ class CategoryController extends Controller
             // Bắt lỗi ngoại lệ (ví dụ: danh mục vẫn còn chứa sản phẩm do Service chặn lại)
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa danh mục thất bại: ' . $e->getMessage(),
+                'message' => 'Xóa danh mục thất bại: '.$e->getMessage(),
             ], 400); // Trả về mã lỗi 400 Bad Request cho các lỗi liên quan đến nghiệp vụ
         }
     }
