@@ -27,6 +27,7 @@ class UpdateOrderRequest extends ApiFormRequest
         return [
             'delivery_address' => ['nullable', 'string'],
             'status' => ['sometimes', 'in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED'],
+            'payment_method' => ['sometimes', 'in:COD,BANK_TRANSFER'],
             'total_price' => ['nullable', 'numeric', 'min:0'],
             'items' => ['sometimes', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'distinct', $this->livingExists('products')],
@@ -42,6 +43,7 @@ class UpdateOrderRequest extends ApiFormRequest
         return [
             'delivery_address' => 'Địa chỉ giao hàng',
             'status' => 'Trạng thái',
+            'payment_method' => 'Phương thức thanh toán',
             'total_price' => 'Tổng tiền',
             'items' => 'Sản phẩm trong đơn',
             'items.*.product_id' => 'Sản phẩm',
@@ -74,6 +76,7 @@ class UpdateOrderRequest extends ApiFormRequest
             }
 
             $this->validateStatusChange($validator, $order);
+            $this->validatePaymentMethod($validator, $order);
             $this->validateItemChange($validator, $order);
         });
     }
@@ -125,6 +128,25 @@ class UpdateOrderRequest extends ApiFormRequest
                 'Đơn hàng cần ít nhất một sản phẩm trước khi chuyển trạng thái.',
             );
         }
+    }
+
+    private function validatePaymentMethod(Validator $validator, Order $order): void
+    {
+        if (! $this->exists('payment_method')) {
+            return;
+        }
+
+        $current = (string) $order->status;
+        $next = $this->exists('status') ? (string) $this->input('status') : $current;
+
+        if ($current === 'CART' && $next === 'PENDING') {
+            return;
+        }
+
+        $validator->errors()->add(
+            'payment_method',
+            'Chỉ được chọn phương thức thanh toán khi đặt đơn.',
+        );
     }
 
     private function validateItemChange(Validator $validator, Order $order): void

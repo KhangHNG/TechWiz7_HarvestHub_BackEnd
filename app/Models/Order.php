@@ -10,7 +10,7 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['customer_id', 'farmer_id', 'delivery_address', 'status', 'total_price', 'completed_at'];
+    protected $fillable = ['customer_id', 'farmer_id', 'delivery_address', 'status', 'payment_method', 'total_price', 'completed_at'];
 
     protected $casts = [
         'completed_at' => 'datetime',

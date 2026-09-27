@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\FarmerNotAcceptingOrdersException;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Farmer;
+use App\Models\FarmerWalletTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -146,6 +147,7 @@ class OrderService
 
             if ($previousStatus !== 'COMPLETED' && $order->status === 'COMPLETED' && $order->completed_at === null) {
                 $order->update(['completed_at' => now()]);
+                $this->creditBankTransfer($order);
                 $order = $order->fresh('items');
             }
 
@@ -209,6 +211,7 @@ class OrderService
                 'farmer_id' => $farmerId,
                 'delivery_address' => $order->delivery_address,
                 'status' => 'PENDING',
+                'payment_method' => $order->payment_method,
                 'total_price' => $items->sum('line_total'),
             ]);
 
@@ -230,6 +233,20 @@ class OrderService
         $stockChanges = array_merge($stockChanges, $this->adjustStock($current, -1));
 
         return array_merge([$current], $placed);
+    }
+
+    private function creditBankTransfer(Order $order): void
+    {
+        if ($order->payment_method !== 'BANK_TRANSFER' || $order->farmer_id === null) {
+            return;
+        }
+
+        FarmerWalletTransaction::query()->create([
+            'farmer_id' => $order->farmer_id,
+            'order_id' => $order->id,
+            'amount' => $order->total_price,
+            'type' => 'credit',
+        ]);
     }
 
     /**

@@ -15,6 +15,7 @@ class OrderResource extends JsonResource
             'farmer_id' => $this->farmer_id,
             'delivery_address' => $this->delivery_address,
             'status' => $this->status,
+            'payment_method' => $this->payment_method,
             'total_price' => $this->total_price,
             'completed_at' => $this->completed_at?->toIso8601String(),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
