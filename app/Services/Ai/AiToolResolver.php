@@ -16,13 +16,17 @@ class AiToolResolver
                 'function_declarations' => [
                     [
                         'name' => 'list_products',
-                        'description' => 'List HarvestHub products in the catalog. Use for questions about which products exist. Optional keyword filters by product name or description.',
+                        'description' => 'List HarvestHub products in the catalog. Use for questions about which products exist, including products of a named farmer. Optional keyword filters by product name or description. Optional farmer filters by farm name.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
                                 'keyword' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional Vietnamese product keyword. Omit it to list the catalog.',
+                                ],
+                                'farmer' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Optional Vietnamese farm or farmer name. Omit it when the user does not name a farmer.',
                                 ],
                             ],
                         ],
@@ -69,7 +73,7 @@ class AiToolResolver
         Log::info("Gemini function: {$functionName}", $args);
 
         return match ($functionName) {
-            'list_products' => $this->listProducts($args['keyword'] ?? null),
+            'list_products' => $this->listProducts($args['keyword'] ?? null, $args['farmer'] ?? null),
             'get_product_stock' => $this->getProductStock(
                 (string) ($args['product'] ?? ''),
                 $args['farmer'] ?? null,
@@ -79,7 +83,7 @@ class AiToolResolver
         };
     }
 
-    private function listProducts(mixed $keyword): array
+    private function listProducts(mixed $keyword, mixed $farmerName = null): array
     {
         $query = Product::query()->with(['farmer', 'category'])->orderBy('name');
 
@@ -88,6 +92,13 @@ class AiToolResolver
             $query->where(function (Builder $inner) use ($like) {
                 $inner->where('name', 'like', $like)
                     ->orWhere('description', 'like', $like);
+            });
+        }
+
+        if (is_string($farmerName) && $this->filled($farmerName)) {
+            $farmerLike = $this->like($farmerName);
+            $query->whereHas('farmer', function (Builder $farmer) use ($farmerLike) {
+                $farmer->where('business_name', 'like', $farmerLike);
             });
         }
 

@@ -47,14 +47,16 @@ class ProfileImageTest extends TestCase
         $cloudinary->shouldReceive('deleteByUrl')->once()->with($secondCover);
         $this->app->instance(CloudinaryService::class, $cloudinary);
 
-        $this->post('/api/users/'.$user->id.'/avatar', [
-            'avatar' => UploadedFile::fake()->image('avatar.jpg'),
-        ])->assertOk()
+        $this->withToken(JWTAuth::fromUser($user))
+            ->post('/api/users/'.$user->id.'/avatar', [
+                'avatar' => UploadedFile::fake()->image('avatar.jpg'),
+            ])->assertOk()
             ->assertJsonPath('data.avatar_url', $customerFirst);
 
-        $this->post('/api/users/'.$user->id.'/avatar', [
-            'avatar' => UploadedFile::fake()->image('avatar-2.jpg'),
-        ])->assertOk()
+        $this->withToken(JWTAuth::fromUser($user))
+            ->post('/api/users/'.$user->id.'/avatar', [
+                'avatar' => UploadedFile::fake()->image('avatar-2.jpg'),
+            ])->assertOk()
             ->assertJsonPath('data.avatar_url', $customerSecond);
 
         $this->assertDatabaseHas('users', [
@@ -67,14 +69,16 @@ class ProfileImageTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.avatar_url', $customerSecond);
 
-        $this->post('/api/farmers/'.$farmer->id.'/cover', [
-            'cover' => UploadedFile::fake()->image('cover.jpg'),
-        ])->assertOk()
+        $this->withToken(JWTAuth::fromUser($owner))
+            ->post('/api/farmers/'.$farmer->id.'/cover', [
+                'cover' => UploadedFile::fake()->image('cover.jpg'),
+            ])->assertOk()
             ->assertJsonPath('data.cover_url', $firstCover);
 
-        $this->post('/api/farmers/'.$farmer->id.'/cover', [
-            'cover' => UploadedFile::fake()->image('cover-2.jpg'),
-        ])->assertOk()
+        $this->withToken(JWTAuth::fromUser($owner))
+            ->post('/api/farmers/'.$farmer->id.'/cover', [
+                'cover' => UploadedFile::fake()->image('cover-2.jpg'),
+            ])->assertOk()
             ->assertJsonPath('data.cover_url', $secondCover)
             ->assertJsonPath('data.avatar_url', null);
 
@@ -83,9 +87,10 @@ class ProfileImageTest extends TestCase
             'cover_url' => $secondCover,
         ]);
 
-        $this->post('/api/users/'.$owner->id.'/avatar', [
-            'avatar' => UploadedFile::fake()->image('farmer.jpg'),
-        ])->assertOk()
+        $this->withToken(JWTAuth::fromUser($owner))
+            ->post('/api/users/'.$owner->id.'/avatar', [
+                'avatar' => UploadedFile::fake()->image('farmer.jpg'),
+            ])->assertOk()
             ->assertJsonPath('data.avatar_url', $farmerAvatar);
 
         $this->getJson('/api/farmers/'.$farmer->id)
@@ -117,14 +122,16 @@ class ProfileImageTest extends TestCase
 
         $tooLarge = UploadedFile::fake()->image('big.jpg')->size(1537);
 
-        $this->post('/api/users/'.$user->id.'/avatar', [
-            'avatar' => $tooLarge,
-        ])->assertUnprocessable()
+        $this->withToken(JWTAuth::fromUser($user))
+            ->post('/api/users/'.$user->id.'/avatar', [
+                'avatar' => $tooLarge,
+            ])->assertUnprocessable()
             ->assertJsonPath('errors.avatar.0', 'Ảnh đại diện không được vượt quá 1.5 MB.');
 
-        $this->post('/api/farmers/'.$farmer->id.'/cover', [
-            'cover' => UploadedFile::fake()->image('big-cover.jpg')->size(1537),
-        ])->assertUnprocessable()
+        $this->withToken(JWTAuth::fromUser($owner))
+            ->post('/api/farmers/'.$farmer->id.'/cover', [
+                'cover' => UploadedFile::fake()->image('big-cover.jpg')->size(1537),
+            ])->assertUnprocessable()
             ->assertJsonPath('errors.cover.0', 'Ảnh bìa không được vượt quá 1.5 MB.');
 
         $this->assertDatabaseHas('users', [
@@ -135,6 +142,47 @@ class ProfileImageTest extends TestCase
             'id' => $farmer->id,
             'cover_url' => null,
         ]);
+    }
+
+    public function test_only_the_owner_can_change_avatar_and_cover(): void
+    {
+        $customer = $this->user('CUSTOMER', 'khach@example.com', '0900000003');
+        $other = $this->user('CUSTOMER', 'khac@example.com', '0900000004');
+        $owner = $this->user('FARMER', 'farmer@example.com', '0900000001');
+        $stranger = $this->user('FARMER', 'la@example.com', '0900000002');
+        $farmer = Farmer::query()->create([
+            'user_id' => $owner->id,
+            'business_name' => 'Vườn A',
+            'is_accepting_orders' => true,
+        ]);
+
+        $cloudinary = Mockery::mock(CloudinaryService::class);
+        $cloudinary->shouldNotReceive('upload');
+        $this->app->instance(CloudinaryService::class, $cloudinary);
+
+        $image = ['avatar' => UploadedFile::fake()->image('avatar.jpg')];
+        $cover = ['cover' => UploadedFile::fake()->image('cover.jpg')];
+
+        $this->post('/api/users/'.$customer->id.'/avatar', $image)
+            ->assertUnauthorized()
+            ->assertJsonPath('message', 'Token bị thiếu hoặc không thể giải mã.');
+
+        $this->post('/api/farmers/'.$farmer->id.'/cover', $cover)
+            ->assertUnauthorized()
+            ->assertJsonPath('message', 'Token bị thiếu hoặc không thể giải mã.');
+
+        $this->withToken(JWTAuth::fromUser($other))
+            ->post('/api/users/'.$customer->id.'/avatar', $image)
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Bạn không có quyền thực hiện thao tác này.');
+
+        $this->withToken(JWTAuth::fromUser($customer))
+            ->post('/api/farmers/'.$farmer->id.'/cover', $cover)
+            ->assertForbidden();
+
+        $this->withToken(JWTAuth::fromUser($stranger))
+            ->post('/api/farmers/'.$farmer->id.'/cover', $cover)
+            ->assertForbidden();
     }
 
     private function user(string $role, string $email, string $phone): User

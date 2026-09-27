@@ -35,14 +35,12 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);
-Route::post('/users/{id}/avatar', [UserController::class, 'updateAvatar']);
 Route::get('/users/{id}', [UserController::class, 'findById']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
 Route::get('/farmers', [FarmerController::class, 'index']);
 Route::post('/farmers', [FarmerController::class, 'store']);
-Route::post('/farmers/{id}/cover', [FarmerController::class, 'updateCover']);
 Route::get('/farmers/{id}', [FarmerController::class, 'findById']);
 Route::put('/farmers/{id}', [FarmerController::class, 'update']);
 Route::delete('/farmers/{id}', [FarmerController::class, 'destroy']);
@@ -71,6 +69,9 @@ Route::middleware(['role:CUSTOMER,FARMER,ADMIN'])->group(function () {
     Route::get('/orders/{id}', [OrderController::class, 'findById']);
     Route::put('/orders/{id}', [OrderController::class, 'update']);
     Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+
+    Route::post('/users/{id}/avatar', [UserController::class, 'updateAvatar']);
+    Route::post('/farmers/{id}/cover', [FarmerController::class, 'updateCover']);
 
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/ai/chat', [AiChatController::class, 'chat']);

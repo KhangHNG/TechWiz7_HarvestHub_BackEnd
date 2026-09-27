@@ -117,6 +117,14 @@ class UserController extends Controller
     public function updateAvatar(StoreAvatarRequest $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
+        $actor = $request->user();
+
+        if (! $actor instanceof User || (int) $actor->id !== (int) $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này.',
+            ], 403);
+        }
 
         try {
             $user = $this->userService->updateAvatar($user, $request->file('avatar'));

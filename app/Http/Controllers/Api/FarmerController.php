@@ -129,6 +129,10 @@ class FarmerController extends Controller
     public function updateCover(StoreCoverRequest $request, $id): JsonResponse
     {
         $farmer = Farmer::findOrFail($id);
+        $denied = $this->denyUnlessFarmOwner($farmer);
+        if ($denied) {
+            return $denied;
+        }
 
         try {
             $farmer = $this->farmerService->updateCover($farmer, $request->file('cover'));
