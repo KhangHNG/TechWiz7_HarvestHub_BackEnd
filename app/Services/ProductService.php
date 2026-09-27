@@ -75,6 +75,13 @@ class ProductService
             $query->where('farmer_id', $request->farmer_id);
         }
 
+        if ($request->filled('market_id')) {
+            $marketId = $request->integer('market_id');
+            $query->whereHas('farmer', function ($farmer) use ($marketId) {
+                $farmer->where('market_id', $marketId);
+            });
+        }
+
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
@@ -109,6 +116,7 @@ class ProductService
         return [
             'keyword' => $request->input('keyword'),
             'farmer_id' => $request->input('farmer_id'),
+            'market_id' => $request->input('market_id'),
             'category_id' => $request->input('category_id'),
             'min_price' => $request->input('min_price'),
             'max_price' => $request->input('max_price'),
