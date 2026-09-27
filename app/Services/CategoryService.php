@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,12 +24,65 @@ class CategoryService
 
         // 2. If the request asks for all (no pagination — used for dropdowns or mobile menus)
         if ($request->boolean('all')) {
-            return $query->orderBy('name', 'asc')->get();
+            $categories = $query->orderBy('name', 'asc')->get();
+
+            return $this->withSampleImages($request, $categories);
         }
 
         // 3. Default is paginated (used for the admin page)
         $perPage = $request->get('per_page', 10);
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $categories = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        return $this->withSampleImages($request, $categories);
+    }
+
+    /**
+     * Newest product photo per category, matching the catalog walk order.
+     *
+     * @param  \Illuminate\Support\Collection<int, Category>|\Illuminate\Contracts\Pagination\LengthAwarePaginator<int, Category>  $categories
+     */
+    private function withSampleImages(Request $request, mixed $categories): mixed
+    {
+        if (! $request->boolean('with_sample_image')) {
+            return $categories;
+        }
+
+        $images = [];
+        $products = Product::query()
+            ->whereNotNull('image_url')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get(['category_id', 'image_url']);
+
+        foreach ($products as $product) {
+            $categoryId = (int) $product->category_id;
+            if (array_key_exists($categoryId, $images)) {
+                continue;
+            }
+
+            $url = Product::imageList($product->image_url)[0] ?? null;
+            if (! is_string($url) || $url === '') {
+                continue;
+            }
+
+            if (! str_starts_with($url, 'http://') && ! str_starts_with($url, 'https://')) {
+                $url = url($url);
+            }
+
+            $images[$categoryId] = $url;
+        }
+
+        $attach = function (Category $category) use ($images): void {
+            $category->setAttribute('sample_image_url', $images[(int) $category->id] ?? null);
+        };
+
+        if ($categories instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) {
+            $categories->getCollection()->each($attach);
+        } else {
+            $categories->each($attach);
+        }
+
+        return $categories;
     }
 
     /**

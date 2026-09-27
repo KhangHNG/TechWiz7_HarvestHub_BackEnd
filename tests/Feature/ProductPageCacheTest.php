@@ -52,6 +52,34 @@ class ProductPageCacheTest extends TestCase
         $this->assertNotSame([], DB::getQueryLog());
     }
 
+    public function test_featured_lists_in_stock_products_before_newer_empty_ones(): void
+    {
+        $this->seedCatalog();
+
+        $response = $this->getJson('/api/products?featured=1&per_page=10');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.name', 'New greens');
+        $response->assertJsonPath('data.1.name', 'Tomato');
+        $response->assertJsonPath('data.2.name', 'Out of stock');
+    }
+
+    public function test_category_sample_image_is_the_newest_product_photo(): void
+    {
+        $this->seedCatalog();
+
+        $older = Product::query()->where('name', 'Tomato')->firstOrFail();
+        $newer = Product::query()->where('name', 'New greens')->firstOrFail();
+        $older->update(['image_url' => ['https://cdn.test/old.jpg']]);
+        $newer->update(['image_url' => ['https://cdn.test/new.jpg']]);
+
+        $response = $this->getJson('/api/categories?per_page=10&with_sample_image=1');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.name', 'Rau');
+        $response->assertJsonPath('data.0.sample_image_url', 'https://cdn.test/new.jpg');
+    }
+
     public function test_in_stock_filter_skips_empty_products(): void
     {
         $this->seedCatalog();

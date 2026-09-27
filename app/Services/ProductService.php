@@ -97,6 +97,13 @@ class ProductService
             $query->where('stock_qty', '>', 0);
         }
 
+        if ($request->boolean('featured')) {
+            return $query
+                ->orderByRaw('CASE WHEN stock_qty > 0 THEN 1 ELSE 0 END DESC')
+                ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc');
+        }
+
         $sortBy = (string) $request->get('sort_by', 'created_at');
         $sortOrder = strtolower((string) $request->get('sort', 'desc')) === 'asc' ? 'asc' : 'desc';
         $allowedSorts = ['created_at', 'price', 'name'];
@@ -121,6 +128,7 @@ class ProductService
             'min_price' => $request->input('min_price'),
             'max_price' => $request->input('max_price'),
             'in_stock' => $request->boolean('in_stock') ? 1 : 0,
+            'featured' => $request->boolean('featured') ? 1 : 0,
             'sort_by' => $request->input('sort_by', 'created_at'),
             'sort' => $request->input('sort', 'desc'),
         ];

@@ -15,6 +15,10 @@ class CategoryResource extends JsonResource {
             'created_by' => $this->created_by,
             'deleted_by' => $this->deleted_by,
             'updated_by' => $this->updated_by,
+            'sample_image_url' => $this->when(
+                $request->boolean('with_sample_image'),
+                $this->sample_image_url,
+            ),
         ];
     }
 }
