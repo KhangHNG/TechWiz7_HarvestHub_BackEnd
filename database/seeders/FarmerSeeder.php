@@ -17,25 +17,29 @@ class FarmerSeeder extends Seeder
         $markets = Market::query()->orderBy('id')->get();
 
         $profiles = [
-            ['Nông Trại Lê Văn Nông', 'Rau củ sạch trồng theo tiêu chuẩn VietGAP, thu hoạch mỗi sáng.', 4.5],
-            ['Vườn Trái Cây Phạm Thị Vườn', 'Trái cây chín cây, hái trong ngày và giao tại chợ.', 4.8],
-            ['Nông Trại Trần Văn Đất', 'Lúa và ngũ cốc sạch, đóng bao đúng cân.', 4.2],
-            ['Vườn Rau Nguyễn Thị Lúa', 'Rau ăn lá theo mùa, không thuốc trừ sâu.', 4.6],
-            ['Nông Trại Võ Minh Vườn', 'Nấm tươi và rau thủy canh, hái theo đơn.', 4.4],
-            ['Vườn Đinh Công Cày', 'Đậu, hạt và nông sản khô phơi nắng.', 4.1],
-            ['Nông Trại Huỳnh Thị Mạ', 'Thảo mộc và gia vị tươi cắt trong ngày.', 4.7],
-            ['Vườn Phan Văn Rẫy', 'Trái cây nhiệt đới, bán sỉ và lẻ tại chợ.', 4.3],
-            ['Nông Trại Lâm Thị Sen', 'Rau hữu cơ có ghi nhật ký chăm sóc.', 4.9],
-            ['Vườn Tô Quốc Thắng', 'Mật ong nguyên chất và sản phẩm từ ong.', 4.6],
+            ['Green Leaf Farm', 'Leafy vegetables harvested each morning and sold the same day at Ben Thanh Market.', 4.6],
+            ['Riverside Orchard', 'Tree-ripened fruit picked in the morning and brought to Binh Tay Market.', 4.8],
+            ['Red River Grains', 'Clean rice and grains packed to weight and sold at Dong Xuan Market.', 4.3],
+            ['Morning Herb Garden', 'Herbs and spices cut the same day for Hom Market stalls.', 4.7],
+            ['Han River Produce', 'Seasonal vegetables and fruit from farms outside Da Nang.', 4.4],
+            ['Coastal Greens', 'Coastal vegetables and herbs delivered to Dam Market before dawn.', 4.5],
+            ['Fort Fresh Farm', 'Mixed vegetables grown for the Crawford Market wholesale floor.', 4.2],
+            ['Chandni Spice Garden', 'Dried spices and chili sorted for Khari Baoli traders.', 4.9],
+            ['Kalasipalya Organics', 'Organic greens with a written care log, sold at KR Market.', 4.6],
+            ['Koyambedu Harvest', 'Wholesale vegetables packed overnight for Koyambedu Market.', 4.1],
+            ['Lindsay Street Dairy', 'Fresh milk and yogurt made for New Market stalls in Kolkata.', 4.5],
+            ['Charminar Honey House', 'Raw honey and bee products bottled for Laad Bazaar.', 4.8],
         ];
 
         foreach ($profiles as $index => [$businessName, $description, $rating]) {
             $this->createAudited(Farmer::class, [
                 'user_id' => $users[$index]->id,
-                'market_id' => $markets[$index % $markets->count()]->id,
+                'market_id' => $markets[$index]->id,
                 'business_name' => $businessName,
                 'description' => $description,
                 'rating' => $rating,
+                'is_accepting_orders' => true,
+                'cover_url' => '/seed/products/mat-ong-'.(($index % 2) + 1).'.jpg',
             ]);
         }
     }

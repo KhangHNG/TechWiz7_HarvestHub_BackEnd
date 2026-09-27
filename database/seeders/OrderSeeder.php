@@ -25,7 +25,9 @@ class OrderSeeder extends Seeder
                 'farmer_id' => $farmer->id,
                 'delivery_address' => $customer->address,
                 'status' => 'CART',
+                'payment_method' => 'COD',
                 'total_price' => 0,
+                'completed_at' => null,
             ]);
 
             $status = $laterStatuses[$index % count($laterStatuses)];
@@ -45,6 +47,7 @@ class OrderSeeder extends Seeder
                 'farmer_id' => $farmer->id,
                 'delivery_address' => $customer->address,
                 'status' => $status,
+                'payment_method' => $index % 2 === 0 ? 'COD' : 'BANK_TRANSFER',
                 'total_price' => 0,
                 'completed_at' => $completedAt,
             ]);

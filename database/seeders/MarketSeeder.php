@@ -12,16 +12,18 @@ class MarketSeeder extends Seeder
     public function run(): void
     {
         $markets = [
-            ['Chợ Nông Sản Quận 1', '123 Nguyễn Huệ, Quận 1, TP.HCM', 10.77560000, 106.70190000, '06:00 - 18:00'],
-            ['Chợ Đầu Mối Thủ Đức', '456 Kha Vạn Cân, Thủ Đức, TP.HCM', 10.84940000, 106.75370000, '04:00 - 12:00'],
-            ['Chợ Bến Thành', 'Lê Lợi, Quận 1, TP.HCM', 10.77250000, 106.69800000, '06:00 - 18:00'],
-            ['Chợ Tân Định', 'Hải Thượng Lãn Ông, Quận 1, TP.HCM', 10.78890000, 106.69070000, '05:00 - 17:00'],
-            ['Chợ Hòa Bình', 'Đường 3 Tháng 2, Quận 5, TP.HCM', 10.75520000, 106.66680000, '05:30 - 18:30'],
-            ['Chợ Phạm Văn Hai', 'Phạm Văn Hai, Tân Bình, TP.HCM', 10.79410000, 106.65820000, '06:00 - 19:00'],
-            ['Chợ Bà Chiểu', 'Bạch Đằng, Bình Thạnh, TP.HCM', 10.81280000, 106.69850000, '05:00 - 18:00'],
-            ['Chợ Thái Bình', 'Phạm Ngũ Lão, Quận 1, TP.HCM', 10.76820000, 106.69240000, '06:00 - 17:00'],
-            ['Chợ An Đông', 'An Dương Vương, Quận 5, TP.HCM', 10.75460000, 106.67210000, '06:00 - 18:00'],
-            ['Chợ Gò Vấp', 'Quang Trung, Gò Vấp, TP.HCM', 10.83820000, 106.66540000, '04:30 - 12:00'],
+            ['Ben Thanh Market', 'Le Loi Street, Ben Thanh Ward, District 1, Ho Chi Minh City, Vietnam', 10.77254000, 106.69801300, '06:00 - 18:00'],
+            ['Binh Tay Market', '57A Thap Muoi Street, District 6, Ho Chi Minh City, Vietnam', 10.74940000, 106.65120000, '06:00 - 18:00'],
+            ['Dong Xuan Market', 'Dong Xuan Street, Hoan Kiem District, Hanoi, Vietnam', 21.03820000, 105.84950000, '06:00 - 18:00'],
+            ['Hom Market', '81 Hue Street, Hai Ba Trung District, Hanoi, Vietnam', 21.01680000, 105.85120000, '06:00 - 19:00'],
+            ['Han Market', '119 Tran Phu Street, Hai Chau District, Da Nang, Vietnam', 16.06780000, 108.22340000, '06:00 - 18:00'],
+            ['Dam Market', 'Tran Phu Street, Nha Trang, Khanh Hoa, Vietnam', 12.23880000, 109.19670000, '05:00 - 18:00'],
+            ['Crawford Market', 'Dr Dadabhai Naoroji Road, Fort, Mumbai, Maharashtra 400001, India', 18.94770000, 72.83470000, '10:00 - 20:00'],
+            ['Khari Baoli', 'Khari Baoli Road, Chandni Chowk, Delhi 110006, India', 28.65620000, 77.21670000, '09:00 - 20:00'],
+            ['KR Market', 'Kalasipalya, Bengaluru, Karnataka 560002, India', 12.96560000, 77.57760000, '06:00 - 21:00'],
+            ['Koyambedu Market', 'Koyambedu, Chennai, Tamil Nadu 600107, India', 13.06940000, 80.19480000, '04:00 - 14:00'],
+            ['New Market', 'Lindsay Street, Kolkata, West Bengal 700087, India', 22.56000000, 88.35250000, '10:00 - 20:00'],
+            ['Laad Bazaar', 'Charminar, Hyderabad, Telangana 500002, India', 17.36160000, 78.47470000, '11:00 - 22:00'],
         ];
 
         foreach ($markets as [$name, $address, $latitude, $longitude, $hours]) {

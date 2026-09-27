@@ -12,16 +12,16 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         foreach ([
-            'Rau củ',
-            'Trái cây',
-            'Ngũ cốc',
-            'Sữa',
-            'Thảo mộc',
-            'Hữu cơ',
-            'Đậu hạt',
-            'Gia vị',
-            'Nấm',
-            'Mật ong',
+            'Vegetables',
+            'Fruits',
+            'Grains',
+            'Dairy',
+            'Herbs',
+            'Organic',
+            'Legumes',
+            'Spices',
+            'Mushrooms',
+            'Honey',
         ] as $name) {
             $this->createAudited(Category::class, ['name' => $name]);
         }

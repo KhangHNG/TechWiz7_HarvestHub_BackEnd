@@ -16,14 +16,15 @@ class UserSeeder extends Seeder
         $verifiedAt = now();
 
         $admin = User::create([
-            'full_name' => 'Quản trị viên',
+            'full_name' => 'Alex Morgan',
             'email' => 'admin@example.com',
-            'phone' => '0900000000',
+            'phone' => '0900000001',
             'password_hash' => $password,
-            'address' => '1 Lê Duẩn, Quận 1, TP.HCM',
-            'city' => 'Hồ Chí Minh',
-            'district' => 'Quận 1',
-            'capital' => 'TP.HCM',
+            'address' => '1 Le Duan Street, District 1, Ho Chi Minh City',
+            'city' => 'Ho Chi Minh City',
+            'district' => 'District 1',
+            'capital' => 'Ho Chi Minh City',
+            'avatar_url' => '/seed/products/rau-cu-1.jpg',
             'role' => 'ADMIN',
             'email_verified_at' => $verifiedAt,
         ]);
@@ -33,18 +34,18 @@ class UserSeeder extends Seeder
         ])->save();
 
         $customers = [
-            ['Nguyễn Văn An', '12 Lê Lợi, Quận 1, TP.HCM', 'Hồ Chí Minh', 'Quận 1', 'TP.HCM'],
-            ['Trần Thị Bình', '34 Điện Biên Phủ, Bình Thạnh, TP.HCM', 'Hồ Chí Minh', 'Bình Thạnh', 'TP.HCM'],
-            ['Lê Hoàng Cường', '56 Nguyễn Văn Cừ, Quận 5, TP.HCM', 'Hồ Chí Minh', 'Quận 5', 'TP.HCM'],
-            ['Phạm Thu Dung', '78 Cách Mạng Tháng 8, Quận 3, TP.HCM', 'Hồ Chí Minh', 'Quận 3', 'TP.HCM'],
-            ['Hoàng Minh Đức', '90 Phan Xích Long, Phú Nhuận, TP.HCM', 'Hồ Chí Minh', 'Phú Nhuận', 'TP.HCM'],
-            ['Võ Thị Em', '15 Nguyễn Thị Minh Khai, Quận 1, TP.HCM', 'Hồ Chí Minh', 'Quận 1', 'TP.HCM'],
-            ['Đặng Quốc Phong', '27 Lý Thường Kiệt, Quận 10, TP.HCM', 'Hồ Chí Minh', 'Quận 10', 'TP.HCM'],
-            ['Bùi Ngọc Giang', '41 Võ Văn Tần, Quận 3, TP.HCM', 'Hồ Chí Minh', 'Quận 3', 'TP.HCM'],
-            ['Ngô Thanh Hà', '63 Trần Hưng Đạo, Quận 5, TP.HCM', 'Hồ Chí Minh', 'Quận 5', 'TP.HCM'],
-            ['Đỗ Kim Yến', '88 Hoàng Văn Thụ, Tân Bình, TP.HCM', 'Hồ Chí Minh', 'Tân Bình', 'TP.HCM'],
-            ['Mai Quốc Khánh', '19 Pasteur, Quận 1, TP.HCM', 'Hồ Chí Minh', 'Quận 1', 'TP.HCM'],
-            ['Lý Thu Trang', '102 Nguyễn Đình Chiểu, Quận 3, TP.HCM', 'Hồ Chí Minh', 'Quận 3', 'TP.HCM'],
+            ['Liam Nguyen', '12 Le Loi Street, Ben Thanh Ward, District 1, Ho Chi Minh City', 'Ho Chi Minh City', 'District 1', 'Ho Chi Minh City'],
+            ['Emma Tran', '34 Thap Muoi Street, District 6, Ho Chi Minh City', 'Ho Chi Minh City', 'District 6', 'Ho Chi Minh City'],
+            ['Noah Pham', '18 Dong Xuan Street, Hoan Kiem District, Hanoi', 'Hanoi', 'Hoan Kiem', 'Hanoi'],
+            ['Olivia Le', '81 Hue Street, Hai Ba Trung District, Hanoi', 'Hanoi', 'Hai Ba Trung', 'Hanoi'],
+            ['Ethan Vo', '119 Tran Phu Street, Hai Chau District, Da Nang', 'Da Nang', 'Hai Chau', 'Da Nang'],
+            ['Sophia Dinh', '10 Tran Phu Street, Nha Trang, Khanh Hoa', 'Nha Trang', 'Nha Trang', 'Khanh Hoa'],
+            ['Arjun Mehta', '12 Dadabhai Naoroji Road, Fort, Mumbai, Maharashtra 400001', 'Mumbai', 'Fort', 'Maharashtra'],
+            ['Priya Sharma', '45 Khari Baoli Road, Chandni Chowk, Delhi 110006', 'Delhi', 'Chandni Chowk', 'Delhi'],
+            ['Rahul Nair', '8 Kalasipalya Main Road, Bengaluru, Karnataka 560002', 'Bengaluru', 'Kalasipalya', 'Karnataka'],
+            ['Ananya Iyer', '22 Koyambedu Market Road, Chennai, Tamil Nadu 600107', 'Chennai', 'Koyambedu', 'Tamil Nadu'],
+            ['Dev Patel', '15 Lindsay Street, Kolkata, West Bengal 700087', 'Kolkata', 'Lindsay Street', 'West Bengal'],
+            ['Fatima Khan', '7 Charminar Road, Hyderabad, Telangana 500002', 'Hyderabad', 'Charminar', 'Telangana'],
         ];
 
         foreach ($customers as $index => [$name, $address, $city, $district, $capital]) {
@@ -58,22 +59,25 @@ class UserSeeder extends Seeder
                 'city' => $city,
                 'district' => $district,
                 'capital' => $capital,
+                'avatar_url' => '/seed/products/trai-cay-'.(($index % 2) + 1).'.jpg',
                 'role' => 'CUSTOMER',
                 'email_verified_at' => $verifiedAt,
             ]);
         }
 
         $farmers = [
-            ['Lê Văn Nông', 'Ấp 2, Củ Chi, TP.HCM', 'Hồ Chí Minh', 'Củ Chi', 'TP.HCM'],
-            ['Phạm Thị Vườn', 'Xã Tân Hiệp, Hóc Môn, TP.HCM', 'Hồ Chí Minh', 'Hóc Môn', 'TP.HCM'],
-            ['Trần Văn Đất', 'Xã Phạm Văn Cội, Củ Chi, TP.HCM', 'Hồ Chí Minh', 'Củ Chi', 'TP.HCM'],
-            ['Nguyễn Thị Lúa', 'Xã Bình Mỹ, Củ Chi, TP.HCM', 'Hồ Chí Minh', 'Củ Chi', 'TP.HCM'],
-            ['Võ Minh Vườn', 'Xã Đông Thạnh, Hóc Môn, TP.HCM', 'Hồ Chí Minh', 'Hóc Môn', 'TP.HCM'],
-            ['Đinh Công Cày', 'Xã Tân Phú Trung, Củ Chi, TP.HCM', 'Hồ Chí Minh', 'Củ Chi', 'TP.HCM'],
-            ['Huỳnh Thị Mạ', 'Xã Trung Lập Thượng, Củ Chi, TP.HCM', 'Hồ Chí Minh', 'Củ Chi', 'TP.HCM'],
-            ['Phan Văn Rẫy', 'Xã Xuân Thới Sơn, Hóc Môn, TP.HCM', 'Hồ Chí Minh', 'Hóc Môn', 'TP.HCM'],
-            ['Lâm Thị Sen', 'Xã Phước Vĩnh An, Củ Chi, TP.HCM', 'Hồ Chí Minh', 'Củ Chi', 'TP.HCM'],
-            ['Tô Quốc Thắng', 'Xã Tân Thới Nhì, Hóc Môn, TP.HCM', 'Hồ Chí Minh', 'Hóc Môn', 'TP.HCM'],
+            ['Minh Le', '25 Le Loi Street, District 1, Ho Chi Minh City', 'Ho Chi Minh City', 'District 1', 'Ho Chi Minh City'],
+            ['Hoa Pham', '57 Thap Muoi Street, District 6, Ho Chi Minh City', 'Ho Chi Minh City', 'District 6', 'Ho Chi Minh City'],
+            ['Anh Tran', '4 Dong Xuan Street, Hoan Kiem District, Hanoi', 'Hanoi', 'Hoan Kiem', 'Hanoi'],
+            ['Lan Nguyen', '90 Hue Street, Hai Ba Trung District, Hanoi', 'Hanoi', 'Hai Ba Trung', 'Hanoi'],
+            ['Khoa Vo', '130 Tran Phu Street, Hai Chau District, Da Nang', 'Da Nang', 'Hai Chau', 'Da Nang'],
+            ['Mai Dinh', '16 Tran Phu Street, Nha Trang, Khanh Hoa', 'Nha Trang', 'Nha Trang', 'Khanh Hoa'],
+            ['Rohan Desai', '30 Dadabhai Naoroji Road, Fort, Mumbai, Maharashtra 400001', 'Mumbai', 'Fort', 'Maharashtra'],
+            ['Neha Gupta', '12 Khari Baoli Road, Chandni Chowk, Delhi 110006', 'Delhi', 'Chandni Chowk', 'Delhi'],
+            ['Vikram Rao', '19 Kalasipalya Main Road, Bengaluru, Karnataka 560002', 'Bengaluru', 'Kalasipalya', 'Karnataka'],
+            ['Meera Krishnan', '40 Koyambedu Market Road, Chennai, Tamil Nadu 600107', 'Chennai', 'Koyambedu', 'Tamil Nadu'],
+            ['Amit Banerjee', '6 Lindsay Street, Kolkata, West Bengal 700087', 'Kolkata', 'Lindsay Street', 'West Bengal'],
+            ['Aisha Qureshi', '3 Charminar Road, Hyderabad, Telangana 500002', 'Hyderabad', 'Charminar', 'Telangana'],
         ];
 
         foreach ($farmers as $index => [$name, $address, $city, $district, $capital]) {
@@ -87,6 +91,7 @@ class UserSeeder extends Seeder
                 'city' => $city,
                 'district' => $district,
                 'capital' => $capital,
+                'avatar_url' => '/seed/products/huu-co-'.(($index % 2) + 1).'.jpg',
                 'role' => 'FARMER',
                 'email_verified_at' => $verifiedAt,
             ]);

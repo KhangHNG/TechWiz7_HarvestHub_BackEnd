@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
                 FarmerFollowSeeder::class,
                 OrderSeeder::class,
                 OrderItemSeeder::class,
+                FarmerWalletSeeder::class,
+                DeviceTokenSeeder::class,
+                NotificationSeeder::class,
             ]);
         });
     }
