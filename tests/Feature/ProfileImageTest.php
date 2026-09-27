@@ -101,6 +101,42 @@ class ProfileImageTest extends TestCase
         $farmer->delete();
     }
 
+    public function test_avatar_and_cover_over_one_and_a_half_megabytes_are_rejected(): void
+    {
+        $user = $this->user('CUSTOMER', 'khach@example.com', '0900000003');
+        $owner = $this->user('FARMER', 'farmer@example.com', '0900000001');
+        $farmer = Farmer::query()->create([
+            'user_id' => $owner->id,
+            'business_name' => 'Vườn A',
+            'is_accepting_orders' => true,
+        ]);
+
+        $cloudinary = Mockery::mock(CloudinaryService::class);
+        $cloudinary->shouldNotReceive('upload');
+        $this->app->instance(CloudinaryService::class, $cloudinary);
+
+        $tooLarge = UploadedFile::fake()->image('big.jpg')->size(1537);
+
+        $this->post('/api/users/'.$user->id.'/avatar', [
+            'avatar' => $tooLarge,
+        ])->assertUnprocessable()
+            ->assertJsonPath('errors.avatar.0', 'Ảnh đại diện không được vượt quá 1.5 MB.');
+
+        $this->post('/api/farmers/'.$farmer->id.'/cover', [
+            'cover' => UploadedFile::fake()->image('big-cover.jpg')->size(1537),
+        ])->assertUnprocessable()
+            ->assertJsonPath('errors.cover.0', 'Ảnh bìa không được vượt quá 1.5 MB.');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'avatar_url' => null,
+        ]);
+        $this->assertDatabaseHas('farmers', [
+            'id' => $farmer->id,
+            'cover_url' => null,
+        ]);
+    }
+
     private function user(string $role, string $email, string $phone): User
     {
         return User::query()->create([

@@ -37,7 +37,7 @@ class FarmerForm
                 FileUpload::make('cover_url')
                     ->label('Ảnh bìa')
                     ->image()
-                    ->maxSize(2048)
+                    ->maxSize(1536)
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'])
                     ->fetchFileInformation(false)
                     ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {

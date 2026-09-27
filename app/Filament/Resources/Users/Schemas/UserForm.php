@@ -46,7 +46,7 @@ class UserForm
                 FileUpload::make('avatar_url')
                     ->label('Ảnh đại diện')
                     ->image()
-                    ->maxSize(2048)
+                    ->maxSize(1536)
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'])
                     ->fetchFileInformation(false)
                     ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
