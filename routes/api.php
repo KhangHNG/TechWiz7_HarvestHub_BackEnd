@@ -35,12 +35,14 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);
+Route::post('/users/{id}/avatar', [UserController::class, 'updateAvatar']);
 Route::get('/users/{id}', [UserController::class, 'findById']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
 Route::get('/farmers', [FarmerController::class, 'index']);
 Route::post('/farmers', [FarmerController::class, 'store']);
+Route::post('/farmers/{id}/cover', [FarmerController::class, 'updateCover']);
 Route::get('/farmers/{id}', [FarmerController::class, 'findById']);
 Route::put('/farmers/{id}', [FarmerController::class, 'update']);
 Route::delete('/farmers/{id}', [FarmerController::class, 'destroy']);

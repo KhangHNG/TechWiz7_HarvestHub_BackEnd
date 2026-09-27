@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Services\CloudinaryService;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class UserForm
 {
@@ -39,6 +43,26 @@ class UserForm
                     ->label('Tỉnh / thành')
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
+                FileUpload::make('avatar_url')
+                    ->label('Ảnh đại diện')
+                    ->image()
+                    ->maxSize(2048)
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'])
+                    ->fetchFileInformation(false)
+                    ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
+                        return app(CloudinaryService::class)->upload($file, 'avatars');
+                    })
+                    ->getUploadedFileUsing(function (BaseFileUpload $component, string $file): array {
+                        return [
+                            'name' => basename(parse_url($file, PHP_URL_PATH) ?: $file),
+                            'size' => 0,
+                            'type' => null,
+                            'url' => str_starts_with($file, 'http') ? $file : $component->getDisk()->url($file),
+                        ];
+                    })
+                    ->deleteUploadedFileUsing(function (string $file): void {
+                        app(CloudinaryService::class)->deleteByUrl($file);
+                    }),
                 TextInput::make('role')
                     ->required()
                     ->default('CUSTOMER'),

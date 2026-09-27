@@ -4,10 +4,13 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 class UserService
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     public function getUsers(Request $request)
     {
         $query = User::query();
@@ -54,6 +57,21 @@ class UserService
 
             return $user->fresh();
         });
+    }
+
+    public function updateAvatar(User $user, UploadedFile $file): User
+    {
+        $url = $this->cloudinary->upload($file, 'avatars');
+
+        try {
+            $user->update(['avatar_url' => $url]);
+        } catch (\Throwable $exception) {
+            $this->cloudinary->deleteByUrl($url);
+
+            throw $exception;
+        }
+
+        return $user->fresh();
     }
 
     public function deleteUser(User $user)

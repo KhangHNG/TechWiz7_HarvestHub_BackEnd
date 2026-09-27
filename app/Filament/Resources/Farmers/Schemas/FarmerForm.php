@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\Farmers\Schemas;
 
+use App\Services\CloudinaryService;
+use Filament\Forms\Components\BaseFileUpload;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class FarmerForm
 {
@@ -30,6 +34,26 @@ class FarmerForm
                 Toggle::make('is_accepting_orders')
                     ->label('Đang nhận đơn')
                     ->default(true),
+                FileUpload::make('cover_url')
+                    ->label('Ảnh bìa')
+                    ->image()
+                    ->maxSize(2048)
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'])
+                    ->fetchFileInformation(false)
+                    ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
+                        return app(CloudinaryService::class)->upload($file, 'covers');
+                    })
+                    ->getUploadedFileUsing(function (BaseFileUpload $component, string $file): array {
+                        return [
+                            'name' => basename(parse_url($file, PHP_URL_PATH) ?: $file),
+                            'size' => 0,
+                            'type' => null,
+                            'url' => str_starts_with($file, 'http') ? $file : $component->getDisk()->url($file),
+                        ];
+                    })
+                    ->deleteUploadedFileUsing(function (string $file): void {
+                        app(CloudinaryService::class)->deleteByUrl($file);
+                    }),
                 TextInput::make('created_by')
                     ->numeric()
                     ->default(null),

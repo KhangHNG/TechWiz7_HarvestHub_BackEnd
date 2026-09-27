@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\CloudinaryService;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
@@ -25,6 +26,7 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
         'city',
         'district',
         'capital',
+        'avatar_url',
         'role',
         'email_verified_at',
     ];
@@ -38,6 +40,27 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
         'password_hash' => 'hashed',
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (User $user): void {
+            if (! $user->isDirty('avatar_url')) {
+                return;
+            }
+
+            $original = $user->getOriginal('avatar_url');
+
+            if (! is_string($original) || $original === '' || $original === $user->avatar_url) {
+                return;
+            }
+
+            app(CloudinaryService::class)->deleteByUrl($original);
+        });
+
+        static::deleting(function (User $user): void {
+            app(CloudinaryService::class)->deleteByUrl($user->avatar_url);
+        });
+    }
 
     // Filament/Laravel auth đọc mật khẩu qua đây thay vì cột "password"
     public function getAuthPassword()

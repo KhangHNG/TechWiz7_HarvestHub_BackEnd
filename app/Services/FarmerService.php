@@ -4,10 +4,13 @@ namespace App\Services;
 
 use App\Models\Farmer;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 class FarmerService
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     public function getFarmers(Request $request)
     {
         $query = Farmer::query()->with('user');
@@ -43,6 +46,21 @@ class FarmerService
 
             return $farmer->fresh();
         });
+    }
+
+    public function updateCover(Farmer $farmer, UploadedFile $file): Farmer
+    {
+        $url = $this->cloudinary->upload($file, 'covers');
+
+        try {
+            $farmer->update(['cover_url' => $url]);
+        } catch (\Throwable $exception) {
+            $this->cloudinary->deleteByUrl($url);
+
+            throw $exception;
+        }
+
+        return $farmer->fresh('user');
     }
 
     public function deleteFarmer(Farmer $farmer)

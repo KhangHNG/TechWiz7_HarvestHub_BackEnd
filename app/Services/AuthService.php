@@ -89,7 +89,7 @@ class AuthService
     }
 
     /**
-     * @return array{access_token: string, token_type: string, expires_in: int, user: array{id: int, full_name: string, email: string, role: string}}
+     * @return array{access_token: string, token_type: string, expires_in: int, user: array{id: int, full_name: string, email: string, role: string, avatar_url: ?string}}
      */
     public function tokenPayload(User $user, string $token): array
     {
@@ -102,6 +102,7 @@ class AuthService
                 'full_name' => $user->full_name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'avatar_url' => $user->avatar_url,
             ],
         ];
     }

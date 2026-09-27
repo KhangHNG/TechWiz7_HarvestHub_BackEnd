@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StoreAvatarRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
@@ -106,6 +107,29 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Cập nhật người dùng thất bại: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * POST /api/users/{id}/avatar
+     */
+    public function updateAvatar(StoreAvatarRequest $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        try {
+            $user = $this->userService->updateAvatar($user, $request->file('avatar'));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật ảnh đại diện thành công.',
+                'data' => new UserResource($user),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cập nhật ảnh đại diện thất bại: '.$e->getMessage(),
             ], 500);
         }
     }

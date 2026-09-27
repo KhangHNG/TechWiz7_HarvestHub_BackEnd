@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Farmer\StoreCoverRequest;
 use App\Http\Requests\Farmer\StoreFarmerRequest;
 use App\Http\Requests\Farmer\UpdateFarmerRequest;
 use App\Http\Resources\FarmerResource;
@@ -118,6 +119,29 @@ class FarmerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Cập nhật nông dân thất bại: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * POST /api/farmers/{id}/cover
+     */
+    public function updateCover(StoreCoverRequest $request, $id): JsonResponse
+    {
+        $farmer = Farmer::findOrFail($id);
+
+        try {
+            $farmer = $this->farmerService->updateCover($farmer, $request->file('cover'));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật ảnh bìa thành công.',
+                'data' => new FarmerResource($farmer),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cập nhật ảnh bìa thất bại: '.$e->getMessage(),
             ], 500);
         }
     }

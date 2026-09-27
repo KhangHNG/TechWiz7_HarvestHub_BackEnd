@@ -8,10 +8,10 @@ use RuntimeException;
 
 class CloudinaryService
 {
-    public function upload(UploadedFile $file): string
+    public function upload(UploadedFile $file, ?string $folder = null): string
     {
         $result = $this->client()->uploadApi()->upload($file->getRealPath(), [
-            'folder' => config('services.cloudinary.folder', 'products'),
+            'folder' => $folder ?? config('services.cloudinary.folder', 'products'),
             'resource_type' => 'image',
         ]);
 

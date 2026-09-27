@@ -19,6 +19,7 @@ class UserResource extends JsonResource
             'district' => $this->district,
             'capital' => $this->capital,
             'role' => $this->role,
+            'avatar_url' => $this->avatar_url,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'deleted_at' => $this->deleted_at?->toIso8601String(),
