@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -14,12 +15,12 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'          => $this->id,
-            'name'        => $this->name,
-            'price'       => $this->price,
-            'image_url'   => $this->absoluteImageUrls(),
+            'id' => $this->id,
+            'name' => $this->name,
+            'price' => $this->price,
+            'image_url' => $this->absoluteImageUrls(),
             'description' => $this->description,
-            'farmer_id'   => $this->farmer_id,
+            'farmer_id' => $this->farmer_id,
             'category_id' => $this->category_id,
             'stock_qty' => $this->stock_qty,
             'category' => $this->whenLoaded('category', fn () => $this->category === null ? null : [
@@ -33,6 +34,7 @@ class ProductResource extends JsonResource
                 return $farmer === null ? null : [
                     'id' => $farmer->id,
                     'business_name' => $farmer->business_name,
+                    'is_accepting_orders' => (bool) $farmer->is_accepting_orders,
                     'rating' => $farmer->rating === null ? null : (float) $farmer->rating,
                     'market' => $market === null ? null : [
                         'id' => $market->id,
@@ -42,8 +44,8 @@ class ProductResource extends JsonResource
                 ];
             }),
 
-            'created_at'  => $this->created_at?->toIso8601String(),
-            'updated_at'  => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
             'deleted_at' => $this->deleted_at?->toIso8601String(),
             'created_by' => $this->created_by,
             'deleted_by' => $this->deleted_by,

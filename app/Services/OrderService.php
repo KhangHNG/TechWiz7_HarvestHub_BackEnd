@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Exceptions\FarmerNotAcceptingOrdersException;
 use App\Exceptions\InsufficientStockException;
+use App\Models\Farmer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -59,6 +62,8 @@ class OrderService
 
     public function createOrder(array $data)
     {
+        $this->assertFarmersAcceptingOrders(collect($data['items'] ?? [])->pluck('product_id'));
+
         $order = DB::transaction(function () use ($data) {
             $items = $data['items'] ?? [];
             unset($data['items']);
@@ -93,6 +98,15 @@ class OrderService
     public function updateOrder(Order $order, array $data)
     {
         $previousStatus = $order->status;
+        $nextStatus = array_key_exists('status', $data) ? (string) $data['status'] : (string) $previousStatus;
+
+        if ($previousStatus === 'CART' && $nextStatus === 'PENDING') {
+            $productIds = array_key_exists('items', $data)
+                ? collect($data['items'])->pluck('product_id')
+                : $order->items()->pluck('product_id');
+            $this->assertFarmersAcceptingOrders($productIds);
+        }
+
         $stockChanges = [];
         $placedOrders = [];
 
@@ -244,6 +258,36 @@ class OrderService
         }
 
         return $changes;
+    }
+
+    /**
+     * @param  Collection<int, mixed>|array<int, mixed>  $productIds
+     */
+    private function assertFarmersAcceptingOrders(mixed $productIds): void
+    {
+        $ids = collect($productIds)->filter()->unique()->values();
+        if ($ids->isEmpty()) {
+            return;
+        }
+
+        $names = Product::query()
+            ->whereIn('id', $ids)
+            ->with('farmer')
+            ->get()
+            ->map(fn (Product $product) => $product->farmer)
+            ->filter(fn (?Farmer $farmer) => $farmer && ! $farmer->is_accepting_orders)
+            ->pluck('business_name')
+            ->unique()
+            ->sort()
+            ->values();
+
+        if ($names->isEmpty()) {
+            return;
+        }
+
+        $label = $names->count() === 1 ? $names->first() : $names->join(', ');
+
+        throw new FarmerNotAcceptingOrdersException('Nông trại '.$label.' đang tạm ngừng nhận đơn.');
     }
 
     public function deleteOrder(Order $order)

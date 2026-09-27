@@ -7,9 +7,14 @@ use App\Http\Requests\Farmer\StoreFarmerRequest;
 use App\Http\Requests\Farmer\UpdateFarmerRequest;
 use App\Http\Resources\FarmerResource;
 use App\Models\Farmer;
+use App\Models\User;
 use App\Services\FarmerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class FarmerController extends Controller
 {
@@ -94,6 +99,13 @@ class FarmerController extends Controller
 
         $validatedData = $request->validated();
 
+        if (array_key_exists('is_accepting_orders', $validatedData)) {
+            $denied = $this->denyUnlessFarmOwner($farmer);
+            if ($denied) {
+                return $denied;
+            }
+        }
+
         try {
             $farmer = $this->farmerService->updateFarmer($farmer, $validatedData);
 
@@ -129,5 +141,36 @@ class FarmerController extends Controller
                 'message' => 'Xóa nông dân thất bại: '.$e->getMessage(),
             ], 400);
         }
+    }
+
+    private function denyUnlessFarmOwner(Farmer $farmer): ?JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+        } catch (TokenExpiredException) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token đã hết hạn, vui lòng đăng nhập lại.',
+            ], 401);
+        } catch (TokenInvalidException) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token không hợp lệ.',
+            ], 401);
+        } catch (JWTException) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token bị thiếu hoặc không thể giải mã.',
+            ], 401);
+        }
+
+        if (! $user instanceof User || $user->role !== 'FARMER' || (int) $user->id !== (int) $farmer->user_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này.',
+            ], 403);
+        }
+
+        return null;
     }
 }

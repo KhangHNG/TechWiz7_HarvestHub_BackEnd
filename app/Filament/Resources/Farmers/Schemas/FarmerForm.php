@@ -2,8 +2,9 @@
 
 namespace App\Filament\Resources\Farmers\Schemas;
 
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
 class FarmerForm
@@ -26,6 +27,9 @@ class FarmerForm
                 TextInput::make('rating')
                     ->numeric()
                     ->default(0),
+                Toggle::make('is_accepting_orders')
+                    ->label('Đang nhận đơn')
+                    ->default(true),
                 TextInput::make('created_by')
                     ->numeric()
                     ->default(null),

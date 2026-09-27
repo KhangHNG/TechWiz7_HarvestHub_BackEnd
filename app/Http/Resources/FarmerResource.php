@@ -16,6 +16,7 @@ class FarmerResource extends JsonResource
             'business_name' => $this->business_name,
             'description' => $this->description,
             'rating' => $this->rating,
+            'is_accepting_orders' => (bool) $this->is_accepting_orders,
             'city' => $this->user?->city,
             'district' => $this->user?->district,
             'capital' => $this->user?->capital,

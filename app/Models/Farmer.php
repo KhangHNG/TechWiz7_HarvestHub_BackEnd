@@ -10,7 +10,11 @@ class Farmer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'market_id', 'business_name', 'description', 'rating'];
+    protected $fillable = ['user_id', 'market_id', 'business_name', 'description', 'rating', 'is_accepting_orders'];
+
+    protected $casts = [
+        'is_accepting_orders' => 'boolean',
+    ];
 
     public function user()
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\FarmerNotAcceptingOrdersException;
 use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreOrderRequest;
@@ -71,6 +72,11 @@ class OrderController extends Controller
                 'message' => 'Tạo đơn hàng thành công.',
                 'data' => new OrderResource($order),
             ], 201);
+        } catch (FarmerNotAcceptingOrdersException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -115,7 +121,7 @@ class OrderController extends Controller
                 'data' => new OrderResource($order->loadMissing('items')),
                 'orders' => OrderResource::collection($orders),
             ], 200);
-        } catch (InsufficientStockException $e) {
+        } catch (InsufficientStockException|FarmerNotAcceptingOrdersException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),

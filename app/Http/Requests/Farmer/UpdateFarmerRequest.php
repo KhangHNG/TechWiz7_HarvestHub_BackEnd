@@ -22,6 +22,7 @@ class UpdateFarmerRequest extends ApiFormRequest
             'business_name' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'rating' => ['sometimes', 'numeric', 'min:0', 'max:5'],
+            'is_accepting_orders' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -33,6 +34,7 @@ class UpdateFarmerRequest extends ApiFormRequest
             'business_name' => 'Tên cửa hàng',
             'description' => 'Mô tả',
             'rating' => 'Đánh giá',
+            'is_accepting_orders' => 'Trạng thái nhận đơn',
         ];
     }
 
