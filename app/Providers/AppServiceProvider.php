@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Wishlist;
 use App\Observers\AdminChangeObserver;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -43,5 +44,15 @@ class AppServiceProvider extends ServiceProvider
         Category::observe($observer);
         Wishlist::observe($observer);
         FarmerFollow::observe($observer);
+
+        $forgetProductPages = static function (): void {
+            ProductService::forgetListPages();
+        };
+
+        foreach ([Product::class, Farmer::class, Category::class, Market::class] as $model) {
+            $model::saved($forgetProductPages);
+            $model::deleted($forgetProductPages);
+            $model::restored($forgetProductPages);
+        }
     }
 }

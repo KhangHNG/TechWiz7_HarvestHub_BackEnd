@@ -2,26 +2,67 @@
 
 namespace App\Services;
 
+use App\Models\Category;
+use App\Models\Farmer;
+use App\Models\Market;
 use App\Models\Product;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
+    private const PAGE_VERSION_KEY = 'products.pages.version';
+
     public function __construct(
         private CloudinaryService $cloudinary,
         private NotificationService $notifications,
     ) {}
 
     /**
-     * Lấy danh sách sản phẩm có phân trang, tìm kiếm, lọc.
+     * Bỏ mọi trang đã cache. Gọi khi sản phẩm, nông dân, danh mục hoặc chợ đổi,
+     * vì những dữ liệu đó nằm trong JSON của từng trang.
      */
-    public function getPaginatedProducts(Request $request)
+    public static function forgetListPages(): void
+    {
+        $version = (int) Cache::get(self::PAGE_VERSION_KEY, 1);
+        Cache::forever(self::PAGE_VERSION_KEY, $version + 1);
+    }
+
+    /**
+     * Lấy một trang sản phẩm. Trang đã tải (cùng bộ lọc) được trả từ cache,
+     * không query lại. Trang khác chỉ được tải khi client gọi tới trang đó.
+     */
+    public function getPaginatedProducts(Request $request): LengthAwarePaginator
+    {
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, (int) $request->input('per_page', 10));
+        $cacheKey = $this->listCacheKey($request, $page, $perPage);
+        $cached = Cache::get($cacheKey);
+
+        if (is_array($cached) && isset($cached['items'], $cached['total'])) {
+            return $this->paginatorFromCache($cached, $perPage, $page);
+        }
+
+        $paginator = $this->productQuery($request)->paginate($perPage, ['*'], 'page', $page);
+
+        Cache::put($cacheKey, [
+            'total' => $paginator->total(),
+            'items' => $paginator->getCollection()
+                ->map(fn (Product $product) => $this->exportProduct($product))
+                ->all(),
+        ], now()->addDay());
+
+        return $paginator;
+    }
+
+    private function productQuery(Request $request)
     {
         $query = Product::query()->with(['farmer.market', 'category']);
 
-        // 1. Tìm kiếm theo keyword (name hoặc description)
         if ($request->filled('keyword')) {
             $keyword = $request->keyword;
             $query->where(function ($q) use ($keyword) {
@@ -30,17 +71,14 @@ class ProductService
             });
         }
 
-        // 2. Lọc theo farmer_id
         if ($request->filled('farmer_id')) {
             $query->where('farmer_id', $request->farmer_id);
         }
 
-        // 3. Lọc theo category_id
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // 4. Lọc theo khoảng giá
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
@@ -48,19 +86,108 @@ class ProductService
             $query->where('price', '<=', $request->max_price);
         }
 
-        // 5. Sắp xếp
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort', 'desc');
-        $allowedSorts = ['created_at', 'price', 'name'];
-
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortOrder);
+        if ($request->boolean('in_stock')) {
+            $query->where('stock_qty', '>', 0);
         }
 
-        // 6. Phân trang
-        $perPage = $request->get('per_page', 10);
+        $sortBy = (string) $request->get('sort_by', 'created_at');
+        $sortOrder = strtolower((string) $request->get('sort', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $allowedSorts = ['created_at', 'price', 'name'];
 
-        return $query->paginate($perPage);
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'created_at';
+        }
+
+        return $query->orderBy($sortBy, $sortOrder)->orderBy('id', $sortOrder);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function listFilters(Request $request): array
+    {
+        return [
+            'keyword' => $request->input('keyword'),
+            'farmer_id' => $request->input('farmer_id'),
+            'category_id' => $request->input('category_id'),
+            'min_price' => $request->input('min_price'),
+            'max_price' => $request->input('max_price'),
+            'in_stock' => $request->boolean('in_stock') ? 1 : 0,
+            'sort_by' => $request->input('sort_by', 'created_at'),
+            'sort' => $request->input('sort', 'desc'),
+        ];
+    }
+
+    private function listCacheKey(Request $request, int $page, int $perPage): string
+    {
+        $version = (int) Cache::get(self::PAGE_VERSION_KEY, 1);
+        $signature = md5(json_encode([$this->listFilters($request), $page, $perPage], JSON_THROW_ON_ERROR));
+
+        return 'products.pages.'.$version.'.'.$signature;
+    }
+
+    /**
+     * @param  array{total: int, items: array<int, array<string, mixed>>}  $cached
+     */
+    private function paginatorFromCache(array $cached, int $perPage, int $page): LengthAwarePaginator
+    {
+        $items = collect($cached['items'])->map(fn (array $row) => $this->importProduct($row));
+
+        return new Paginator(
+            $items,
+            (int) $cached['total'],
+            $perPage,
+            $page,
+            ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page'],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function exportProduct(Product $product): array
+    {
+        $farmer = $product->relationLoaded('farmer') ? $product->farmer : null;
+        $market = $farmer?->relationLoaded('market') ? $farmer->market : null;
+
+        return [
+            'attributes' => $product->getAttributes(),
+            'category' => $product->relationLoaded('category') && $product->category
+                ? $product->category->getAttributes()
+                : null,
+            'farmer' => $farmer ? [
+                'attributes' => $farmer->getAttributes(),
+                'market' => $market?->getAttributes(),
+            ] : null,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    private function importProduct(array $row): Product
+    {
+        $product = (new Product)->newFromBuilder($row['attributes']);
+
+        $product->setRelation(
+            'category',
+            isset($row['category']) ? (new Category)->newFromBuilder($row['category']) : null,
+        );
+
+        if (! isset($row['farmer'])) {
+            $product->setRelation('farmer', null);
+
+            return $product;
+        }
+
+        $farmer = (new Farmer)->newFromBuilder($row['farmer']['attributes']);
+        $farmer->setRelation(
+            'market',
+            isset($row['farmer']['market']) ? (new Market)->newFromBuilder($row['farmer']['market']) : null,
+        );
+        $product->setRelation('farmer', $farmer);
+
+        return $product;
     }
 
     /**
