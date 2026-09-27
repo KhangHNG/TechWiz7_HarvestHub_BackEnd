@@ -67,7 +67,7 @@ class FarmerService
     {
         return DB::transaction(function () use ($farmer) {
             if ($farmer->products()->count() > 0) {
-                throw new \Exception('Không thể xóa nông dân đang có sản phẩm.');
+                throw new \Exception('Cannot delete a farmer that still has products.');
             }
 
             return $farmer->delete();

@@ -30,14 +30,14 @@ class WishlistController extends Controller
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả yêu thích thành công.',
+                'message' => 'All wishlists retrieved successfully.',
                 'data' => WishlistResource::collection($wishlists),
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách yêu thích thành công.',
+            'message' => 'Wishlists retrieved successfully.',
             'data' => WishlistResource::collection($wishlists),
             'meta' => [
                 'current_page' => $wishlists->currentPage(),
@@ -60,13 +60,13 @@ class WishlistController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Thêm yêu thích thành công.',
+                'message' => 'Added to wishlist successfully.',
                 'data' => new WishlistResource($wishlist),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Thêm yêu thích thất bại: '.$e->getMessage(),
+                'message' => 'Failed to add to wishlist: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -80,7 +80,7 @@ class WishlistController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy yêu thích thành công.',
+            'message' => 'Wishlist item retrieved successfully.',
             'data' => new WishlistResource($wishlist),
         ], 200);
     }
@@ -99,13 +99,13 @@ class WishlistController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật yêu thích thành công.',
+                'message' => 'Wishlist updated successfully.',
                 'data' => new WishlistResource($wishlist),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật yêu thích thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update wishlist: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -121,12 +121,12 @@ class WishlistController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa yêu thích thành công.',
+                'message' => 'Removed from wishlist successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa yêu thích thất bại: '.$e->getMessage(),
+                'message' => 'Failed to remove from wishlist: '.$e->getMessage(),
             ], 400);
         }
     }

@@ -16,7 +16,7 @@ class DeleteDeviceTokenRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'fcm_token' => 'Token thiết bị',
+            'fcm_token' => 'Device token',
         ];
     }
 }

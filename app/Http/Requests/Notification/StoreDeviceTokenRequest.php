@@ -17,8 +17,8 @@ class StoreDeviceTokenRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'fcm_token' => 'Token thiết bị',
-            'platform' => 'Nền tảng',
+            'fcm_token' => 'Device token',
+            'platform' => 'Platform',
         ];
     }
 }

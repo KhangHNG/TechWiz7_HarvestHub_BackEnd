@@ -23,27 +23,27 @@ abstract class ApiFormRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'required' => ':attribute không được để trống.',
-            'string' => ':attribute phải là chuỗi.',
-            'email' => ':attribute không đúng định dạng email.',
-            'max.string' => ':attribute không được vượt quá :max ký tự.',
-            'max.array' => ':attribute không được vượt quá :max phần tử.',
-            'max.file' => ':attribute không được vượt quá :max kilobyte.',
-            'min.string' => ':attribute phải có ít nhất :min ký tự.',
-            'min.numeric' => ':attribute phải lớn hơn hoặc bằng :min.',
-            'min.integer' => ':attribute phải lớn hơn hoặc bằng :min.',
-            'numeric' => ':attribute phải là số.',
-            'integer' => ':attribute phải là số nguyên.',
-            'boolean' => ':attribute phải là true hoặc false.',
-            'array' => ':attribute phải là mảng.',
-            'in' => ':attribute không hợp lệ.',
-            'exists' => ':attribute không tồn tại.',
-            'unique' => ':attribute đã tồn tại.',
-            'image' => ':attribute phải là hình ảnh.',
-            'mimes' => ':attribute phải có định dạng: :values.',
-            'between.numeric' => ':attribute phải nằm trong khoảng :min đến :max.',
-            'regex' => ':attribute không đúng định dạng.',
-            'distinct' => ':attribute bị trùng.',
+            'required' => 'The :attribute field is required.',
+            'string' => 'The :attribute must be a string.',
+            'email' => 'The :attribute must be a valid email address.',
+            'max.string' => 'The :attribute may not be greater than :max characters.',
+            'max.array' => 'The :attribute may not have more than :max items.',
+            'max.file' => 'The :attribute may not be greater than :max kilobytes.',
+            'min.string' => 'The :attribute must be at least :min characters.',
+            'min.numeric' => 'The :attribute must be at least :min.',
+            'min.integer' => 'The :attribute must be at least :min.',
+            'numeric' => 'The :attribute must be a number.',
+            'integer' => 'The :attribute must be an integer.',
+            'boolean' => 'The :attribute must be true or false.',
+            'array' => 'The :attribute must be an array.',
+            'in' => 'The :attribute is invalid.',
+            'exists' => 'The :attribute does not exist.',
+            'unique' => 'The :attribute has already been taken.',
+            'image' => 'The :attribute must be an image.',
+            'mimes' => 'The :attribute must be a file of type: :values.',
+            'between.numeric' => 'The :attribute must be between :min and :max.',
+            'regex' => 'The :attribute format is invalid.',
+            'distinct' => 'The :attribute has a duplicate value.',
         ];
     }
 
@@ -51,7 +51,7 @@ abstract class ApiFormRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Dữ liệu không hợp lệ.',
+            'message' => 'Invalid data.',
             'errors' => $validator->errors(),
         ], 422));
     }

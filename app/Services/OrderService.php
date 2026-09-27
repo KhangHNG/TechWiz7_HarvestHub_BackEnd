@@ -186,14 +186,14 @@ class OrderService
             $product = $item->product;
 
             if (! $product) {
-                throw new InsufficientStockException('Sản phẩm trong đơn không còn để cập nhật kho.');
+                throw new InsufficientStockException('Order products are no longer available to update stock.');
             }
 
             return (int) $product->farmer_id;
         });
 
         if ($order->items->isEmpty()) {
-            throw new InsufficientStockException('Sản phẩm trong đơn không còn để cập nhật kho.');
+            throw new InsufficientStockException('Order products are no longer available to update stock.');
         }
 
         $placed = [];
@@ -261,12 +261,12 @@ class OrderService
             $quantity = (int) $item->quantity;
 
             if (! $product) {
-                throw new InsufficientStockException('Sản phẩm trong đơn không còn để cập nhật kho.');
+                throw new InsufficientStockException('Order products are no longer available to update stock.');
             }
 
             $previous = (int) $product->stock_qty;
             if ($direction < 0 && $previous < $quantity) {
-                throw new InsufficientStockException('Sản phẩm '.$product->name.' không đủ số lượng trong kho.');
+                throw new InsufficientStockException('Product '.$product->name.' does not have enough stock.');
             }
 
             $current = $direction < 0 ? $previous - $quantity : $previous + $quantity;
@@ -304,7 +304,7 @@ class OrderService
 
         $label = $names->count() === 1 ? $names->first() : $names->join(', ');
 
-        throw new FarmerNotAcceptingOrdersException('Nông trại '.$label.' đang tạm ngừng nhận đơn.');
+        throw new FarmerNotAcceptingOrdersException('Farm '.$label.' is temporarily not accepting orders.');
     }
 
     public function deleteOrder(Order $order)

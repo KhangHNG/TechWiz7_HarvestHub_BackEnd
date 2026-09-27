@@ -32,10 +32,10 @@ class FarmerForm
                     ->numeric()
                     ->default(0),
                 Toggle::make('is_accepting_orders')
-                    ->label('Đang nhận đơn')
+                    ->label('Accepting orders')
                     ->default(true),
                 FileUpload::make('cover_url')
-                    ->label('Ảnh bìa')
+                    ->label('Cover image')
                     ->image()
                     ->maxSize(1536)
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'])

@@ -16,12 +16,12 @@ class AcceptingOrdersTest extends TestCase
 
     public function test_only_the_farm_owner_can_pause_orders(): void
     {
-        [$owner, $farmer] = $this->farm('Vườn A');
+        [$owner, $farmer] = $this->farm('Garden A');
         $other = $this->user('FARMER', 'other@example.com', '0900000002');
 
         $this->putJson('/api/farmers/'.$farmer->id, ['is_accepting_orders' => false])
             ->assertUnauthorized()
-            ->assertJsonPath('message', 'Token bị thiếu hoặc không thể giải mã.');
+            ->assertJsonPath('message', 'Token is missing or could not be decoded.');
 
         $this->withToken($this->token($other))
             ->putJson('/api/farmers/'.$farmer->id, ['is_accepting_orders' => false])
@@ -39,12 +39,12 @@ class AcceptingOrdersTest extends TestCase
 
     public function test_paused_farm_blocks_new_carts_and_checkout_but_not_open_orders(): void
     {
-        [$owner, $farmer] = $this->farm('Vườn A');
+        [$owner, $farmer] = $this->farm('Garden A');
         $customer = $this->user('CUSTOMER', 'khach@example.com', '0900000003');
         $product = Product::query()->create([
             'farmer_id' => $farmer->id,
             'category_id' => Category::query()->create(['name' => 'Rau'])->id,
-            'name' => 'Cải',
+            'name' => 'Mustard greens',
             'price' => 10000,
             'stock_qty' => 20,
         ]);
@@ -63,7 +63,7 @@ class AcceptingOrdersTest extends TestCase
         $this->withToken($customerToken)
             ->putJson('/api/orders/'.$openCart, [
                 'status' => 'PENDING',
-                'delivery_address' => '1 Đường A',
+                'delivery_address' => '1 Street A',
             ])
             ->assertOk()
             ->assertJsonPath('data.status', 'PENDING');
@@ -88,15 +88,15 @@ class AcceptingOrdersTest extends TestCase
         $this->withToken($customerToken)
             ->putJson('/api/orders/'.$heldCart, [
                 'status' => 'PENDING',
-                'delivery_address' => '1 Đường A',
+                'delivery_address' => '1 Street A',
             ])
             ->assertStatus(422)
-            ->assertJsonPath('message', 'Nông trại Vườn A đang tạm ngừng nhận đơn.');
+            ->assertJsonPath('message', 'Farm Garden A is temporarily not accepting orders.');
 
         $this->withToken($customerToken)
             ->postJson('/api/orders', $this->cartPayload($product, 1))
             ->assertStatus(422)
-            ->assertJsonPath('message', 'Nông trại Vườn A đang tạm ngừng nhận đơn.');
+            ->assertJsonPath('message', 'Farm Garden A is temporarily not accepting orders.');
 
         $this->withToken($this->token($owner))
             ->putJson('/api/orders/'.$openCart, ['status' => 'CONFIRMED'])
@@ -126,7 +126,7 @@ class AcceptingOrdersTest extends TestCase
             'email' => $email,
             'phone' => $phone,
             'password_hash' => 'secret',
-            'address' => '1 Đường A',
+            'address' => '1 Street A',
             'role' => $role,
             'email_verified_at' => now(),
         ]);
@@ -143,7 +143,7 @@ class AcceptingOrdersTest extends TestCase
     private function cartPayload(Product $product, int $quantity): array
     {
         return [
-            'delivery_address' => '1 Đường A',
+            'delivery_address' => '1 Street A',
             'status' => 'CART',
             'total_price' => $product->price * $quantity,
             'items' => [$this->line($product, $quantity)],

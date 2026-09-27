@@ -32,9 +32,9 @@ class UsersTable
                 TextColumn::make('role')
                     ->searchable(),
                 TextColumn::make('email_verified_at')
-                    ->label('Email xác thực')
+                    ->label('Email verified')
                     ->dateTime()
-                    ->placeholder('Chưa xác thực')
+                    ->placeholder('Unverified')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -60,17 +60,17 @@ class UsersTable
             ])
             ->filters([
                 SelectFilter::make('role')
-                    ->label('Vai trò')
+                    ->label('Role')
                     ->options([
-                        'CUSTOMER' => 'Khách hàng',
-                        'FARMER' => 'Nông dân',
-                        'ADMIN' => 'Quản trị',
+                        'CUSTOMER' => 'Customer',
+                        'FARMER' => 'Farmer',
+                        'ADMIN' => 'Admin',
                     ]),
                 TernaryFilter::make('email_verified_at')
-                    ->label('Email xác thực')
+                    ->label('Email verified')
                     ->nullable()
-                    ->trueLabel('Đã xác thực')
-                    ->falseLabel('Chưa xác thực'),
+                    ->trueLabel('Verified')
+                    ->falseLabel('Unverified'),
                 CreatedBetweenFilter::make(),
                 TrashedFilter::make(),
             ])

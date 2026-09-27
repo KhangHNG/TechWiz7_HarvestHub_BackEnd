@@ -62,19 +62,19 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
         });
     }
 
-    // Filament/Laravel auth đọc mật khẩu qua đây thay vì cột "password"
+    // Filament/Laravel auth reads the password here instead of a "password" column
     public function getAuthPassword()
     {
         return $this->password_hash;
     }
 
-    // Tên hiển thị trên giao diện Filament
+    // Display name on the Filament UI
     public function getFilamentName(): string
     {
         return $this->full_name;
     }
 
-    // Cho phép mọi user vào panel admin (tạm thời; siết lại theo role sau)
+    // Allow every user into the admin panel (temporary; tighten by role later)
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

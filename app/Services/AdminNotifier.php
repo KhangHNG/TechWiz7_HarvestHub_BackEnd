@@ -51,11 +51,11 @@ class AdminNotifier
 
         $label = $this->label($model);
         $title = match ($event) {
-            'created' => $label.' vừa được tạo',
-            'updated' => $label.' vừa được cập nhật',
-            'deleted' => $label.' vừa bị xóa',
-            'restored' => $label.' vừa được khôi phục',
-            default => $label.' vừa thay đổi',
+            'created' => $label.' was just created',
+            'updated' => $label.' was just updated',
+            'deleted' => $label.' was just deleted',
+            'restored' => $label.' was just restored',
+            default => $label.' just changed',
         };
         $body = $this->body($model, $event);
         $url = $this->url($model, $event);
@@ -81,7 +81,7 @@ class AdminNotifier
             if ($url) {
                 $notification->actions([
                     Action::make('open')
-                        ->label('Xem')
+                        ->label('View')
                         ->url($url),
                 ]);
             }
@@ -93,14 +93,14 @@ class AdminNotifier
     private function label(Model $model): string
     {
         return match (true) {
-            $model instanceof User => 'Người dùng '.($model->full_name ?: '#'.$model->getKey()),
-            $model instanceof Farmer => 'Nông dân '.($model->business_name ?: '#'.$model->getKey()),
-            $model instanceof Product => 'Sản phẩm '.($model->name ?: '#'.$model->getKey()),
-            $model instanceof Order => 'Đơn hàng #'.$model->getKey(),
-            $model instanceof Market => 'Chợ '.($model->name ?: '#'.$model->getKey()),
-            $model instanceof Category => 'Danh mục '.($model->name ?: '#'.$model->getKey()),
-            $model instanceof Wishlist => 'Yêu thích #'.$model->getKey(),
-            $model instanceof FarmerFollow => 'Theo dõi #'.$model->getKey(),
+            $model instanceof User => 'User '.($model->full_name ?: '#'.$model->getKey()),
+            $model instanceof Farmer => 'Farmer '.($model->business_name ?: '#'.$model->getKey()),
+            $model instanceof Product => 'Product '.($model->name ?: '#'.$model->getKey()),
+            $model instanceof Order => 'Order #'.$model->getKey(),
+            $model instanceof Market => 'Market '.($model->name ?: '#'.$model->getKey()),
+            $model instanceof Category => 'Category '.($model->name ?: '#'.$model->getKey()),
+            $model instanceof Wishlist => 'Wishlist #'.$model->getKey(),
+            $model instanceof FarmerFollow => 'Follow #'.$model->getKey(),
             default => class_basename($model).' #'.$model->getKey(),
         };
     }
@@ -112,11 +112,11 @@ class AdminNotifier
         }
 
         if ($model instanceof Order && $model->wasChanged('status')) {
-            return 'Trạng thái: '.$model->status;
+            return 'Status: '.$model->status;
         }
 
         if ($model instanceof Product && $model->wasChanged('stock_qty')) {
-            return 'Tồn kho: '.$model->stock_qty;
+            return 'Stock: '.$model->stock_qty;
         }
 
         return null;

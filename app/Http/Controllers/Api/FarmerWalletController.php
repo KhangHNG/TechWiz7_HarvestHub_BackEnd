@@ -17,7 +17,7 @@ class FarmerWalletController extends Controller
         if (! $farmer) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy hồ sơ nông dân.',
+                'message' => 'Farmer profile not found.',
             ], 404);
         }
 
@@ -29,7 +29,7 @@ class FarmerWalletController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy số dư ví thành công.',
+            'message' => 'Wallet balance retrieved successfully.',
             'data' => [
                 'balance' => (float) $totals->credit_total - (float) $totals->debit_total,
             ],

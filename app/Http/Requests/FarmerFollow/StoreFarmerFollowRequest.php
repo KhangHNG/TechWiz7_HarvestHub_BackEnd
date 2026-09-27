@@ -19,16 +19,16 @@ class StoreFarmerFollowRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'customer_id' => 'Khách hàng',
-            'farmer_id' => 'Nông dân',
+            'customer_id' => 'Customer',
+            'farmer_id' => 'Farmer',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'customer_id.exists' => 'Khách hàng không tồn tại hoặc không có vai trò CUSTOMER.',
-            'farmer_id.exists' => 'Nông dân không tồn tại.',
+            'customer_id.exists' => 'The customer does not exist or does not have the CUSTOMER role.',
+            'farmer_id.exists' => 'The farmer does not exist.',
         ]);
     }
 
@@ -46,7 +46,7 @@ class StoreFarmerFollowRequest extends ApiFormRequest
                 ->exists();
 
             if ($exists) {
-                $validator->errors()->add('farmer_id', 'Bạn đã theo dõi nông dân này.');
+                $validator->errors()->add('farmer_id', 'You already follow this farmer.');
             }
         });
     }

@@ -23,7 +23,7 @@ class OrdersChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Doanh thu (đ)',
+                    'label' => 'Revenue (VND)',
                     'data' => $revenue->toArray(),
                     'borderColor' => '#22c55e',
                     'backgroundColor' => 'rgba(34,197,94,0.2)',

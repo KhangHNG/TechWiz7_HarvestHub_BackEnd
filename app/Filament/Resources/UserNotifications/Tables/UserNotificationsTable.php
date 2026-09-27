@@ -18,47 +18,47 @@ class UserNotificationsTable
         return $table
             ->columns([
                 TextColumn::make('user.full_name')
-                    ->label('Người nhận')
+                    ->label('Recipient')
                     ->searchable(),
                 TextColumn::make('type')
-                    ->label('Loại')
+                    ->label('Type')
                     ->searchable(),
                 TextColumn::make('title')
-                    ->label('Tiêu đề')
+                    ->label('Title')
                     ->searchable()
                     ->limit(40),
                 TextColumn::make('read_at')
-                    ->label('Lúc đọc')
+                    ->label('Read at')
                     ->dateTime()
-                    ->placeholder('Chưa đọc')
+                    ->placeholder('Unread')
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->label('Ngày tạo')
+                    ->label('Created at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('user')
-                    ->label('Người nhận')
+                    ->label('Recipient')
                     ->relationship('user', 'full_name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('type')
-                    ->label('Loại')
+                    ->label('Type')
                     ->options([
-                        'order_pending' => 'Chờ xác nhận',
-                        'order_confirmed' => 'Đã xác nhận',
-                        'order_ready' => 'Sẵn sàng lấy hàng',
-                        'order_completed' => 'Hoàn thành',
-                        'order_cancelled' => 'Đã hủy',
-                        'stock_low' => 'Sắp hết hàng',
-                        'stock_out' => 'Hết hàng',
+                        'order_pending' => 'Pending confirmation',
+                        'order_confirmed' => 'Confirmed',
+                        'order_ready' => 'Ready for pickup',
+                        'order_completed' => 'Completed',
+                        'order_cancelled' => 'Cancelled',
+                        'stock_low' => 'Low stock',
+                        'stock_out' => 'Out of stock',
                     ]),
                 TernaryFilter::make('read_at')
-                    ->label('Đã đọc')
+                    ->label('Read')
                     ->nullable()
-                    ->trueLabel('Đã đọc')
-                    ->falseLabel('Chưa đọc'),
+                    ->trueLabel('Read')
+                    ->falseLabel('Unread'),
                 CreatedBetweenFilter::make(),
             ])
             ->recordActions([

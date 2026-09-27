@@ -18,18 +18,18 @@ class RevenueRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'period' => 'Kỳ thống kê',
-            'year' => 'Năm',
-            'month' => 'Tháng',
+            'period' => 'Period',
+            'year' => 'Year',
+            'month' => 'Month',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'period.in' => 'Kỳ thống kê phải là day, month hoặc year.',
-            'year.required_if' => 'Năm không được để trống.',
-            'month.required_if' => 'Tháng không được để trống.',
+            'period.in' => 'The period must be day, month, or year.',
+            'year.required_if' => 'The year field is required.',
+            'month.required_if' => 'The month field is required.',
         ]);
     }
 }

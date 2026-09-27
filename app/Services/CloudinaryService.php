@@ -18,7 +18,7 @@ class CloudinaryService
         $url = $result['secure_url'] ?? null;
 
         if (! is_string($url) || $url === '') {
-            throw new RuntimeException('Không tải được ảnh lên Cloudinary.');
+            throw new RuntimeException('Could not upload image to Cloudinary.');
         }
 
         return $url;
@@ -60,7 +60,7 @@ class CloudinaryService
         try {
             $this->client()->uploadApi()->destroy($publicId);
         } catch (\Throwable) {
-            // Ảnh có thể đã bị xóa trước đó.
+            // The image may already have been deleted.
         }
     }
 
@@ -114,7 +114,7 @@ class CloudinaryService
         $apiSecret = config('services.cloudinary.api_secret');
 
         if (! is_string($cloudName) || $cloudName === '' || ! is_string($apiKey) || $apiKey === '' || ! is_string($apiSecret) || $apiSecret === '') {
-            throw new RuntimeException('Thiếu cấu hình Cloudinary.');
+            throw new RuntimeException('Cloudinary configuration is missing.');
         }
 
         return new Cloudinary([

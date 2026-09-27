@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Đặt lại mật khẩu</title>
+    <title>Reset password</title>
 </head>
 <body>
-    <p>Mã đặt lại mật khẩu HarvestHub của bạn là:</p>
+    <p>Your HarvestHub password reset code is:</p>
     <p style="font-size: 24px; font-weight: bold; letter-spacing: 4px;">{{ $code }}</p>
-    <p>Mã có hiệu lực trong 10 phút. Nếu bạn không yêu cầu mã này, hãy bỏ qua email.</p>
+    <p>This code is valid for 10 minutes. If you did not request it, please ignore this email.</p>
 </body>
 </html>

@@ -54,12 +54,12 @@ class FarmersTable
             ])
             ->filters([
                 SelectFilter::make('market')
-                    ->label('Chợ')
+                    ->label('Market')
                     ->relationship('market', 'name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('user')
-                    ->label('Người dùng')
+                    ->label('User')
                     ->relationship('user', 'full_name')
                     ->searchable()
                     ->preload(),

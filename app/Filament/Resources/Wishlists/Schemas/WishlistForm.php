@@ -16,7 +16,7 @@ class WishlistForm
         return $schema
             ->components([
                 Select::make('customer_id')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->relationship(
                         'customer',
                         'full_name',
@@ -26,7 +26,7 @@ class WishlistForm
                     ->preload()
                     ->required(),
                 Select::make('product_id')
-                    ->label('Sản phẩm')
+                    ->label('Product')
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
@@ -40,7 +40,7 @@ class WishlistForm
                                 ->exists();
 
                             if ($exists) {
-                                $fail('Khách đã yêu thích sản phẩm này.');
+                                $fail('This customer already has this product in their wishlist.');
                             }
                         },
                     ]),

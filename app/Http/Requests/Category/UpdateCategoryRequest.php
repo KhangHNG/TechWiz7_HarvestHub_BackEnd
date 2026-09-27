@@ -25,14 +25,14 @@ class UpdateCategoryRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'Tên danh mục',
+            'name' => 'Category name',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'name.unique' => 'Tên danh mục này đã tồn tại.',
+            'name.unique' => 'This category name has already been taken.',
         ]);
     }
 }

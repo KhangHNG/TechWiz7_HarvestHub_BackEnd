@@ -12,8 +12,8 @@ class WishlistInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('customer.full_name')->label('Khách hàng'),
-                TextEntry::make('product.name')->label('Sản phẩm'),
+                TextEntry::make('customer.full_name')->label('Customer'),
+                TextEntry::make('product.name')->label('Product'),
                 TextEntry::make('created_at')->dateTime(),
                 TextEntry::make('deleted_at')
                     ->dateTime()

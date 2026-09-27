@@ -33,13 +33,13 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api', 'api/*')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Liên kết xác thực không hợp lệ hoặc đã hết hạn.',
+                    'message' => 'The verification link is invalid or has expired.',
                 ], 403);
             }
 
             return response()->view('auth.email-verified', [
                 'success' => false,
-                'message' => 'Liên kết xác thực không hợp lệ hoặc đã hết hạn.',
+                'message' => 'The verification link is invalid or has expired.',
             ], 403);
         });
 
@@ -51,7 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof ValidationException) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dữ liệu không hợp lệ.',
+                    'message' => 'Invalid data.',
                     'errors' => $e->errors(),
                 ], 422);
             }
@@ -68,14 +68,14 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $message = match (true) {
-                $status === 401 => 'Token bị thiếu hoặc không thể giải mã.',
-                $status === 403 => 'Bạn không có quyền thực hiện thao tác này.',
-                $status === 404 => 'Không tìm thấy.',
-                $status === 405 => 'Phương thức không được hỗ trợ.',
-                $status === 422 => 'Dữ liệu không hợp lệ.',
-                $status === 429 => 'Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau.',
-                $status >= 500 => 'Đã xảy ra lỗi. Vui lòng thử lại.',
-                default => 'Yêu cầu không hợp lệ.',
+                $status === 401 => 'Token is missing or could not be decoded.',
+                $status === 403 => 'You do not have permission to perform this action.',
+                $status === 404 => 'Not found.',
+                $status === 405 => 'Method not allowed.',
+                $status === 422 => 'Invalid data.',
+                $status === 429 => 'Too many requests. Please try again later.',
+                $status >= 500 => 'An error occurred. Please try again.',
+                default => 'Invalid request.',
             };
 
             return response()->json([

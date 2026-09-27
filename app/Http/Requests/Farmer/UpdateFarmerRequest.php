@@ -29,21 +29,21 @@ class UpdateFarmerRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'user_id' => 'Người dùng',
-            'market_id' => 'Chợ',
-            'business_name' => 'Tên cửa hàng',
-            'description' => 'Mô tả',
-            'rating' => 'Đánh giá',
-            'is_accepting_orders' => 'Trạng thái nhận đơn',
+            'user_id' => 'User',
+            'market_id' => 'Market',
+            'business_name' => 'Business name',
+            'description' => 'Description',
+            'rating' => 'Rating',
+            'is_accepting_orders' => 'Accepting orders',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'user_id.unique' => 'Người dùng này đã có hồ sơ nông dân.',
-            'user_id.exists' => 'Người dùng không tồn tại.',
-            'market_id.exists' => 'Chợ không tồn tại.',
+            'user_id.unique' => 'This user already has a farmer profile.',
+            'user_id.exists' => 'The user does not exist.',
+            'market_id.exists' => 'The market does not exist.',
         ]);
     }
 }

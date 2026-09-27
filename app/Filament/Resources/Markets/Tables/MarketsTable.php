@@ -57,9 +57,9 @@ class MarketsTable
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Đang hoạt động')
-                    ->trueLabel('Đang hoạt động')
-                    ->falseLabel('Ngừng hoạt động'),
+                    ->label('Active')
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive'),
                 CreatedBetweenFilter::make(),
                 TrashedFilter::make(),
             ])

@@ -25,8 +25,8 @@ class NotificationService
         $this->notify(
             $this->farmerUser($order),
             'order_pending',
-            'Đơn hàng mới',
-            'Bạn có đơn hàng mới cần xác nhận.',
+            'New order',
+            'You have a new order that needs confirmation.',
             ['order_id' => (string) $order->id],
         );
     }
@@ -41,26 +41,26 @@ class NotificationService
             'PENDING' => [
                 $this->farmerUser($order),
                 'order_pending',
-                'Đơn hàng mới',
-                'Bạn có đơn hàng mới cần xác nhận.',
+                'New order',
+                'You have a new order that needs confirmation.',
             ],
             'CONFIRMED' => [
                 $order->customer,
                 'order_confirmed',
-                'Đơn đã được xác nhận',
-                'Nông dân đã xác nhận đơn hàng của bạn.',
+                'Order confirmed',
+                'The farmer has confirmed your order.',
             ],
             'READY_FOR_PICKUP' => [
                 $order->customer,
                 'order_ready',
-                'Đơn sẵn sàng để lấy',
-                'Đơn hàng của bạn đã sẵn sàng để lấy.',
+                'Order ready for pickup',
+                'Your order is ready for pickup.',
             ],
             'COMPLETED' => [
                 $order->customer,
                 'order_completed',
-                'Đơn đã hoàn thành',
-                'Đơn hàng của bạn đã hoàn thành.',
+                'Order completed',
+                'Your order has been completed.',
             ],
             'CANCELLED' => $this->cancelledRecipient($order),
             default => [null, null, null, null],
@@ -87,12 +87,12 @@ class NotificationService
 
         if ($current === 0 && $previous > 0) {
             $type = 'stock_out';
-            $title = 'Hết hàng';
-            $body = $product->name.' đã hết hàng.';
+            $title = 'Out of stock';
+            $body = $product->name.' is out of stock.';
         } elseif ($current >= 1 && $current <= 20 && $previous > 20) {
             $type = 'stock_low';
-            $title = 'Sắp hết hàng';
-            $body = $product->name.' còn '.$current.' sản phẩm.';
+            $title = 'Low stock';
+            $body = $product->name.' has '.$current.' left in stock.';
         }
 
         if (! $type) {
@@ -241,11 +241,11 @@ class NotificationService
         $farmerUser = $order->farmer?->user;
 
         if ($actor && (int) $actor->id === (int) $order->customer_id) {
-            return [$farmerUser, 'order_cancelled', 'Đơn đã bị hủy', 'Khách hàng đã hủy đơn hàng.'];
+            return [$farmerUser, 'order_cancelled', 'Order cancelled', 'The customer cancelled the order.'];
         }
 
         if ($actor && $farmerUser && (int) $actor->id === (int) $farmerUser->id) {
-            return [$order->customer, 'order_cancelled', 'Đơn đã bị hủy', 'Nông dân đã hủy đơn hàng.'];
+            return [$order->customer, 'order_cancelled', 'Order cancelled', 'The farmer cancelled the order.'];
         }
 
         return [null, null, null, null];

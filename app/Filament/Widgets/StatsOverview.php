@@ -14,23 +14,23 @@ class StatsOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Tổng sản phẩm', Product::count())
-                ->description('Sản phẩm đang bán')
+            Stat::make('Total products', Product::count())
+                ->description('Products for sale')
                 ->descriptionIcon('heroicon-m-shopping-bag')
                 ->color('success'),
 
-            Stat::make('Tổng đơn hàng', Order::count())
-                ->description('Tất cả đơn hàng')
+            Stat::make('Total orders', Order::count())
+                ->description('All orders')
                 ->descriptionIcon('heroicon-m-clipboard-document-list')
                 ->color('warning'),
 
-            Stat::make('Tổng doanh thu', number_format(Order::query()->where('status', 'COMPLETED')->sum('total_price')).' đ')
-                ->description('Đơn đã hoàn thành')
+            Stat::make('Total revenue', number_format(Order::query()->where('status', 'COMPLETED')->sum('total_price')).' VND')
+                ->description('Order completed')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('primary'),
 
-            Stat::make('Tổng nông dân', Farmer::count())
-                ->description('Nông dân đang hoạt động')
+            Stat::make('Total farmers', Farmer::count())
+                ->description('Active farmers')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('info'),
         ];

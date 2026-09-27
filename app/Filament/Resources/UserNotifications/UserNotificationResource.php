@@ -19,11 +19,11 @@ class UserNotificationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBell;
 
-    protected static ?string $navigationLabel = 'Thông báo';
+    protected static ?string $navigationLabel = 'Notifications';
 
-    protected static ?string $modelLabel = 'thông báo';
+    protected static ?string $modelLabel = 'notification';
 
-    protected static ?string $pluralModelLabel = 'thông báo';
+    protected static ?string $pluralModelLabel = 'notifications';
 
     protected static ?string $recordTitleAttribute = 'title';
 

@@ -14,32 +14,32 @@ class OrderInfolist
         return $schema
             ->components([
                 TextEntry::make('customer.full_name')
-                    ->label('Khách hàng'),
+                    ->label('Customer'),
                 TextEntry::make('farmer.business_name')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->placeholder('-'),
                 TextEntry::make('delivery_address')
-                    ->label('Địa chỉ giao hàng')
+                    ->label('Delivery address')
                     ->placeholder('-')
                     ->columnSpanFull(),
                 TextEntry::make('status')
-                    ->label('Trạng thái')
+                    ->label('Status')
                     ->formatStateUsing(fn (?string $state): string => OrderForm::statusOptions($state)[$state] ?? (string) $state),
                 TextEntry::make('total_price')
-                    ->label('Tổng tiền')
+                    ->label('Total')
                     ->money('vnd')
                     ->placeholder('-'),
                 TextEntry::make('completed_at')
-                    ->label('Hoàn thành lúc')
+                    ->label('Completed at')
                     ->dateTime()
                     ->placeholder('-'),
                 RepeatableEntry::make('items')
-                    ->label('Sản phẩm')
+                    ->label('Product')
                     ->schema([
-                        TextEntry::make('product_name')->label('Sản phẩm'),
-                        TextEntry::make('quantity')->label('Số lượng'),
-                        TextEntry::make('unit_price')->label('Đơn giá'),
-                        TextEntry::make('line_total')->label('Thành tiền'),
+                        TextEntry::make('product_name')->label('Product'),
+                        TextEntry::make('quantity')->label('Quantity'),
+                        TextEntry::make('unit_price')->label('Unit price'),
+                        TextEntry::make('line_total')->label('Line total'),
                     ])
                     ->columnSpanFull(),
                 TextEntry::make('created_at')

@@ -24,11 +24,11 @@ class FarmerFollowResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
-    protected static ?string $navigationLabel = 'Theo dõi';
+    protected static ?string $navigationLabel = 'Follows';
 
-    protected static ?string $modelLabel = 'theo dõi';
+    protected static ?string $modelLabel = 'follow';
 
-    protected static ?string $pluralModelLabel = 'theo dõi';
+    protected static ?string $pluralModelLabel = 'follows';
 
     public static function form(Schema $schema): Schema
     {

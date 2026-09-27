@@ -36,14 +36,14 @@ class FarmerController extends Controller
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả nông dân thành công.',
+                'message' => 'All farmers retrieved successfully.',
                 'data' => FarmerResource::collection($farmers),
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách nông dân thành công.',
+            'message' => 'Farmers retrieved successfully.',
             'data' => FarmerResource::collection($farmers),
             'meta' => [
                 'current_page' => $farmers->currentPage(),
@@ -66,13 +66,13 @@ class FarmerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo nông dân thành công.',
+                'message' => 'Farmer created successfully.',
                 'data' => new FarmerResource($farmer),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo nông dân thất bại: '.$e->getMessage(),
+                'message' => 'Failed to create farmer: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -86,7 +86,7 @@ class FarmerController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy nông dân thành công.',
+            'message' => 'Farmer retrieved successfully.',
             'data' => new FarmerResource($farmer),
         ], 200);
     }
@@ -112,13 +112,13 @@ class FarmerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật nông dân thành công.',
+                'message' => 'Farmer updated successfully.',
                 'data' => new FarmerResource($farmer),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật nông dân thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update farmer: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -139,13 +139,13 @@ class FarmerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật ảnh bìa thành công.',
+                'message' => 'Cover image updated successfully.',
                 'data' => new FarmerResource($farmer),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật ảnh bìa thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update cover image: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -161,12 +161,12 @@ class FarmerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa nông dân thành công.',
+                'message' => 'Farmer deleted successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa nông dân thất bại: '.$e->getMessage(),
+                'message' => 'Failed to delete farmer: '.$e->getMessage(),
             ], 400);
         }
     }
@@ -178,24 +178,24 @@ class FarmerController extends Controller
         } catch (TokenExpiredException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token đã hết hạn, vui lòng đăng nhập lại.',
+                'message' => 'Token has expired, please sign in again.',
             ], 401);
         } catch (TokenInvalidException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token không hợp lệ.',
+                'message' => 'Invalid token.',
             ], 401);
         } catch (JWTException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token bị thiếu hoặc không thể giải mã.',
+                'message' => 'Token is missing or could not be decoded.',
             ], 401);
         }
 
         if (! $user instanceof User || $user->role !== 'FARMER' || (int) $user->id !== (int) $farmer->user_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bạn không có quyền thực hiện thao tác này.',
+                'message' => 'You do not have permission to perform this action.',
             ], 403);
         }
 

@@ -16,14 +16,14 @@ class StoreCoverRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'cover' => 'Ảnh bìa',
+            'cover' => 'Cover image',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'cover.max' => 'Ảnh bìa không được vượt quá 1.5 MB.',
+            'cover.max' => 'The cover image may not be greater than 1.5 MB.',
         ]);
     }
 }

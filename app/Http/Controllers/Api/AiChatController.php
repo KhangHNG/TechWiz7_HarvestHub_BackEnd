@@ -19,7 +19,7 @@ class AiChatController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã trả lời',
+            'message' => 'Replied',
             'data' => [
                 'reply' => $reply,
             ],

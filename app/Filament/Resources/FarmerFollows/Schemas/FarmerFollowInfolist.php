@@ -12,8 +12,8 @@ class FarmerFollowInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('customer.full_name')->label('Khách hàng'),
-                TextEntry::make('farmer.business_name')->label('Nông dân'),
+                TextEntry::make('customer.full_name')->label('Customer'),
+                TextEntry::make('farmer.business_name')->label('Farmer'),
                 TextEntry::make('created_at')->dateTime(),
                 TextEntry::make('deleted_at')
                     ->dateTime()

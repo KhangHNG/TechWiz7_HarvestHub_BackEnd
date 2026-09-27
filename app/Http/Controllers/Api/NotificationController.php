@@ -19,7 +19,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách thông báo thành công.',
+            'message' => 'Notifications retrieved successfully.',
             'data' => $notifications->getCollection()->map(fn (UserNotification $notification) => $this->payload($notification))->values(),
             'meta' => [
                 'current_page' => $notifications->currentPage(),
@@ -39,7 +39,7 @@ class NotificationController extends Controller
         if (! $notification) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy thông báo.',
+                'message' => 'Notification not found.',
             ], 404);
         }
 
@@ -50,7 +50,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã đánh dấu đã đọc.',
+            'message' => 'Marked as read.',
             'data' => $this->payload($notification),
         ]);
     }

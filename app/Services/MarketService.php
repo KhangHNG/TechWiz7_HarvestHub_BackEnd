@@ -45,7 +45,7 @@ class MarketService
     {
         return DB::transaction(function () use ($market) {
             if ($market->farmers()->count() > 0) {
-                throw new \Exception('Không thể xóa chợ đang có nông dân.');
+                throw new \Exception('Cannot delete a market that still has farmers.');
             }
 
             return $market->delete();

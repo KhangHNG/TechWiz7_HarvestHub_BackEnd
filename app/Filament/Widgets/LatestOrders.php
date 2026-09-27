@@ -10,7 +10,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 class LatestOrders extends BaseWidget
 {
     protected static ?int $sort = 3;
-    protected static ?string $heading = 'Đơn hàng gần nhất';
+    protected static ?string $heading = 'Latest orders';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -19,12 +19,12 @@ class LatestOrders extends BaseWidget
         return $table
             ->query(Order::query()->latest())
             ->columns([
-                Tables\Columns\TextColumn::make('id')->label('Mã ĐH'),
-                Tables\Columns\TextColumn::make('customer.full_name')->label('Khách hàng'),
-                Tables\Columns\TextColumn::make('farmer.business_name')->label('Nông dân'),
-                Tables\Columns\TextColumn::make('status')->label('Trạng thái')->badge(),
-                Tables\Columns\TextColumn::make('total_price')->label('Tổng tiền')->money('vnd'),
-                Tables\Columns\TextColumn::make('created_at')->label('Ngày tạo')->dateTime('d/m/Y H:i'),
+                Tables\Columns\TextColumn::make('id')->label('Order ID'),
+                Tables\Columns\TextColumn::make('customer.full_name')->label('Customer'),
+                Tables\Columns\TextColumn::make('farmer.business_name')->label('Farmer'),
+                Tables\Columns\TextColumn::make('status')->label('Status')->badge(),
+                Tables\Columns\TextColumn::make('total_price')->label('Total')->money('vnd'),
+                Tables\Columns\TextColumn::make('created_at')->label('Created at')->dateTime('d/m/Y H:i'),
             ])
             ->paginated([5]);
     }

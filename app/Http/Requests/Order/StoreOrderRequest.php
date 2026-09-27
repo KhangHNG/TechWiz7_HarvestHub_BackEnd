@@ -19,7 +19,7 @@ class StoreOrderRequest extends ApiFormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Chỉ khách hàng mới được tạo đơn hàng.',
+            'message' => 'Only customers can create orders.',
         ], 403));
     }
 
@@ -57,30 +57,30 @@ class StoreOrderRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'customer_id' => 'Khách hàng',
-            'farmer_id' => 'Nông dân',
-            'delivery_address' => 'Địa chỉ giao hàng',
-            'status' => 'Trạng thái',
-            'total_price' => 'Tổng tiền',
-            'items' => 'Sản phẩm trong đơn',
-            'items.*.product_id' => 'Sản phẩm',
-            'items.*.product_name' => 'Tên sản phẩm',
-            'items.*.unit_price' => 'Đơn giá',
-            'items.*.quantity' => 'Số lượng',
-            'items.*.line_total' => 'Thành tiền',
+            'customer_id' => 'Customer',
+            'farmer_id' => 'Farmer',
+            'delivery_address' => 'Delivery address',
+            'status' => 'Status',
+            'total_price' => 'Total',
+            'items' => 'Order items',
+            'items.*.product_id' => 'Product',
+            'items.*.product_name' => 'Product name',
+            'items.*.unit_price' => 'Unit price',
+            'items.*.quantity' => 'Quantity',
+            'items.*.line_total' => 'Line total',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'customer_id.exists' => 'Khách hàng không tồn tại hoặc không có vai trò CUSTOMER.',
-            'farmer_id.exists' => 'Nông dân không tồn tại.',
-            'status.in' => 'Đơn mới chỉ được tạo ở trạng thái CART.',
-            'items.required' => 'Đơn hàng cần ít nhất một sản phẩm.',
-            'items.min' => 'Đơn hàng cần ít nhất một sản phẩm.',
-            'items.*.product_id.exists' => 'Sản phẩm không tồn tại.',
-            'items.*.product_id.distinct' => 'Sản phẩm bị trùng trong đơn hàng.',
+            'customer_id.exists' => 'The customer does not exist or does not have the CUSTOMER role.',
+            'farmer_id.exists' => 'The farmer does not exist.',
+            'status.in' => 'New orders can only be created with CART status.',
+            'items.required' => 'The order needs at least one product.',
+            'items.min' => 'The order needs at least one product.',
+            'items.*.product_id.exists' => 'The product does not exist.',
+            'items.*.product_id.distinct' => 'Duplicate products in the order.',
         ]);
     }
 

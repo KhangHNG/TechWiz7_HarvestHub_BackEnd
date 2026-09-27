@@ -22,19 +22,19 @@ class FarmerFollowsTable
         return $table
             ->columns([
                 TextColumn::make('customer.full_name')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->searchable(),
                 TextColumn::make('farmer.business_name')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->searchable(),
                 TextColumn::make('created_at')
-                    ->label('Ngày tạo')
+                    ->label('Created at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('customer')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->relationship(
                         'customer',
                         'full_name',
@@ -43,7 +43,7 @@ class FarmerFollowsTable
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('farmer')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->relationship('farmer', 'business_name')
                     ->searchable()
                     ->preload(),

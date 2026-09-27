@@ -13,7 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class CheckRole
 {
     /**
-     * @param  string  ...$roles  Role được phép, ví dụ CUSTOMER, FARMER
+     * @param  string  ...$roles  Allowed roles, e.g. CUSTOMER, FARMER
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
@@ -23,30 +23,30 @@ class CheckRole
             if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Không tìm thấy thông tin người dùng.',
+                    'message' => 'User information not found.',
                 ], 404);
             }
 
             if ($roles !== [] && ! in_array($user->role, $roles, true)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bạn không có quyền thực hiện thao tác này.',
+                    'message' => 'You do not have permission to perform this action.',
                 ], 403);
             }
         } catch (TokenExpiredException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token đã hết hạn, vui lòng đăng nhập lại.',
+                'message' => 'Token has expired, please sign in again.',
             ], 401);
         } catch (TokenInvalidException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token không hợp lệ.',
+                'message' => 'Invalid token.',
             ], 401);
         } catch (JWTException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token bị thiếu hoặc không thể giải mã.',
+                'message' => 'Token is missing or could not be decoded.',
             ], 401);
         }
 

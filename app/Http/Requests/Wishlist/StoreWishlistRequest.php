@@ -19,16 +19,16 @@ class StoreWishlistRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'customer_id' => 'Khách hàng',
-            'product_id' => 'Sản phẩm',
+            'customer_id' => 'Customer',
+            'product_id' => 'Product',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'customer_id.exists' => 'Khách hàng không tồn tại hoặc không có vai trò CUSTOMER.',
-            'product_id.exists' => 'Sản phẩm không tồn tại.',
+            'customer_id.exists' => 'The customer does not exist or does not have the CUSTOMER role.',
+            'product_id.exists' => 'The product does not exist.',
         ]);
     }
 
@@ -46,7 +46,7 @@ class StoreWishlistRequest extends ApiFormRequest
                 ->exists();
 
             if ($exists) {
-                $validator->errors()->add('product_id', 'Sản phẩm đã có trong danh sách yêu thích.');
+                $validator->errors()->add('product_id', 'The product is already in the wishlist.');
             }
         });
     }

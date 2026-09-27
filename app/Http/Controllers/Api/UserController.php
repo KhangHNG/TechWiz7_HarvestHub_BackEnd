@@ -31,14 +31,14 @@ class UserController extends Controller
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả người dùng thành công.',
+                'message' => 'All users retrieved successfully.',
                 'data' => UserResource::collection($users),
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách người dùng thành công.',
+            'message' => 'Users retrieved successfully.',
             'data' => UserResource::collection($users),
             'meta' => [
                 'current_page' => $users->currentPage(),
@@ -61,13 +61,13 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo người dùng thành công.',
+                'message' => 'User created successfully.',
                 'data' => new UserResource($user),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo người dùng thất bại: '.$e->getMessage(),
+                'message' => 'Failed to create user: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -81,7 +81,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy người dùng thành công.',
+            'message' => 'User retrieved successfully.',
             'data' => new UserResource($user),
         ], 200);
     }
@@ -100,13 +100,13 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật người dùng thành công.',
+                'message' => 'User updated successfully.',
                 'data' => new UserResource($user),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật người dùng thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update user: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -122,7 +122,7 @@ class UserController extends Controller
         if (! $actor instanceof User || (int) $actor->id !== (int) $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bạn không có quyền thực hiện thao tác này.',
+                'message' => 'You do not have permission to perform this action.',
             ], 403);
         }
 
@@ -131,13 +131,13 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật ảnh đại diện thành công.',
+                'message' => 'Avatar updated successfully.',
                 'data' => new UserResource($user),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật ảnh đại diện thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update avatar: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -153,12 +153,12 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa người dùng thành công.',
+                'message' => 'User deleted successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa người dùng thất bại: '.$e->getMessage(),
+                'message' => 'Failed to delete user: '.$e->getMessage(),
             ], 400);
         }
     }

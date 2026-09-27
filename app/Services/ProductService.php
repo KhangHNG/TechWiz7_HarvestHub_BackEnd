@@ -23,8 +23,8 @@ class ProductService
     ) {}
 
     /**
-     * Bỏ mọi trang đã cache. Gọi khi sản phẩm, nông dân, danh mục hoặc chợ đổi,
-     * vì những dữ liệu đó nằm trong JSON của từng trang.
+     * Clear every cached page. Call when a product, farmer, category, or market changes,
+     * because that data is embedded in each page JSON.
      */
     public static function forgetListPages(): void
     {
@@ -33,8 +33,8 @@ class ProductService
     }
 
     /**
-     * Lấy một trang sản phẩm. Trang đã tải (cùng bộ lọc) được trả từ cache,
-     * không query lại. Trang khác chỉ được tải khi client gọi tới trang đó.
+     * Fetch one product page. Already-loaded pages (same filters) are served from cache,
+     * without re-querying. Other pages load only when the client requests them.
      */
     public function getPaginatedProducts(Request $request): LengthAwarePaginator
     {
@@ -199,7 +199,7 @@ class ProductService
     }
 
     /**
-     * Tạo mới sản phẩm (Xử lý cả logic upload ảnh nếu có).
+     * Create a product (also handles image upload if present).
      */
     public function createProduct(array $data)
     {
@@ -219,7 +219,7 @@ class ProductService
     }
 
     /**
-     * Cập nhật thông tin sản phẩm.
+     * Update product details.
      */
     public function updateProduct(Product $product, array $data)
     {
@@ -248,7 +248,7 @@ class ProductService
     }
 
     /**
-     * Xóa sản phẩm.
+     * Delete a product.
      */
     public function deleteProduct(Product $product)
     {

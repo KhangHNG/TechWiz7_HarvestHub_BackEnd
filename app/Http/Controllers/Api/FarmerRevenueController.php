@@ -20,7 +20,7 @@ class FarmerRevenueController extends Controller
         if (! $farmer) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy hồ sơ nông dân.',
+                'message' => 'Farmer profile not found.',
             ], 404);
         }
 
@@ -33,7 +33,7 @@ class FarmerRevenueController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy doanh thu thành công.',
+            'message' => 'Revenue retrieved successfully.',
             'data' => $summary,
         ]);
     }

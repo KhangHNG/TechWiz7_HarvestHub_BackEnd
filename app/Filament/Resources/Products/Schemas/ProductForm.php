@@ -36,7 +36,7 @@ class ProductForm
                     ->numeric()
                     ->default(0),
                 FileUpload::make('image_url')
-                    ->label('Ảnh sản phẩm')
+                    ->label('Product image')
                     ->image()
                     ->multiple()
                     ->minFiles(1)

@@ -16,7 +16,7 @@ class FarmerFollowForm
         return $schema
             ->components([
                 Select::make('customer_id')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->relationship(
                         'customer',
                         'full_name',
@@ -26,7 +26,7 @@ class FarmerFollowForm
                     ->preload()
                     ->required(),
                 Select::make('farmer_id')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->relationship('farmer', 'business_name')
                     ->searchable()
                     ->preload()
@@ -40,7 +40,7 @@ class FarmerFollowForm
                                 ->exists();
 
                             if ($exists) {
-                                $fail('Khách đã theo dõi nông dân này.');
+                                $fail('This customer already follows this farmer.');
                             }
                         },
                     ]),

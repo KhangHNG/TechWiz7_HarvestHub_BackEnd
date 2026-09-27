@@ -22,19 +22,19 @@ class WishlistsTable
         return $table
             ->columns([
                 TextColumn::make('customer.full_name')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->searchable(),
                 TextColumn::make('product.name')
-                    ->label('Sản phẩm')
+                    ->label('Product')
                     ->searchable(),
                 TextColumn::make('created_at')
-                    ->label('Ngày tạo')
+                    ->label('Created at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('customer')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->relationship(
                         'customer',
                         'full_name',
@@ -43,7 +43,7 @@ class WishlistsTable
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('product')
-                    ->label('Sản phẩm')
+                    ->label('Product')
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),

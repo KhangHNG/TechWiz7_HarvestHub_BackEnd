@@ -17,7 +17,7 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mã đặt lại mật khẩu HarvestHub',
+            subject: 'HarvestHub password reset code',
         );
     }
 

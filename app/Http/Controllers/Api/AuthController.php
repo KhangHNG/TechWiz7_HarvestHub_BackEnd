@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đăng ký thành công. Email xác thực đã được gửi. Hãy mở liên kết trong email.',
+            'message' => 'Registration successful. A verification email has been sent. Please open the link in the email.',
             'data' => [
                 'email' => $user->email,
             ],
@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         return view('auth.email-verified', [
             'success' => true,
-            'message' => 'Email đã được xác thực. Bạn có thể đăng nhập.',
+            'message' => 'Email verified. You can sign in.',
         ]);
     }
 
@@ -62,7 +62,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Email xác thực đã được gửi. Hãy mở liên kết trong email.',
+            'message' => 'A verification email has been sent. Please open the link in the email.',
         ]);
     }
 
@@ -75,13 +75,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Không gửi được email. Vui lòng thử lại.',
+                'message' => 'Could not send email. Please try again.',
             ], 500);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Nếu email tồn tại, mã OTP đặt lại mật khẩu đã được gửi.',
+            'message' => 'If the email exists, a password reset OTP has been sent.',
         ]);
     }
 
@@ -97,7 +97,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đặt lại mật khẩu thành công.',
+            'message' => 'Password reset successful.',
         ]);
     }
 
@@ -108,7 +108,7 @@ class AuthController extends Controller
         if (! $token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email hoặc mật khẩu không chính xác.',
+                'message' => 'Incorrect email or password.',
             ], 401);
         }
 
@@ -123,13 +123,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Email chưa được xác thực. Hãy mở liên kết trong email xác thực.',
+                'message' => 'Email is not verified. Please open the link in the verification email.',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Đăng nhập thành công',
+            'message' => 'Signed in successfully',
             'data' => $this->auth->tokenPayload($user, $token),
         ]);
     }

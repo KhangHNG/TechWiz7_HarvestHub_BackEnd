@@ -31,25 +31,25 @@ class RegisterRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'full_name' => 'Họ tên',
+            'full_name' => 'Full name',
             'email' => 'Email',
-            'phone' => 'Số điện thoại',
-            'password' => 'Mật khẩu',
-            'address' => 'Địa chỉ',
-            'city' => 'Thành phố',
-            'district' => 'Quận / huyện',
-            'capital' => 'Tỉnh / thành',
-            'role' => 'Vai trò',
+            'phone' => 'Phone number',
+            'password' => 'Password',
+            'address' => 'Address',
+            'city' => 'City',
+            'district' => 'District',
+            'capital' => 'Province / city',
+            'role' => 'Role',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'email.email' => 'Email không đúng định dạng.',
-            'email.unique' => 'Email này đã tồn tại.',
-            'phone.digits' => 'Số điện thoại phải là số và đủ 10 chữ số.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            'email.email' => 'The email format is invalid.',
+            'email.unique' => 'This email has already been taken.',
+            'phone.digits' => 'The phone number must be numeric and exactly 10 digits.',
+            'password.confirmed' => 'The password confirmation does not match.',
         ]);
     }
 }

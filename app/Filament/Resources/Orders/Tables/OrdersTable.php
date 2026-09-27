@@ -22,13 +22,13 @@ class OrdersTable
         return $table
             ->columns([
                 TextColumn::make('customer.full_name')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->searchable(),
                 TextColumn::make('farmer.business_name')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->searchable(),
                 TextColumn::make('status')
-                    ->label('Trạng thái')
+                    ->label('Status')
                     ->searchable(),
                 TextColumn::make('total_price')
                     ->money()
@@ -57,17 +57,17 @@ class OrdersTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Trạng thái')
+                    ->label('Status')
                     ->options([
-                        'CART' => 'Giỏ hàng',
-                        'PENDING' => 'Chờ xác nhận',
-                        'CONFIRMED' => 'Đã xác nhận',
-                        'READY_FOR_PICKUP' => 'Sẵn sàng lấy hàng',
-                        'COMPLETED' => 'Hoàn thành',
-                        'CANCELLED' => 'Đã hủy',
+                        'CART' => 'Cart',
+                        'PENDING' => 'Pending confirmation',
+                        'CONFIRMED' => 'Confirmed',
+                        'READY_FOR_PICKUP' => 'Ready for pickup',
+                        'COMPLETED' => 'Completed',
+                        'CANCELLED' => 'Cancelled',
                     ]),
                 SelectFilter::make('customer')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->relationship(
                         'customer',
                         'full_name',
@@ -76,7 +76,7 @@ class OrdersTable
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('farmer')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->relationship('farmer', 'business_name')
                     ->searchable()
                     ->preload(),

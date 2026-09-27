@@ -27,24 +27,24 @@ class UpdateProductRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'Tên sản phẩm',
-            'description' => 'Mô tả',
-            'price' => 'Giá',
-            'farmer_id' => 'Nông dân',
-            'category_id' => 'Danh mục',
-            'stock_qty' => 'Số lượng tồn',
-            'image_url' => 'Ảnh sản phẩm',
-            'image_url.*' => 'Ảnh sản phẩm',
+            'name' => 'Product name',
+            'description' => 'Description',
+            'price' => 'Price',
+            'farmer_id' => 'Farmer',
+            'category_id' => 'Category',
+            'stock_qty' => 'Stock quantity',
+            'image_url' => 'Product image',
+            'image_url.*' => 'Product image',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'farmer_id.exists' => 'Nông dân không tồn tại.',
-            'category_id.exists' => 'Danh mục không tồn tại.',
-            'image_url.min' => 'Sản phẩm cần ít nhất một ảnh.',
-            'image_url.max' => 'Sản phẩm chỉ được tối đa :max ảnh.',
+            'farmer_id.exists' => 'The farmer does not exist.',
+            'category_id.exists' => 'The category does not exist.',
+            'image_url.min' => 'The product needs at least one image.',
+            'image_url.max' => 'The product may have at most :max images.',
         ]);
     }
 
@@ -58,14 +58,14 @@ class UpdateProductRequest extends ApiFormRequest
             foreach (Arr::wrap($this->all()['image_url'] ?? []) as $index => $image) {
                 if (is_string($image)) {
                     if (filter_var($image, FILTER_VALIDATE_URL) === false || strlen($image) > 500) {
-                        $validator->errors()->add("image_url.$index", 'Ảnh sản phẩm phải là URL hợp lệ.');
+                        $validator->errors()->add("image_url.$index", 'Product image must be a valid URL.');
                     }
 
                     continue;
                 }
 
                 if (! $image instanceof UploadedFile) {
-                    $validator->errors()->add("image_url.$index", 'Ảnh sản phẩm không hợp lệ.');
+                    $validator->errors()->add("image_url.$index", 'Invalid product image.');
 
                     continue;
                 }

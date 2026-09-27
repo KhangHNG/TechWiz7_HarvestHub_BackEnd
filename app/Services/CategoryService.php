@@ -9,35 +9,35 @@ use Illuminate\Support\Facades\Storage;
 class CategoryService
 {
     /**
-     * Lấy danh sách danh mục (Hỗ trợ tìm kiếm, phân trang hoặc lấy tất cả cho App mobile).
+     * List categories (supports search, pagination, or fetch-all for the mobile app).
      */
     public function getCategories(Request $request)
     {
         $query = Category::query();
 
-        // 1. Tìm kiếm theo tên danh mục
+        // 1. Search by category name
         if ($request->filled('keyword')) {
             $keyword = $request->keyword;
             $query->where('name', 'LIKE', "%{$keyword}%");
         }
 
-        // 2. Nếu request yêu cầu lấy tất cả (không phân trang - dùng cho dropdown hoặc menu mobile)
+        // 2. If the request asks for all (no pagination — used for dropdowns or mobile menus)
         if ($request->boolean('all')) {
             return $query->orderBy('name', 'asc')->get();
         }
 
-        // 3. Mặc định có phân trang (dùng cho trang quản trị Admin)
+        // 3. Default is paginated (used for the admin page)
         $perPage = $request->get('per_page', 10);
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
-     * Tạo mới danh mục (Xử lý cả ảnh icon/thumbnail nếu có).
+     * Create a category (also handles icon/thumbnail image if present).
      */
     public function createCategory(array $data)
     {
         return DB::transaction(function () use ($data) {
-            // Xử lý upload ảnh icon/thumbnail nếu có gửi lên
+            // Upload icon/thumbnail image if provided
             if (isset($data['image']) && $data['image']->isValid()) {
                 $data['image'] = $data['image']->store('categories', 'public');
             }
@@ -47,12 +47,12 @@ class CategoryService
     }
 
     /**
-     * Cập nhật thông tin danh mục.
+     * Update category details.
      */
     public function updateCategory(Category $category, array $data)
     {
         return DB::transaction(function () use ($category, $data) {
-            // Nếu có ảnh mới thì xóa ảnh cũ trên storage và lưu ảnh mới
+            // If there is a new image, delete the old one from storage and save the new one
             if (isset($data['image']) && $data['image']->isValid()) {
                 if ($category->image && Storage::disk('public')->exists($category->image)) {
                     Storage::disk('public')->delete($category->image);
@@ -66,17 +66,17 @@ class CategoryService
     }
 
     /**
-     * Xóa danh mục.
+     * Delete a category.
      */
     public function deleteCategory(Category $category)
     {
         return DB::transaction(function () use ($category) {
-            // Kiểm tra xem danh mục có sản phẩm nào không (tùy chọn nghiệp vụ)
+            // Check whether the category still has products (business rule)
             if ($category->products()->count() > 0) {
-                throw new \Exception('Không thể xóa danh mục đang chứa sản phẩm.');
+                throw new \Exception('Cannot delete a category that still has products.');
             }
 
-            // Xóa file ảnh vật lý nếu có
+            // Delete the physical image file if present
             if ($category->image && Storage::disk('public')->exists($category->image)) {
                 Storage::disk('public')->delete($category->image);
             }

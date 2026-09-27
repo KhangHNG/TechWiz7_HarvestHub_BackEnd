@@ -11,7 +11,7 @@ class GeminiService
     public function __construct(private AiToolResolver $toolResolver) {}
 
     /**
-     * Lịch sử chỉ dùng cho request này. Không ghi database.
+     * History is only used for this request. Not persisted to the database.
      *
      * @param  array<int, array{role: string, text: string}>  $history
      */
@@ -21,13 +21,13 @@ class GeminiService
         $apiKey = config('services.gemini.api_key');
         if (! is_string($apiKey) || $apiKey === '') {
             return $vietnamese
-                ? 'Chưa cấu hình GEMINI_API_KEY.'
+                ? 'GEMINI_API_KEY is not configured.'
                 : 'GEMINI_API_KEY is not configured.';
         }
 
         $systemInstruction = [
             'parts' => [[
-                'text' => 'You are the HarvestHub farm-market assistant. Reply briefly in the language of the current user message. Answer two kinds of questions, and never use the under-development sentence for them. First, HarvestHub catalog facts: products, prices, stock, farms, farmers, markets, addresses, and pickup hours. Call a tool and answer only from the tool result. For which products exist, call list_products. For products of a named farmer, call list_products with farmer set to that name and omit keyword. For the price or stock of a named product, call get_product_stock. For the market, address, or pickup hours of a named farm, call get_pickup_slots. Catalog names are Vietnamese. Pass the Vietnamese catalog name (water spinach = rau muống, cherry tomato = cà chua bi). If the first call returns not_found, call once more with another Vietnamese name. Do not invent products, prices, stock, farm names, addresses, or hours. Keep stored names, addresses, hours, and prices unchanged. The tool result includes reply_language. Write the sentence in that language even when names are Vietnamese. If the result is not_found, say it was not found in reply_language. Second, agricultural knowledge that does not need the catalog: how to store produce, nutrition such as foods rich in vitamin C, which produce is in season, and dishes or recipes that use agricultural products. Examples: "Mẹo bảo quản rau", "Thực phẩm giàu Vitamin C", "Nông sản theo mùa". Answer these from general knowledge and do not call a tool. Do not invent HarvestHub prices, stock, farm names, addresses, or hours. For anything else, including weather, the current time, sports, and personal chat unrelated to produce, farmers, or farm food, do not call a tool. Reply with exactly "Hiện tính năng đang phát triển." when the user message is Vietnamese, or exactly "This feature is under development." when it is English.',
+                'text' => 'You are the HarvestHub farm-market assistant. Reply briefly in English. Answer two kinds of questions, and never use the under-development sentence for them. First, HarvestHub catalog facts: products, prices, stock, farms, farmers, markets, addresses, and pickup hours. Call a tool and answer only from the tool result. For which products exist, call list_products. For products of a named farmer, call list_products with farmer set to that name and omit keyword. For the price or stock of a named product, call get_product_stock. For the market, address, or pickup hours of a named farm, call get_pickup_slots. Catalog names are English, for example water spinach, cherry tomato, and mango. Pass that English name. If the first call returns not_found, call once more with another English name. Do not invent products, prices, stock, farm names, addresses, or hours. Keep stored names, addresses, hours, and prices unchanged. The tool result includes reply_language. Write the sentence in English. If the result is not_found, say it was not found. Second, agricultural knowledge that does not need the catalog: how to store produce, nutrition such as foods rich in vitamin C, which produce is in season, and dishes or recipes that use agricultural products. Examples: "How to store leafy greens", "Foods rich in vitamin C", "Seasonal produce". Answer these from general knowledge and do not call a tool. Do not invent HarvestHub prices, stock, farm names, addresses, or hours. For anything else, including weather, the current time, sports, and personal chat unrelated to produce, farmers, or farm food, do not call a tool. Reply with exactly "This feature is under development."',
             ]],
         ];
 
@@ -54,7 +54,7 @@ class GeminiService
 
             if ($functionCalls === []) {
                 return $this->textFromParts($parts) ?? ($vietnamese
-                    ? 'Rất tiếc, tôi chưa hiểu ý của bạn.'
+                    ? "Sorry, I didn't understand that."
                     : 'Sorry, I did not understand that.');
             }
 
@@ -67,7 +67,7 @@ class GeminiService
                 $functionResponse = [
                     'name' => $functionCall['name'],
                     'response' => array_merge($dbResult, [
-                        'reply_language' => $vietnamese ? 'vi' : 'en',
+                        'reply_language' => 'en',
                     ]),
                 ];
                 if (isset($functionCall['id']) && is_string($functionCall['id']) && $functionCall['id'] !== '') {
@@ -101,7 +101,7 @@ class GeminiService
         $parts = $response->json('candidates.0.content.parts') ?? [];
 
         return $this->textFromParts($parts) ?? ($vietnamese
-            ? 'Đã kiểm tra thông tin nông sản.'
+            ? 'Checked produce information.'
             : 'Checked the product information.');
     }
 
@@ -226,12 +226,12 @@ class GeminiService
 
         if (in_array($response->status(), [429, 503], true)) {
             return $vietnamese
-                ? 'Trợ lý AI đang quá tải, vui lòng thử lại sau một lát.'
+                ? 'The AI assistant is overloaded, please try again shortly.'
                 : 'The assistant is busy. Please try again in a moment.';
         }
 
         return $vietnamese
-            ? 'Xin lỗi, hiện tại không thể kết nối tới trợ lý AI.'
+            ? 'Sorry, the AI assistant is currently unavailable.'
             : 'Sorry, the assistant is unavailable right now.';
     }
 }

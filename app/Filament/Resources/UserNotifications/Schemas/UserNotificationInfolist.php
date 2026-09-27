@@ -11,18 +11,18 @@ class UserNotificationInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('user.full_name')->label('Người nhận'),
-                TextEntry::make('type')->label('Loại'),
-                TextEntry::make('title')->label('Tiêu đề'),
+                TextEntry::make('user.full_name')->label('Recipient'),
+                TextEntry::make('type')->label('Type'),
+                TextEntry::make('title')->label('Title'),
                 TextEntry::make('body')
-                    ->label('Nội dung')
+                    ->label('Body')
                     ->columnSpanFull(),
                 TextEntry::make('read_at')
-                    ->label('Lúc đọc')
+                    ->label('Read at')
                     ->dateTime()
-                    ->placeholder('Chưa đọc'),
+                    ->placeholder('Unread'),
                 TextEntry::make('created_at')
-                    ->label('Ngày tạo')
+                    ->label('Created at')
                     ->dateTime(),
             ]);
     }

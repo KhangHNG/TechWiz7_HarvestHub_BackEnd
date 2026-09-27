@@ -16,14 +16,14 @@ class StoreAvatarRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'avatar' => 'Ảnh đại diện',
+            'avatar' => 'Avatar',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'avatar.max' => 'Ảnh đại diện không được vượt quá 1.5 MB.',
+            'avatar.max' => 'The avatar may not be greater than 1.5 MB.',
         ]);
     }
 }

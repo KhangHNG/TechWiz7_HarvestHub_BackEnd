@@ -26,7 +26,7 @@ class ProductInfolist
                 TextEntry::make('stock_qty')
                     ->numeric(),
                 ImageEntry::make('image_url')
-                    ->label('Ảnh sản phẩm')
+                    ->label('Product image')
                     ->limit(10)
                     ->placeholder('-'),
                 TextEntry::make('created_at')

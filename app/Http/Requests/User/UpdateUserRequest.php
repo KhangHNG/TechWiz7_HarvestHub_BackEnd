@@ -36,24 +36,24 @@ class UpdateUserRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'full_name' => 'Họ tên',
+            'full_name' => 'Full name',
             'email' => 'Email',
-            'phone' => 'Số điện thoại',
-            'password' => 'Mật khẩu',
-            'address' => 'Địa chỉ',
-            'city' => 'Thành phố',
-            'district' => 'Quận / huyện',
-            'capital' => 'Tỉnh / thành',
-            'role' => 'Vai trò',
+            'phone' => 'Phone number',
+            'password' => 'Password',
+            'address' => 'Address',
+            'city' => 'City',
+            'district' => 'District',
+            'capital' => 'Province / city',
+            'role' => 'Role',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'email.email' => 'Email không đúng định dạng.',
-            'email.unique' => 'Email này đã tồn tại.',
-            'phone.digits' => 'Số điện thoại phải là số và đủ 10 chữ số.',
+            'email.email' => 'The email format is invalid.',
+            'email.unique' => 'This email has already been taken.',
+            'phone.digits' => 'The phone number must be numeric and exactly 10 digits.',
         ]);
     }
 
@@ -68,9 +68,9 @@ class UpdateUserRequest extends ApiFormRequest
             }
 
             foreach ([
-                'city' => 'Thành phố không được để trống.',
-                'district' => 'Quận / huyện không được để trống.',
-                'capital' => 'Tỉnh / thành không được để trống.',
+                'city' => 'The city field is required.',
+                'district' => 'The district field is required.',
+                'capital' => 'The province/city field is required.',
             ] as $field => $message) {
                 $value = $this->exists($field) ? $this->input($field) : $user?->{$field};
 

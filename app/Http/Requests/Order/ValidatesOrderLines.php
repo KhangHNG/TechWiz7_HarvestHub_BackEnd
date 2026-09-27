@@ -34,21 +34,21 @@ trait ValidatesOrderLines
             if ($enforceFarmer && (int) $product->farmer_id !== (int) $farmerId) {
                 $validator->errors()->add(
                     "items.$index.product_id",
-                    'Sản phẩm không thuộc nông dân của đơn hàng.',
+                    'The product does not belong to the order farmer.',
                 );
             }
 
             if ((int) $item['quantity'] > (int) $product->stock_qty) {
                 $validator->errors()->add(
                     "items.$index.quantity",
-                    'Số lượng vượt quá tồn kho.',
+                    'Quantity exceeds stock.',
                 );
             }
 
             if (! $this->amountsMatch($item['unit_price'] ?? null, $product->price)) {
                 $validator->errors()->add(
                     "items.$index.unit_price",
-                    'Đơn giá không khớp giá sản phẩm.',
+                    'Unit price does not match the product price.',
                 );
             }
 
@@ -56,7 +56,7 @@ trait ValidatesOrderLines
             if (! $this->amountsMatch($item['line_total'] ?? null, $expected)) {
                 $validator->errors()->add(
                     "items.$index.line_total",
-                    'Thành tiền không khớp đơn giá nhân số lượng.',
+                    'Line total does not match unit price times quantity.',
                 );
             }
         }

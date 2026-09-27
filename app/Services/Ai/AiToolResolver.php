@@ -22,24 +22,24 @@ class AiToolResolver
                             'properties' => [
                                 'keyword' => [
                                     'type' => 'STRING',
-                                    'description' => 'Optional Vietnamese product keyword. Omit it to list the catalog.',
+                                    'description' => 'Optional English product keyword. Omit it to list the catalog.',
                                 ],
                                 'farmer' => [
                                     'type' => 'STRING',
-                                    'description' => 'Optional Vietnamese farm or farmer name. Omit it when the user does not name a farmer.',
+                                    'description' => 'Optional English farm or farmer name. Omit it when the user does not name a farmer.',
                                 ],
                             ],
                         ],
                     ],
                     [
                         'name' => 'get_product_stock',
-                        'description' => 'Look up HarvestHub product price and stock by Vietnamese catalog name and, if given, farm name.',
+                        'description' => 'Look up HarvestHub product price and stock by English catalog name and, if given, farm name.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
                                 'product' => [
                                     'type' => 'STRING',
-                                    'description' => 'Vietnamese catalog name, for example cà chua bi, rau muống, xoài. Do not pass an English name.',
+                                    'description' => 'English catalog name, for example cherry tomato, water spinach, mango.',
                                 ],
                                 'farmer' => [
                                     'type' => 'STRING',
@@ -57,7 +57,7 @@ class AiToolResolver
                             'properties' => [
                                 'farmer' => [
                                     'type' => 'STRING',
-                                    'description' => 'Vietnamese farm or farmer name to look up pickup hours.',
+                                    'description' => 'English farm or farmer name to look up pickup hours.',
                                 ],
                             ],
                             'required' => ['farmer'],

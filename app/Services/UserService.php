@@ -78,7 +78,7 @@ class UserService
     {
         return DB::transaction(function () use ($user) {
             if ($user->role === 'FARMER' && $user->farmer()->exists()) {
-                throw new \Exception('Không thể xóa người dùng đang là nông dân.');
+                throw new \Exception('Cannot delete a user who is a farmer.');
             }
 
             return $user->delete();

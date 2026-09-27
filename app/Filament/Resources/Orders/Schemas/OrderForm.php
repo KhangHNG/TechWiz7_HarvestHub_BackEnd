@@ -19,12 +19,12 @@ class OrderForm
     public static function statusOptions(?string $current): array
     {
         $labels = [
-            'CART' => 'Giỏ hàng',
-            'PENDING' => 'Chờ xác nhận',
-            'CONFIRMED' => 'Đã xác nhận',
-            'READY_FOR_PICKUP' => 'Sẵn sàng lấy hàng',
-            'COMPLETED' => 'Hoàn thành',
-            'CANCELLED' => 'Đã hủy',
+            'CART' => 'Cart',
+            'PENDING' => 'Pending confirmation',
+            'CONFIRMED' => 'Confirmed',
+            'READY_FOR_PICKUP' => 'Ready for pickup',
+            'COMPLETED' => 'Completed',
+            'CANCELLED' => 'Cancelled',
         ];
 
         $allowed = match ($current) {
@@ -84,7 +84,7 @@ class OrderForm
         return $schema
             ->components([
                 Select::make('customer_id')
-                    ->label('Khách hàng')
+                    ->label('Customer')
                     ->relationship(
                         'customer',
                         'full_name',
@@ -94,7 +94,7 @@ class OrderForm
                     ->preload()
                     ->required(),
                 Select::make('farmer_id')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->relationship('farmer', 'business_name')
                     ->searchable()
                     ->preload()
@@ -103,18 +103,18 @@ class OrderForm
                     ->disabled(fn (?Order $record): bool => $record !== null && $record->status !== 'CART')
                     ->dehydrated(fn (?Order $record): bool => $record !== null && $record->status !== 'CART'),
                 Textarea::make('delivery_address')
-                    ->label('Địa chỉ giao hàng')
+                    ->label('Delivery address')
                     ->columnSpanFull(),
                 Select::make('status')
-                    ->label('Trạng thái')
+                    ->label('Status')
                     ->options(fn (?Order $record): array => self::statusOptions($record?->status))
                     ->default('CART')
                     ->required(),
                 Repeater::make('items')
-                    ->label('Sản phẩm')
+                    ->label('Product')
                     ->schema([
                         Select::make('product_id')
-                            ->label('Sản phẩm')
+                            ->label('Product')
                             ->options(fn (): array => Product::query()
                                 ->with('farmer')
                                 ->orderBy('name')
@@ -140,7 +140,7 @@ class OrderForm
                             ->searchable()
                             ->required(),
                         TextInput::make('quantity')
-                            ->label('Số lượng')
+                            ->label('Quantity')
                             ->numeric()
                             ->minValue(1)
                             ->required(),

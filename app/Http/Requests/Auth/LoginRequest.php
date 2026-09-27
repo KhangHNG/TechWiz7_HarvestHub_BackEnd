@@ -18,7 +18,7 @@ class LoginRequest extends ApiFormRequest
     {
         return [
             'email' => 'Email',
-            'password' => 'Mật khẩu',
+            'password' => 'Password',
         ];
     }
 }

@@ -24,11 +24,11 @@ class WishlistResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
 
-    protected static ?string $navigationLabel = 'Yêu thích';
+    protected static ?string $navigationLabel = 'Wishlists';
 
-    protected static ?string $modelLabel = 'yêu thích';
+    protected static ?string $modelLabel = 'wishlist';
 
-    protected static ?string $pluralModelLabel = 'yêu thích';
+    protected static ?string $pluralModelLabel = 'wishlists';
 
     public static function form(Schema $schema): Schema
     {

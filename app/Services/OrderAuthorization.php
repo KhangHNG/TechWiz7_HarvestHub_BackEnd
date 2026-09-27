@@ -51,7 +51,7 @@ class OrderAuthorization
             return;
         }
 
-        $this->deny('Bạn không có quyền xem đơn hàng này.');
+        $this->deny('You do not have permission to view this order.');
     }
 
     /**
@@ -60,12 +60,12 @@ class OrderAuthorization
     public function assertCanUpdate(User $user, Order $order, array $data): void
     {
         if ($user->role === 'ADMIN') {
-            $this->deny('Admin không được sửa đơn qua API.');
+            $this->deny('Admins cannot update orders via the API.');
         }
 
         if ($user->role === 'CUSTOMER') {
             if ((int) $order->customer_id !== (int) $user->id) {
-                $this->deny('Bạn không có quyền sửa đơn hàng này.');
+                $this->deny('You do not have permission to update this order.');
             }
 
             $this->assertCustomerUpdate($order, $data);
@@ -75,7 +75,7 @@ class OrderAuthorization
 
         if ($user->role === 'FARMER') {
             if ((int) $order->farmer_id !== (int) $this->farmerProfile($user)->id) {
-                $this->deny('Bạn không có quyền sửa đơn hàng này.');
+                $this->deny('You do not have permission to update this order.');
             }
 
             $this->assertFarmerUpdate($order, $data);
@@ -83,21 +83,21 @@ class OrderAuthorization
             return;
         }
 
-        $this->deny('Bạn không có quyền thực hiện thao tác này.');
+        $this->deny('You do not have permission to perform this action.');
     }
 
     public function assertCanDelete(User $user, Order $order): void
     {
         if ($user->role === 'ADMIN') {
-            $this->deny('Admin không được xóa đơn qua API.');
+            $this->deny('Admins cannot delete orders via the API.');
         }
 
         if ($user->role !== 'CUSTOMER' || (int) $order->customer_id !== (int) $user->id) {
-            $this->deny('Bạn không có quyền xóa đơn hàng này.');
+            $this->deny('You do not have permission to delete this order.');
         }
 
         if ($order->status !== 'CART') {
-            $this->deny('Đơn đã đặt cần được hủy thay vì xóa.');
+            $this->deny('Placed orders must be cancelled instead of deleted.');
         }
     }
 
@@ -108,7 +108,7 @@ class OrderAuthorization
     {
         $contentKeys = array_intersect(array_keys($data), ['delivery_address', 'items', 'total_price']);
         if ($contentKeys !== [] && $order->status !== 'CART') {
-            $this->deny('Chỉ đơn giỏ hàng mới được sửa thông tin.');
+            $this->deny('Only cart orders can be edited.');
         }
 
         if (! array_key_exists('status', $data)) {
@@ -129,7 +129,7 @@ class OrderAuthorization
             return;
         }
 
-        $this->deny('Bạn không được chuyển đơn sang trạng thái này.');
+        $this->deny('You cannot change the order to this status.');
     }
 
     /**
@@ -139,7 +139,7 @@ class OrderAuthorization
     {
         $extra = array_diff(array_keys($data), ['status']);
         if ($extra !== []) {
-            $this->deny('Nông dân chỉ được cập nhật trạng thái đơn hàng.');
+            $this->deny('Farmers may only update the order status.');
         }
 
         if (! array_key_exists('status', $data)) {
@@ -154,7 +154,7 @@ class OrderAuthorization
 
         $allowed = self::FARMER_TRANSITIONS[$current] ?? [];
         if (! in_array($next, $allowed, true)) {
-            $this->deny('Bạn không được chuyển đơn sang trạng thái này.');
+            $this->deny('You cannot change the order to this status.');
         }
     }
 
@@ -165,7 +165,7 @@ class OrderAuthorization
         if (! $farmer) {
             throw new HttpResponseException(response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy hồ sơ nông dân.',
+                'message' => 'Farmer profile not found.',
             ], 404));
         }
 

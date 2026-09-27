@@ -30,14 +30,14 @@ class MarketController extends Controller
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả chợ thành công.',
+                'message' => 'All markets retrieved successfully.',
                 'data' => MarketResource::collection($markets),
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách chợ thành công.',
+            'message' => 'Markets retrieved successfully.',
             'data' => MarketResource::collection($markets),
             'meta' => [
                 'current_page' => $markets->currentPage(),
@@ -60,13 +60,13 @@ class MarketController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo chợ thành công.',
+                'message' => 'Market created successfully.',
                 'data' => new MarketResource($market),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo chợ thất bại: '.$e->getMessage(),
+                'message' => 'Failed to create market: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -80,7 +80,7 @@ class MarketController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy chợ thành công.',
+            'message' => 'Market retrieved successfully.',
             'data' => new MarketResource($market),
         ], 200);
     }
@@ -99,13 +99,13 @@ class MarketController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật chợ thành công.',
+                'message' => 'Market updated successfully.',
                 'data' => new MarketResource($market),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật chợ thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update market: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -121,12 +121,12 @@ class MarketController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa chợ thành công.',
+                'message' => 'Market deleted successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa chợ thất bại: '.$e->getMessage(),
+                'message' => 'Failed to delete market: '.$e->getMessage(),
             ], 400);
         }
     }

@@ -17,7 +17,7 @@ class VerifyEmailMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Xác thực email HarvestHub',
+            subject: 'HarvestHub email verification',
         );
     }
 

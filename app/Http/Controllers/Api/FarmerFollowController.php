@@ -30,14 +30,14 @@ class FarmerFollowController extends Controller
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả lượt theo dõi thành công.',
+                'message' => 'All follows retrieved successfully.',
                 'data' => FarmerFollowResource::collection($follows),
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách theo dõi thành công.',
+            'message' => 'Follows retrieved successfully.',
             'data' => FarmerFollowResource::collection($follows),
             'meta' => [
                 'current_page' => $follows->currentPage(),
@@ -60,13 +60,13 @@ class FarmerFollowController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Theo dõi nông dân thành công.',
+                'message' => 'Farmer followed successfully.',
                 'data' => new FarmerFollowResource($follow),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Theo dõi nông dân thất bại: '.$e->getMessage(),
+                'message' => 'Failed to follow farmer: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -80,7 +80,7 @@ class FarmerFollowController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy lượt theo dõi thành công.',
+            'message' => 'Follow retrieved successfully.',
             'data' => new FarmerFollowResource($follow),
         ], 200);
     }
@@ -99,13 +99,13 @@ class FarmerFollowController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật theo dõi thành công.',
+                'message' => 'Follow updated successfully.',
                 'data' => new FarmerFollowResource($follow),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật theo dõi thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update follow: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -121,12 +121,12 @@ class FarmerFollowController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Bỏ theo dõi thành công.',
+                'message' => 'Unfollowed successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bỏ theo dõi thất bại: '.$e->getMessage(),
+                'message' => 'Failed to unfollow: '.$e->getMessage(),
             ], 400);
         }
     }

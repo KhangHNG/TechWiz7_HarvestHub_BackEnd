@@ -32,19 +32,19 @@ class UserForm
                 TextInput::make('address')
                     ->default(null),
                 TextInput::make('city')
-                    ->label('Thành phố')
+                    ->label('City')
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
                 TextInput::make('district')
-                    ->label('Quận / huyện')
+                    ->label('District')
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
                 TextInput::make('capital')
-                    ->label('Tỉnh / thành')
+                    ->label('Province / city')
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
                 FileUpload::make('avatar_url')
-                    ->label('Ảnh đại diện')
+                    ->label('Avatar')
                     ->image()
                     ->maxSize(1536)
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'])
@@ -67,7 +67,7 @@ class UserForm
                     ->required()
                     ->default('CUSTOMER'),
                 DateTimePicker::make('email_verified_at')
-                    ->label('Email đã xác thực lúc'),
+                    ->label('Email verified at'),
                 TextInput::make('created_by')
                     ->numeric()
                     ->default(null),

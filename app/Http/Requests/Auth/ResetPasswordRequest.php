@@ -19,16 +19,16 @@ class ResetPasswordRequest extends ApiFormRequest
     {
         return [
             'email' => 'Email',
-            'otp' => 'Mã OTP',
-            'password' => 'Mật khẩu',
+            'otp' => 'OTP',
+            'password' => 'Password',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'otp.digits' => 'Mã OTP phải gồm 6 chữ số.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            'otp.digits' => 'The OTP must be 6 digits.',
+            'password.confirmed' => 'The password confirmation does not match.',
         ]);
     }
 }

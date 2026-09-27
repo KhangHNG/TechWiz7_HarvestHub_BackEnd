@@ -19,10 +19,10 @@ class ChatRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'message' => 'Tin nhắn',
-            'history' => 'Lịch sử hội thoại',
-            'history.*.role' => 'Vai trò',
-            'history.*.text' => 'Nội dung hội thoại',
+            'message' => 'Message',
+            'history' => 'Conversation history',
+            'history.*.role' => 'Role',
+            'history.*.text' => 'Conversation text',
         ];
     }
 }

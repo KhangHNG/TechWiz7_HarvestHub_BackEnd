@@ -62,19 +62,19 @@ class ProductsTable
             ])
             ->filters([
                 SelectFilter::make('farmer')
-                    ->label('Nông dân')
+                    ->label('Farmer')
                     ->relationship('farmer', 'business_name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('category')
-                    ->label('Danh mục')
+                    ->label('Category')
                     ->relationship('category', 'name')
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('in_stock')
-                    ->label('Tồn kho')
-                    ->trueLabel('Còn hàng')
-                    ->falseLabel('Hết hàng')
+                    ->label('Stock')
+                    ->trueLabel('In stock')
+                    ->falseLabel('Out of stock')
                     ->queries(
                         true: fn (Builder $query): Builder => $query->where('stock_qty', '>', 0),
                         false: fn (Builder $query): Builder => $query->where('stock_qty', '<=', 0),

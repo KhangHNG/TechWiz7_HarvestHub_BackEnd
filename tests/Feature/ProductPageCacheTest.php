@@ -19,9 +19,9 @@ class ProductPageCacheTest extends TestCase
         $first->assertOk();
         $first->assertJsonPath('meta.current_page', 1);
         $first->assertJsonPath('meta.last_page', 3);
-        $first->assertJsonPath('data.0.name', 'Cải mới');
-        $first->assertJsonPath('data.0.farmer.business_name', 'Vườn A');
-        $first->assertJsonPath('data.0.farmer.market.name', 'Chợ X');
+        $first->assertJsonPath('data.0.name', 'New greens');
+        $first->assertJsonPath('data.0.farmer.business_name', 'Garden A');
+        $first->assertJsonPath('data.0.farmer.market.name', 'Market X');
         $first->assertJsonPath('data.0.category.name', 'Rau');
 
         DB::flushQueryLog();
@@ -29,21 +29,21 @@ class ProductPageCacheTest extends TestCase
 
         $cached = $this->getJson('/api/products?per_page=1&page=1');
         $cached->assertOk();
-        $cached->assertJsonPath('data.0.name', 'Cải mới');
-        $cached->assertJsonPath('data.0.farmer.business_name', 'Vườn A');
+        $cached->assertJsonPath('data.0.name', 'New greens');
+        $cached->assertJsonPath('data.0.farmer.business_name', 'Garden A');
         $cached->assertJsonPath('data.0.category.name', 'Rau');
         $this->assertSame([], DB::getQueryLog());
 
         $pageTwo = $this->getJson('/api/products?per_page=1&page=2');
         $pageTwo->assertOk();
-        $pageTwo->assertJsonPath('data.0.name', 'Hết hàng');
+        $pageTwo->assertJsonPath('data.0.name', 'Out of stock');
 
         DB::flushQueryLog();
         $this->getJson('/api/products?per_page=1&page=1')->assertOk();
         $this->getJson('/api/products?per_page=1&page=2')->assertOk();
         $this->assertSame([], DB::getQueryLog());
 
-        Product::query()->where('name', 'Cải mới')->firstOrFail()->update(['stock_qty' => 1]);
+        Product::query()->where('name', 'New greens')->firstOrFail()->update(['stock_qty' => 1]);
 
         DB::flushQueryLog();
         $refreshed = $this->getJson('/api/products?per_page=1&page=1');
@@ -60,8 +60,8 @@ class ProductPageCacheTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('meta.total', 2);
-        $response->assertJsonPath('data.0.name', 'Cải mới');
-        $response->assertJsonPath('data.1.name', 'Cà chua');
+        $response->assertJsonPath('data.0.name', 'New greens');
+        $response->assertJsonPath('data.1.name', 'Tomato');
     }
 
     private function seedCatalog(): void
@@ -70,11 +70,11 @@ class ProductPageCacheTest extends TestCase
 
         DB::table('users')->insert([
             'id' => 1,
-            'full_name' => 'Nông dân A',
+            'full_name' => 'Farmer A',
             'email' => 'farmer@example.com',
             'phone' => '0900000001',
             'password_hash' => 'secret',
-            'address' => '1 Đường A',
+            'address' => '1 Street A',
             'role' => 'FARMER',
             'created_at' => $now,
             'updated_at' => $now,
@@ -82,8 +82,8 @@ class ProductPageCacheTest extends TestCase
 
         DB::table('markets')->insert([
             'id' => 1,
-            'name' => 'Chợ X',
-            'address' => 'Quận 1',
+            'name' => 'Market X',
+            'address' => 'District 1',
             'is_active' => true,
             'created_at' => $now,
             'updated_at' => $now,
@@ -93,7 +93,7 @@ class ProductPageCacheTest extends TestCase
             'id' => 1,
             'user_id' => 1,
             'market_id' => 1,
-            'business_name' => 'Vườn A',
+            'business_name' => 'Garden A',
             'rating' => 0,
             'created_at' => $now,
             'updated_at' => $now,
@@ -107,9 +107,9 @@ class ProductPageCacheTest extends TestCase
         ]);
 
         foreach ([
-            ['Cà chua', 4, $now->copy()->subHour()],
-            ['Hết hàng', 0, $now->copy()->subMinutes(30)],
-            ['Cải mới', 5, $now],
+            ['Tomato', 4, $now->copy()->subHour()],
+            ['Out of stock', 0, $now->copy()->subMinutes(30)],
+            ['New greens', 5, $now],
         ] as [$name, $stock, $createdAt]) {
             $product = Product::query()->create([
                 'farmer_id' => 1,

@@ -23,7 +23,7 @@ class DeviceTokenController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã lưu token thông báo.',
+            'message' => 'Notification token saved.',
             'data' => [
                 'id' => $token->id,
                 'platform' => $token->platform,
@@ -37,7 +37,7 @@ class DeviceTokenController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã xóa token thông báo.',
+            'message' => 'Notification token deleted.',
         ]);
     }
 }

@@ -21,7 +21,7 @@ class ProfileImageTest extends TestCase
         $owner = $this->user('FARMER', 'farmer@example.com', '0900000001');
         $farmer = Farmer::query()->create([
             'user_id' => $owner->id,
-            'business_name' => 'Vườn A',
+            'business_name' => 'Garden A',
             'is_accepting_orders' => true,
         ]);
 
@@ -112,7 +112,7 @@ class ProfileImageTest extends TestCase
         $owner = $this->user('FARMER', 'farmer@example.com', '0900000001');
         $farmer = Farmer::query()->create([
             'user_id' => $owner->id,
-            'business_name' => 'Vườn A',
+            'business_name' => 'Garden A',
             'is_accepting_orders' => true,
         ]);
 
@@ -126,13 +126,13 @@ class ProfileImageTest extends TestCase
             ->post('/api/users/'.$user->id.'/avatar', [
                 'avatar' => $tooLarge,
             ])->assertUnprocessable()
-            ->assertJsonPath('errors.avatar.0', 'Ảnh đại diện không được vượt quá 1.5 MB.');
+            ->assertJsonPath('errors.avatar.0', 'The avatar may not be greater than 1.5 MB.');
 
         $this->withToken(JWTAuth::fromUser($owner))
             ->post('/api/farmers/'.$farmer->id.'/cover', [
                 'cover' => UploadedFile::fake()->image('big-cover.jpg')->size(1537),
             ])->assertUnprocessable()
-            ->assertJsonPath('errors.cover.0', 'Ảnh bìa không được vượt quá 1.5 MB.');
+            ->assertJsonPath('errors.cover.0', 'The cover image may not be greater than 1.5 MB.');
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
@@ -152,7 +152,7 @@ class ProfileImageTest extends TestCase
         $stranger = $this->user('FARMER', 'la@example.com', '0900000002');
         $farmer = Farmer::query()->create([
             'user_id' => $owner->id,
-            'business_name' => 'Vườn A',
+            'business_name' => 'Garden A',
             'is_accepting_orders' => true,
         ]);
 
@@ -165,16 +165,16 @@ class ProfileImageTest extends TestCase
 
         $this->post('/api/users/'.$customer->id.'/avatar', $image)
             ->assertUnauthorized()
-            ->assertJsonPath('message', 'Token bị thiếu hoặc không thể giải mã.');
+            ->assertJsonPath('message', 'Token is missing or could not be decoded.');
 
         $this->post('/api/farmers/'.$farmer->id.'/cover', $cover)
             ->assertUnauthorized()
-            ->assertJsonPath('message', 'Token bị thiếu hoặc không thể giải mã.');
+            ->assertJsonPath('message', 'Token is missing or could not be decoded.');
 
         $this->withToken(JWTAuth::fromUser($other))
             ->post('/api/users/'.$customer->id.'/avatar', $image)
             ->assertForbidden()
-            ->assertJsonPath('message', 'Bạn không có quyền thực hiện thao tác này.');
+            ->assertJsonPath('message', 'You do not have permission to perform this action.');
 
         $this->withToken(JWTAuth::fromUser($customer))
             ->post('/api/farmers/'.$farmer->id.'/cover', $cover)
@@ -192,7 +192,7 @@ class ProfileImageTest extends TestCase
             'email' => $email,
             'phone' => $phone,
             'password_hash' => 'secret',
-            'address' => '1 Đường A',
+            'address' => '1 Street A',
             'role' => $role,
             'email_verified_at' => now(),
         ]);

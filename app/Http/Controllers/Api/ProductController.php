@@ -29,7 +29,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách sản phẩm thành công.',
+            'message' => 'Products retrieved successfully.',
             'data' => ProductResource::collection($products),
             'meta' => [
                 'current_page' => $products->currentPage(),
@@ -52,7 +52,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tạo sản phẩm thành công.',
+            'message' => 'Product created successfully.',
             'data' => new ProductResource($product),
         ], 201);
     }
@@ -66,7 +66,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy sản phẩm thành công.',
+            'message' => 'Product retrieved successfully.',
             'data' => new ProductResource($product),
         ], 200);
     }
@@ -85,13 +85,13 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật sản phẩm thành công.',
+                'message' => 'Product updated successfully.',
                 'data' => new ProductResource($product),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật sản phẩm thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update product: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -107,12 +107,12 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa sản phẩm thành công.',
+                'message' => 'Product deleted successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa sản phẩm thất bại: '.$e->getMessage(),
+                'message' => 'Failed to delete product: '.$e->getMessage(),
             ], 500);
         }
     }

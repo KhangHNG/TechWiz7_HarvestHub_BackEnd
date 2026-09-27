@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CreatedBetweenFilter
 {
-    public static function make(string $column = 'created_at', string $label = 'Ngày tạo'): Filter
+    public static function make(string $column = 'created_at', string $label = 'Created at'): Filter
     {
         return Filter::make($column)
             ->label($label)
             ->schema([
-                DatePicker::make('from')->label('Từ ngày'),
-                DatePicker::make('until')->label('Đến ngày'),
+                DatePicker::make('from')->label('From date'),
+                DatePicker::make('until')->label('Until date'),
             ])
             ->query(function (Builder $query, array $data) use ($column): Builder {
                 return $query
@@ -32,11 +32,11 @@ class CreatedBetweenFilter
                 $indicators = [];
 
                 if ($from = $data['from'] ?? null) {
-                    $indicators[] = Indicator::make($label.' từ '.$from);
+                    $indicators[] = Indicator::make($label.' from '.$from);
                 }
 
                 if ($until = $data['until'] ?? null) {
-                    $indicators[] = Indicator::make($label.' đến '.$until);
+                    $indicators[] = Indicator::make($label.' until '.$until);
                 }
 
                 return $indicators;

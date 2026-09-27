@@ -39,14 +39,14 @@ class OrderController extends Controller
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả đơn hàng thành công.',
+                'message' => 'All orders retrieved successfully.',
                 'data' => OrderResource::collection($orders),
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách đơn hàng thành công.',
+            'message' => 'Orders retrieved successfully.',
             'data' => OrderResource::collection($orders),
             'meta' => [
                 'current_page' => $orders->currentPage(),
@@ -69,7 +69,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo đơn hàng thành công.',
+                'message' => 'Order created successfully.',
                 'data' => new OrderResource($order),
             ], 201);
         } catch (FarmerNotAcceptingOrdersException $e) {
@@ -80,7 +80,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo đơn hàng thất bại: '.$e->getMessage(),
+                'message' => 'Failed to create order: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -95,7 +95,7 @@ class OrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy đơn hàng thành công.',
+            'message' => 'Order retrieved successfully.',
             'data' => new OrderResource($order),
         ], 200);
     }
@@ -117,7 +117,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật đơn hàng thành công.',
+                'message' => 'Order updated successfully.',
                 'data' => new OrderResource($order->loadMissing('items')),
                 'orders' => OrderResource::collection($orders),
             ], 200);
@@ -129,7 +129,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật đơn hàng thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update order: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -147,12 +147,12 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa đơn hàng thành công.',
+                'message' => 'Order deleted successfully.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa đơn hàng thất bại: '.$e->getMessage(),
+                'message' => 'Failed to delete order: '.$e->getMessage(),
             ], 400);
         }
     }
@@ -164,7 +164,7 @@ class OrderController extends Controller
         if (! $user instanceof User) {
             throw new HttpResponseException(response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy thông tin người dùng.',
+                'message' => 'User information not found.',
             ], 404));
         }
 

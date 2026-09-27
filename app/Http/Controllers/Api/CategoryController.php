@@ -27,19 +27,19 @@ class CategoryController extends Controller
     {
         $categories = $this->categoryService->getCategories($request);
 
-        // Trường hợp trả về dạng Collection (khi gọi ?all=true)
+        // Collection response case (when calling ?all=true)
         if ($request->boolean('all')) {
             return response()->json([
                 'success' => true,
-                'message' => 'Lấy tất cả danh mục thành công.',
+                'message' => 'All categories retrieved successfully.',
                 'data' => CategoryResource::collection($categories),
             ], 200);
         }
 
-        // Trường hợp trả về phân trang
+        // Paginated response case
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh sách danh mục thành công.',
+            'message' => 'Categories retrieved successfully.',
             'data' => CategoryResource::collection($categories),
             'meta' => [
                 'current_page' => $categories->currentPage(),
@@ -55,21 +55,21 @@ class CategoryController extends Controller
         $validatedData = $request->validated();
 
         try {
-            // 2. Gọi Service để xử lý logic tạo mới và upload ảnh (nếu có)
+            // 2. Call Service to handle create logic and image upload (if any)
             $category = $this->categoryService->createCategory($validatedData);
 
-            // 3. Trả về kết quả thành công với CategoryResource
+            // 3. Return success result with CategoryResource
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo danh mục mới thành công.',
+                'message' => 'Category created successfully.',
                 'data' => new CategoryResource($category),
             ], 201); // HTTP Status 201 Created
 
         } catch (\Exception $e) {
-            // Xử lý bắt lỗi nếu có sự cố phát sinh (ví dụ: lỗi lưu storage)
+            // Handle exceptions if something goes wrong (e.g. storage errors)
             return response()->json([
                 'success' => false,
-                'message' => 'Tạo danh mục thất bại: '.$e->getMessage(),
+                'message' => 'Failed to create category: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -83,7 +83,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy danh mục thành công.',
+            'message' => 'Category retrieved successfully.',
             'data' => new CategoryResource($category),
         ], 200);
     }
@@ -102,42 +102,42 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật danh mục thành công.',
+                'message' => 'Category updated successfully.',
                 'data' => new CategoryResource($category),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cập nhật danh mục thất bại: '.$e->getMessage(),
+                'message' => 'Failed to update category: '.$e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * DELETE /api/categories/{id}
-     * Xóa một danh mục sản phẩm.
+     * Delete a product category.
      */
     public function destroy($id): JsonResponse
     {
         try {
-            // 1. Tìm danh mục theo ID, nếu không thấy sẽ tự động trả về lỗi 404
+            // 1. Find category by ID; returns 404 automatically if not found
             $category = Category::findOrFail($id);
 
-            // 2. Gọi Service để xử lý logic xóa (bao gồm kiểm tra sản phẩm liên quan và xóa ảnh)
+            // 2. Call Service to handle delete logic (including related-product checks and image deletion)
             $this->categoryService->deleteCategory($category);
 
-            // 3. Trả về kết quả thành công
+            // 3. Return success result
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa danh mục thành công.',
+                'message' => 'Category deleted successfully.',
             ], 200);
 
         } catch (\Exception $e) {
-            // Bắt lỗi ngoại lệ (ví dụ: danh mục vẫn còn chứa sản phẩm do Service chặn lại)
+            // Catch exceptions (e.g. category still has products blocked by Service)
             return response()->json([
                 'success' => false,
-                'message' => 'Xóa danh mục thất bại: '.$e->getMessage(),
-            ], 400); // Trả về mã lỗi 400 Bad Request cho các lỗi liên quan đến nghiệp vụ
+                'message' => 'Failed to delete category: '.$e->getMessage(),
+            ], 400); // Return 400 Bad Request for business-rule errors
         }
     }
 }

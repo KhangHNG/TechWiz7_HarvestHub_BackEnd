@@ -17,20 +17,20 @@ class ProductMarketFilterTest extends TestCase
     public function test_products_can_be_filtered_by_the_farmers_market(): void
     {
         $category = Category::query()->create(['name' => 'Rau']);
-        $first = $this->productAt('Chợ Một', 'Rau muống', $category);
-        $second = $this->productAt('Chợ Hai', 'Cà chua', $category);
+        $first = $this->productAt('Market One', 'Water spinach', $category);
+        $second = $this->productAt('Market Two', 'Tomato', $category);
 
         $this->getJson('/api/products?market_id='.$first['market']->id)
             ->assertOk()
             ->assertJsonPath('meta.total', 1)
-            ->assertJsonPath('data.0.name', 'Rau muống')
+            ->assertJsonPath('data.0.name', 'Water spinach')
             ->assertJsonPath('data.0.farmer.market.id', $first['market']->id)
-            ->assertJsonPath('data.0.farmer.market.name', 'Chợ Một');
+            ->assertJsonPath('data.0.farmer.market.name', 'Market One');
 
         $this->getJson('/api/products?market_id='.$second['market']->id)
             ->assertOk()
             ->assertJsonPath('meta.total', 1)
-            ->assertJsonPath('data.0.name', 'Cà chua')
+            ->assertJsonPath('data.0.name', 'Tomato')
             ->assertJsonPath('data.0.farmer.market.id', $second['market']->id);
     }
 
@@ -47,7 +47,7 @@ class ProductMarketFilterTest extends TestCase
         $user = User::query()->create([
             'full_name' => $marketName,
             'email' => strtolower(str_replace(' ', '', $marketName)).'@example.com',
-            'phone' => $marketName === 'Chợ Một' ? '0900000001' : '0900000002',
+            'phone' => $marketName === 'Market One' ? '0900000001' : '0900000002',
             'password_hash' => 'secret',
             'address' => $marketName,
             'role' => 'FARMER',
@@ -56,7 +56,7 @@ class ProductMarketFilterTest extends TestCase
         $farmer = Farmer::query()->create([
             'user_id' => $user->id,
             'market_id' => $market->id,
-            'business_name' => 'Vườn '.$marketName,
+            'business_name' => 'Garden '.$marketName,
         ]);
         $product = Product::query()->create([
             'farmer_id' => $farmer->id,

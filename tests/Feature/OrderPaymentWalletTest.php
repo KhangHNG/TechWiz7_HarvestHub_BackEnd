@@ -18,9 +18,9 @@ class OrderPaymentWalletTest extends TestCase
 
     public function test_payment_method_is_only_accepted_when_the_cart_is_placed(): void
     {
-        [$owner, $farmer] = $this->farm('Vườn A', 'a@example.com', '0900000001');
+        [$owner, $farmer] = $this->farm('Garden A', 'a@example.com', '0900000001');
         $customer = $this->user('CUSTOMER', 'khach@example.com', '0900000003');
-        $product = $this->product($farmer, 'Cải', 10000);
+        $product = $this->product($farmer, 'Mustard greens', 10000);
         $token = $this->token($customer);
 
         $cartId = $this->withToken($token)
@@ -34,12 +34,12 @@ class OrderPaymentWalletTest extends TestCase
                 'payment_method' => 'BANK_TRANSFER',
             ])
             ->assertUnprocessable()
-            ->assertJsonPath('errors.payment_method.0', 'Chỉ được chọn phương thức thanh toán khi đặt đơn.');
+            ->assertJsonPath('errors.payment_method.0', 'Payment method can only be selected when placing the order.');
 
         $this->withToken($token)
             ->putJson('/api/orders/'.$cartId, [
                 'status' => 'PENDING',
-                'delivery_address' => '1 Đường A',
+                'delivery_address' => '1 Street A',
                 'payment_method' => 'BANK_TRANSFER',
             ])
             ->assertOk()
@@ -51,20 +51,20 @@ class OrderPaymentWalletTest extends TestCase
                 'payment_method' => 'COD',
             ])
             ->assertUnprocessable()
-            ->assertJsonPath('errors.payment_method.0', 'Chỉ được chọn phương thức thanh toán khi đặt đơn.');
+            ->assertJsonPath('errors.payment_method.0', 'Payment method can only be selected when placing the order.');
     }
 
     public function test_bank_transfer_is_copied_when_split_and_credited_once(): void
     {
-        [$ownerA, $farmerA] = $this->farm('Vườn A', 'a@example.com', '0900000001');
-        [$ownerB, $farmerB] = $this->farm('Vườn B', 'b@example.com', '0900000002');
+        [$ownerA, $farmerA] = $this->farm('Garden A', 'a@example.com', '0900000001');
+        [$ownerB, $farmerB] = $this->farm('Garden B', 'b@example.com', '0900000002');
         $customer = $this->user('CUSTOMER', 'khach@example.com', '0900000003');
-        $productA = $this->product($farmerA, 'Cải', 10000);
-        $productB = $this->product($farmerB, 'Cà rốt', 20000);
+        $productA = $this->product($farmerA, 'Mustard greens', 10000);
+        $productB = $this->product($farmerB, 'Carrot', 20000);
 
         $this->getJson('/api/farmer/wallet')
             ->assertUnauthorized()
-            ->assertJsonPath('message', 'Token bị thiếu hoặc không thể giải mã.');
+            ->assertJsonPath('message', 'Token is missing or could not be decoded.');
 
         $placed = $this->withToken($this->token($customer))
             ->postJson('/api/orders', $this->cartPayload([$productA, $productB]))
@@ -74,7 +74,7 @@ class OrderPaymentWalletTest extends TestCase
         $this->withToken($this->token($customer))
             ->putJson('/api/orders/'.$placed, [
                 'status' => 'PENDING',
-                'delivery_address' => '1 Đường A',
+                'delivery_address' => '1 Street A',
                 'payment_method' => 'BANK_TRANSFER',
             ])
             ->assertOk()
@@ -125,9 +125,9 @@ class OrderPaymentWalletTest extends TestCase
 
     public function test_cod_completion_does_not_credit_the_wallet(): void
     {
-        [$owner, $farmer] = $this->farm('Vườn A', 'a@example.com', '0900000001');
+        [$owner, $farmer] = $this->farm('Garden A', 'a@example.com', '0900000001');
         $customer = $this->user('CUSTOMER', 'khach@example.com', '0900000003');
-        $product = $this->product($farmer, 'Cải', 10000);
+        $product = $this->product($farmer, 'Mustard greens', 10000);
 
         $cartId = $this->withToken($this->token($customer))
             ->postJson('/api/orders', $this->cartPayload([$product]))
@@ -137,7 +137,7 @@ class OrderPaymentWalletTest extends TestCase
         $this->withToken($this->token($customer))
             ->putJson('/api/orders/'.$cartId, [
                 'status' => 'PENDING',
-                'delivery_address' => '1 Đường A',
+                'delivery_address' => '1 Street A',
             ])
             ->assertOk()
             ->assertJsonPath('data.payment_method', 'COD');
@@ -183,7 +183,7 @@ class OrderPaymentWalletTest extends TestCase
             'email' => $email,
             'phone' => $phone,
             'password_hash' => 'secret',
-            'address' => '1 Đường A',
+            'address' => '1 Street A',
             'role' => $role,
             'email_verified_at' => now(),
         ]);
@@ -220,7 +220,7 @@ class OrderPaymentWalletTest extends TestCase
         ], $products);
 
         return [
-            'delivery_address' => '1 Đường A',
+            'delivery_address' => '1 Street A',
             'status' => 'CART',
             'total_price' => array_sum(array_column($items, 'line_total')),
             'items' => $items,

@@ -24,11 +24,11 @@ class OrderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $navigationLabel = 'Đơn hàng';
+    protected static ?string $navigationLabel = 'Orders';
 
-    protected static ?string $modelLabel = 'đơn hàng';
+    protected static ?string $modelLabel = 'order';
 
-    protected static ?string $pluralModelLabel = 'đơn hàng';
+    protected static ?string $pluralModelLabel = 'orders';
 
     protected static ?string $recordTitleAttribute = 'id';
 

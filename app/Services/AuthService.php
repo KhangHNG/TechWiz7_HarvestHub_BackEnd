@@ -28,7 +28,7 @@ class AuthService
             report($e);
             $user->delete();
 
-            throw new \RuntimeException('Không gửi được email xác thực. Vui lòng thử lại.', 500);
+            throw new \RuntimeException('Could not send verification email. Please try again.', 500);
         }
 
         return $user;
@@ -39,7 +39,7 @@ class AuthService
         $user = User::query()->find($id);
 
         if (! $user || ! hash_equals(sha1($user->email), $hash)) {
-            throw new \RuntimeException('Liên kết xác thực không hợp lệ hoặc đã hết hạn.', 403);
+            throw new \RuntimeException('The verification link is invalid or has expired.', 403);
         }
 
         if ($user->email_verified_at === null) {
@@ -55,11 +55,11 @@ class AuthService
         $user = User::query()->where('email', $email)->first();
 
         if (! $user) {
-            throw new \RuntimeException('Không tìm thấy tài khoản với email này.', 404);
+            throw new \RuntimeException('No account found with this email.', 404);
         }
 
         if ($user->email_verified_at !== null) {
-            throw new \RuntimeException('Email đã được xác thực.', 400);
+            throw new \RuntimeException('Email has already been verified.', 400);
         }
 
         $this->sendVerificationLink($user);
@@ -81,7 +81,7 @@ class AuthService
         $user = User::query()->where('email', $email)->first();
 
         if (! $user || ! $this->consumeOtp($email, 'reset', $otp)) {
-            throw new \RuntimeException('Mã OTP không đúng hoặc đã hết hạn.', 400);
+            throw new \RuntimeException('OTP is incorrect or has expired.', 400);
         }
 
         $user->password_hash = $password;

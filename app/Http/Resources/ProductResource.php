@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ProductResource extends JsonResource
 {
     /**
-     * Transform resource thành một mảng JSON.
+     * Transform the resource into a JSON array.
      *
      * @return array<string, mixed>
      */

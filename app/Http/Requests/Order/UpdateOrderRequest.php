@@ -41,25 +41,25 @@ class UpdateOrderRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'delivery_address' => 'Địa chỉ giao hàng',
-            'status' => 'Trạng thái',
-            'payment_method' => 'Phương thức thanh toán',
-            'total_price' => 'Tổng tiền',
-            'items' => 'Sản phẩm trong đơn',
-            'items.*.product_id' => 'Sản phẩm',
-            'items.*.product_name' => 'Tên sản phẩm',
-            'items.*.unit_price' => 'Đơn giá',
-            'items.*.quantity' => 'Số lượng',
-            'items.*.line_total' => 'Thành tiền',
+            'delivery_address' => 'Delivery address',
+            'status' => 'Status',
+            'payment_method' => 'Payment method',
+            'total_price' => 'Total',
+            'items' => 'Order items',
+            'items.*.product_id' => 'Product',
+            'items.*.product_name' => 'Product name',
+            'items.*.unit_price' => 'Unit price',
+            'items.*.quantity' => 'Quantity',
+            'items.*.line_total' => 'Line total',
         ];
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'items.min' => 'Đơn hàng cần ít nhất một sản phẩm.',
-            'items.*.product_id.exists' => 'Sản phẩm không tồn tại.',
-            'items.*.product_id.distinct' => 'Sản phẩm bị trùng trong đơn hàng.',
+            'items.min' => 'The order needs at least one product.',
+            'items.*.product_id.exists' => 'The product does not exist.',
+            'items.*.product_id.distinct' => 'Duplicate products in the order.',
         ]);
     }
 
@@ -97,7 +97,7 @@ class UpdateOrderRequest extends ApiFormRequest
         if (! in_array($next, $allowed, true)) {
             $validator->errors()->add(
                 'status',
-                "Không thể chuyển trạng thái từ {$current} sang {$next}.",
+                "Cannot change status from {$current} to {$next}.",
             );
 
             return;
@@ -114,7 +114,7 @@ class UpdateOrderRequest extends ApiFormRequest
         if (! is_string($address) || trim($address) === '') {
             $validator->errors()->add(
                 'delivery_address',
-                'Cần địa chỉ giao hàng trước khi chuyển trạng thái.',
+                'A delivery address is required before changing status.',
             );
         }
 
@@ -125,7 +125,7 @@ class UpdateOrderRequest extends ApiFormRequest
         if (! $hasItems) {
             $validator->errors()->add(
                 'items',
-                'Đơn hàng cần ít nhất một sản phẩm trước khi chuyển trạng thái.',
+                'The order needs at least one product before changing status.',
             );
         }
     }
@@ -145,7 +145,7 @@ class UpdateOrderRequest extends ApiFormRequest
 
         $validator->errors()->add(
             'payment_method',
-            'Chỉ được chọn phương thức thanh toán khi đặt đơn.',
+            'Payment method can only be selected when placing the order.',
         );
     }
 
@@ -156,7 +156,7 @@ class UpdateOrderRequest extends ApiFormRequest
         }
 
         if ($order->status !== 'CART') {
-            $validator->errors()->add('items', 'Chỉ đơn giỏ hàng mới được sửa sản phẩm.');
+            $validator->errors()->add('items', 'Only cart orders can have their products edited.');
 
             return;
         }

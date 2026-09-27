@@ -21,12 +21,12 @@ class StoreMarketRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'Tên chợ',
-            'address' => 'Địa chỉ',
-            'latitude' => 'Vĩ độ',
-            'longitude' => 'Kinh độ',
-            'operating_hours' => 'Giờ hoạt động',
-            'is_active' => 'Trạng thái hoạt động',
+            'name' => 'Market name',
+            'address' => 'Address',
+            'latitude' => 'Latitude',
+            'longitude' => 'Longitude',
+            'operating_hours' => 'Operating hours',
+            'is_active' => 'Active status',
         ];
     }
 }
