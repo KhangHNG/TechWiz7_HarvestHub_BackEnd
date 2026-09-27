@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendPushNotification;
 use App\Models\DeviceToken;
 use App\Models\Order;
 use App\Models\Product;
@@ -144,13 +145,13 @@ class NotificationService
             'data' => $payload,
         ]);
 
-        $this->push($user, $title, $body, $payload);
+        SendPushNotification::dispatch($user->id, $title, $body, $payload);
     }
 
     /**
      * @param  array<string, string>  $data
      */
-    private function push(User $user, string $title, string $body, array $data): void
+    public function push(User $user, string $title, string $body, array $data): void
     {
         $tokens = DeviceToken::query()
             ->where('user_id', $user->id)
