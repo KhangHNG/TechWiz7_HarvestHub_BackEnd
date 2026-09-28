@@ -14,20 +14,33 @@ class GeminiService
      * History is only used for this request. Not persisted to the database.
      *
      * @param  array<int, array{role: string, text: string}>  $history
+     * @return array{reply: string, suggestions: array<int, string>}
      */
-    public function ask(string $userPrompt, array $history = []): string
+    public function ask(string $userPrompt, array $history = []): array
     {
         $vietnamese = $this->vietnamese($userPrompt);
         $apiKey = config('services.gemini.api_key');
         if (! is_string($apiKey) || $apiKey === '') {
-            return $vietnamese
-                ? 'GEMINI_API_KEY is not configured.'
-                : 'GEMINI_API_KEY is not configured.';
+            return self::splitSuggestions('GEMINI_API_KEY is not configured.');
         }
 
         $systemInstruction = [
             'parts' => [[
-                'text' => 'You are the HarvestHub farm-market assistant. Reply briefly in English. Answer two kinds of questions, and never use the under-development sentence for them. First, HarvestHub catalog facts: products, prices, stock, farms, farmers, markets, addresses, and pickup hours. Call a tool and answer only from the tool result. For which products exist, call list_products. For products of a named farmer, call list_products with farmer set to that name and omit keyword. For the price or stock of a named product, call get_product_stock. For the market, address, or pickup hours of a named farm, call get_pickup_slots. Catalog names are English, for example water spinach, cherry tomato, and mango. Pass that English name. If the first call returns not_found, call once more with another English name. Do not invent products, prices, stock, farm names, addresses, or hours. Keep stored names, addresses, hours, and prices unchanged. The tool result includes reply_language. Write the sentence in English. If the result is not_found, say it was not found. Second, agricultural knowledge that does not need the catalog: how to store produce, nutrition such as foods rich in vitamin C, which produce is in season, and dishes or recipes that use agricultural products. Examples: "How to store leafy greens", "Foods rich in vitamin C", "Seasonal produce". Answer these from general knowledge and do not call a tool. Do not invent HarvestHub prices, stock, farm names, addresses, or hours. For anything else, including weather, the current time, sports, and personal chat unrelated to produce, farmers, or farm food, do not call a tool. Reply with exactly "This feature is under development."',
+                'text' => <<<'TXT'
+You are the HarvestHub farm-market assistant. Reply briefly in English. Answer two kinds of questions, and never use the under-development sentence for them.
+
+First, HarvestHub catalog facts: products, prices, stock, farms, farmers, markets, addresses, and pickup hours. Call a tool and answer only from the tool result. For which products exist, call list_products. For products of a named farmer, call list_products with farmer set to that name and omit keyword. For the price or stock of a named product, call get_product_stock. For the market, address, or pickup hours of a named farm, call get_pickup_slots. Catalog names are English, for example water spinach, cherry tomato, and mango. Pass that English name. If the first call returns not_found, call once more with another English name. Do not invent products, prices, stock, farm names, addresses, or hours. Keep stored names, addresses, hours, and prices unchanged. The tool result includes reply_language. Write the sentence in English. If the result is not_found, say it was not found.
+
+Second, agricultural knowledge: how to store produce, nutrition such as foods rich in vitamin C, which produce is in season, and dishes or recipes that use agricultural products. Give a short answer from general knowledge. Before the final sentence, call list_products in the same step for each English catalog name that fits. For vitamin C, call list_products for guava, king orange, and cherry tomato. Mention only product_name and farmer_name from those tool results, and include the price or stock when the result has them. Ask if the user wants to order. Skip a name when its call returns not_found. Do not invent HarvestHub prices, stock, farm names, addresses, or hours.
+
+For anything else, including weather, the current time, sports, and personal chat unrelated to produce, farmers, or farm food, do not call a tool. Reply with exactly "This feature is under development."
+
+On every reply except exactly "This feature is under development.", end the message with this block and nothing after it:
+SUGGESTIONS:
+- Order guava from Riverside Orchard?
+- What is the price of king orange?
+Write 2 or 3 lines. Each line starts with "- " and is one question the user could send next. Each question must lead toward buying a product_name from a farmer_name that appeared in the latest tool result. Do not name a product or farm that was not in a tool result.
+TXT
             ]],
         ];
 
@@ -45,7 +58,7 @@ class GeminiService
 
         $response = $this->post($payload);
         if ($response->failed()) {
-            return $this->failureMessage($response, 'ask', $vietnamese);
+            return self::splitSuggestions($this->failureMessage($response, 'ask', $vietnamese));
         }
 
         for ($round = 0; $round < 2; $round++) {
@@ -53,9 +66,9 @@ class GeminiService
             $functionCalls = $this->functionCalls($parts);
 
             if ($functionCalls === []) {
-                return $this->textFromParts($parts) ?? ($vietnamese
+                return self::splitSuggestions($this->textFromParts($parts) ?? ($vietnamese
                     ? "Sorry, I didn't understand that."
-                    : 'Sorry, I did not understand that.');
+                    : 'Sorry, I did not understand that.'));
             }
 
             $responseParts = [];
@@ -94,15 +107,62 @@ class GeminiService
             ]);
 
             if ($response->failed()) {
-                return $this->failureMessage($response, 'synthesize', $vietnamese);
+                return self::splitSuggestions($this->failureMessage($response, 'synthesize', $vietnamese));
             }
         }
 
         $parts = $response->json('candidates.0.content.parts') ?? [];
 
-        return $this->textFromParts($parts) ?? ($vietnamese
+        return self::splitSuggestions($this->textFromParts($parts) ?? ($vietnamese
             ? 'Checked produce information.'
-            : 'Checked the product information.');
+            : 'Checked the product information.'));
+    }
+
+    /**
+     * @return array{reply: string, suggestions: array<int, string>}
+     */
+    public static function splitSuggestions(string $text): array
+    {
+        $normalized = str_replace("\r\n", "\n", trim($text));
+        $marker = "\nSUGGESTIONS:\n";
+        $position = strpos($normalized, $marker);
+
+        if ($position === false) {
+            return [
+                'reply' => $normalized,
+                'suggestions' => [],
+            ];
+        }
+
+        $reply = trim(substr($normalized, 0, $position));
+        $body = substr($normalized, $position + strlen($marker));
+        $suggestions = [];
+
+        foreach (preg_split("/\n/", $body) ?: [] as $line) {
+            $line = trim($line);
+            if (! str_starts_with($line, '- ')) {
+                continue;
+            }
+
+            $question = trim(substr($line, 2));
+            if ($question === '') {
+                continue;
+            }
+
+            $suggestions[] = $question;
+            if (count($suggestions) === 3) {
+                break;
+            }
+        }
+
+        if ($reply === 'This feature is under development.') {
+            $suggestions = [];
+        }
+
+        return [
+            'reply' => $reply,
+            'suggestions' => $suggestions,
+        ];
     }
 
     private function vietnamese(string $text): bool

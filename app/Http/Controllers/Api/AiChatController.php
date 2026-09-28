@@ -15,13 +15,14 @@ class AiChatController extends Controller
     {
         $data = $request->validated();
 
-        $reply = $this->gemini->ask($data['message'], $data['history'] ?? []);
+        $result = $this->gemini->ask($data['message'], $data['history'] ?? []);
 
         return response()->json([
             'success' => true,
             'message' => 'Replied',
             'data' => [
-                'reply' => $reply,
+                'reply' => $result['reply'],
+                'suggestions' => $result['suggestions'],
             ],
         ]);
     }
