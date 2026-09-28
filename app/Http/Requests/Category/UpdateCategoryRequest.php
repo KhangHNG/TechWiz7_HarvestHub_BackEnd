@@ -19,6 +19,7 @@ class UpdateCategoryRequest extends ApiFormRequest
                     ->ignore($this->route('id'))
                     ->where(fn ($query) => $query->whereNull('deleted_at')),
             ],
+            'image_url' => ['sometimes', 'nullable', 'url', 'max:500'],
         ];
     }
 
@@ -26,6 +27,7 @@ class UpdateCategoryRequest extends ApiFormRequest
     {
         return [
             'name' => 'Category name',
+            'image_url' => 'Category picture',
         ];
     }
 

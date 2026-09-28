@@ -16,6 +16,7 @@ class StoreCategoryRequest extends ApiFormRequest
                 'max:255',
                 Rule::unique('categories', 'name')->where(fn ($query) => $query->whereNull('deleted_at')),
             ],
+            'image_url' => ['nullable', 'url', 'max:500'],
         ];
     }
 
@@ -23,6 +24,7 @@ class StoreCategoryRequest extends ApiFormRequest
     {
         return [
             'name' => 'Category name',
+            'image_url' => 'Category picture',
         ];
     }
 
