@@ -61,9 +61,9 @@ TXT);
 
     public function test_reply_without_a_block_keeps_the_full_text(): void
     {
-        $result = GeminiService::splitSuggestions('Guava costs 25000 VND.');
+        $result = GeminiService::splitSuggestions('Guava costs $1.00.');
 
-        $this->assertSame('Guava costs 25000 VND.', $result['reply']);
+        $this->assertSame('Guava costs $1.00.', $result['reply']);
         $this->assertSame([], $result['suggestions']);
     }
 }

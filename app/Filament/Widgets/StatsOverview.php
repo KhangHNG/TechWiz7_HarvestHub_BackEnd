@@ -24,7 +24,7 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-clipboard-document-list')
                 ->color('warning'),
 
-            Stat::make('Total revenue', number_format(Order::query()->where('status', 'COMPLETED')->sum('total_price')).' VND')
+            Stat::make('Total revenue', '$'.number_format(Order::query()->where('status', 'COMPLETED')->sum('total_price'), 2))
                 ->description('Order completed')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('primary'),

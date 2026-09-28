@@ -11,19 +11,24 @@ class CategorySeeder extends Seeder
 
     public function run(): void
     {
+        // Pictures sit in public/seed/categories; the API turns each path
+        // into a full link.
         foreach ([
-            'Vegetables',
-            'Fruits',
-            'Grains',
-            'Dairy',
-            'Herbs',
-            'Organic',
-            'Legumes',
-            'Spices',
-            'Mushrooms',
-            'Honey',
-        ] as $name) {
-            $this->createAudited(Category::class, ['name' => $name]);
+            'Vegetables' => 'vegetables.webp',
+            'Fruits' => 'fruits.webp',
+            'Grains' => 'grains.webp',
+            'Dairy' => 'dairy.webp',
+            'Herbs' => 'herbs.webp',
+            'Organic' => 'organic.webp',
+            'Legumes' => 'legumes.webp',
+            'Spices' => 'spices.webp',
+            'Mushrooms' => 'mushrooms.webp',
+            'Honey' => 'honey.webp',
+        ] as $name => $picture) {
+            $this->createAudited(Category::class, [
+                'name' => $name,
+                'image_url' => 'seed/categories/'.$picture,
+            ]);
         }
     }
 }

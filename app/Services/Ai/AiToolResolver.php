@@ -118,7 +118,7 @@ class AiToolResolver
                     'product_name' => $product->name,
                     'category_name' => $product->category->name ?? null,
                     'farmer_name' => $product->farmer->business_name ?? null,
-                    'price' => number_format((float) $product->price).' VND',
+                    'price' => '$'.number_format((float) $product->price, 2),
                     'stock_qty' => $product->stock_qty,
                 ];
             })->all(),
@@ -164,7 +164,7 @@ class AiToolResolver
                 return [
                     'product_name' => $product->name,
                     'farmer_name' => $product->farmer->business_name ?? null,
-                    'price' => number_format((float) $product->price).' VND',
+                    'price' => '$'.number_format((float) $product->price, 2),
                     'stock_qty' => $product->stock_qty,
                     'in_stock' => $product->stock_qty > 0,
                 ];

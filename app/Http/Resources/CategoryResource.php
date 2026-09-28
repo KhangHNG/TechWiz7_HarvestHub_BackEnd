@@ -9,6 +9,7 @@ class CategoryResource extends JsonResource {
         return [
             'id'   => $this->id,
             'name' => $this->name,
+            'image_url' => $this->absoluteImageUrl(),
             'created_at'  => $this->created_at?->toIso8601String(),
             'updated_at'  => $this->updated_at?->toIso8601String(),
             'deleted_at' => $this->deleted_at?->toIso8601String(),
@@ -20,5 +21,21 @@ class CategoryResource extends JsonResource {
                 $this->sample_image_url,
             ),
         ];
+    }
+
+    /** Uploaded pictures are full links; seeded ones are public paths. */
+    private function absoluteImageUrl(): ?string
+    {
+        $url = $this->image_url;
+
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        return url($url);
     }
 }

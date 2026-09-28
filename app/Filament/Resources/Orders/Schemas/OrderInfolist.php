@@ -36,7 +36,7 @@ class OrderInfolist
                     ->formatStateUsing(fn (?string $state): string => OrderForm::statusOptions($state)[$state] ?? (string) $state),
                 TextEntry::make('total_price')
                     ->label('Total')
-                    ->money('vnd')
+                    ->money('usd')
                     ->placeholder('-'),
                 TextEntry::make('completed_at')
                     ->label('Completed at')
