@@ -18,20 +18,33 @@ class OrderItemSeeder extends Seeder
         foreach ($orders as $order) {
             $products = Product::query()
                 ->where('farmer_id', $order->farmer_id)
+                ->where('stock_qty', '>', 0)
                 ->orderBy('id')
                 ->get();
+
+            if ($products->isEmpty()) {
+                continue;
+            }
 
             $count = $products->count();
             $shift = $order->status === 'CART' ? 0 : 2;
             $start = ($order->customer_id + $shift) % $count;
-            $chosen = [
-                $products[$start],
-                $products[($start + 1) % $count],
-            ];
+            $chosen = [$products[$start]];
+
+            if ($count > 1) {
+                $chosen[] = $products[($start + 1) % $count];
+            }
+
             $total = 0;
 
             foreach ($chosen as $offset => $product) {
-                $quantity = $offset + 1;
+                $product->refresh();
+
+                if ($product->stock_qty <= 0) {
+                    continue;
+                }
+
+                $quantity = min($offset + 1, (int) $product->stock_qty);
                 $lineTotal = (float) $product->price * $quantity;
                 $total += $lineTotal;
 

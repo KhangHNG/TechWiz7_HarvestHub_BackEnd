@@ -17,18 +17,18 @@ class FarmerSeeder extends Seeder
         $markets = Market::query()->orderBy('id')->get();
 
         $profiles = [
-            ['Green Leaf Farm', 'Leafy vegetables harvested each morning and sold the same day at Ben Thanh Market.', 4.6],
-            ['Riverside Orchard', 'Tree-ripened fruit picked in the morning and brought to Binh Tay Market.', 4.8],
-            ['Red River Grains', 'Clean rice and grains packed to weight and sold at Dong Xuan Market.', 4.3],
-            ['Morning Herb Garden', 'Herbs and spices cut the same day for Hom Market stalls.', 4.7],
-            ['Han River Produce', 'Seasonal vegetables and fruit from farms outside Da Nang.', 4.4],
-            ['Coastal Greens', 'Coastal vegetables and herbs delivered to Dam Market before dawn.', 4.5],
-            ['Fort Fresh Farm', 'Mixed vegetables grown for the Crawford Market wholesale floor.', 4.2],
-            ['Chandni Spice Garden', 'Dried spices and chili sorted for Khari Baoli traders.', 4.9],
-            ['Kalasipalya Organics', 'Organic greens with a written care log, sold at KR Market.', 4.6],
-            ['Koyambedu Harvest', 'Wholesale vegetables packed overnight for Koyambedu Market.', 4.1],
-            ['Lindsay Street Dairy', 'Fresh milk and yogurt made for New Market stalls in Kolkata.', 4.5],
-            ['Charminar Honey House', 'Raw honey and bee products bottled for Laad Bazaar.', 4.8],
+            ['Green Leaf Farm', 'Morning-cut leafy vegetables packed for Ben Thanh Market the same day.', 4.6],
+            ['Riverside Orchard', 'Tree-ripened fruit picked at dawn and sold at Binh Tay Market.', 4.8],
+            ['Red River Grains', 'Milled rice, glutinous rice, and dried beans weighed for Dong Xuan Market.', 4.3],
+            ['Morning Herb Garden', 'Herbs cut the same morning for the stalls at Hom Market.', 4.7],
+            ['Han River Produce', 'Seasonal fruit and vegetables from farms outside Da Nang, sold at Han Market.', 4.4],
+            ['Coastal Greens', 'Cabbage, cauliflower, and garden greens delivered to Dam Market before dawn.', 4.5],
+            ['Fort Fresh Farm', 'Vegetables and cultivated mushrooms grown for the Crawford Market floor in Mumbai.', 4.2],
+            ['Chandni Spice Garden', 'Dried chili, turmeric, garlic, and whole spices sorted for Khari Baoli.', 4.9],
+            ['Kalasipalya Organics', 'Organic greens and roots with a written harvest log, sold at KR Market.', 4.6],
+            ['Koyambedu Harvest', 'Wholesale vegetables packed overnight for Koyambedu Market in Chennai.', 4.1],
+            ['Lindsay Street Dairy', 'Fresh milk, yogurt, paneer, and butter made for New Market in Kolkata.', 4.5],
+            ['Charminar Honey House', 'Raw honey, bee pollen, and beeswax bottled for Laad Bazaar in Hyderabad.', 4.8],
         ];
 
         foreach ($profiles as $index => [$businessName, $description, $rating]) {
@@ -39,7 +39,7 @@ class FarmerSeeder extends Seeder
                 'description' => $description,
                 'rating' => $rating,
                 'is_accepting_orders' => true,
-                'cover_url' => '/seed/products/mat-ong-'.(($index % 2) + 1).'.jpg',
+                'cover_url' => null,
             ]);
         }
     }
