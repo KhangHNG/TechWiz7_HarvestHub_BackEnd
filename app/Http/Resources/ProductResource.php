@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\ImageUrls;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +19,8 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'price' => $this->price,
-            'image_url' => $this->absoluteImageUrls(),
+            'image_url' => $this->sizedImageUrls(ImageUrls::GALLERY_WIDTH),
+            'thumbnail_url' => $this->sizedImageUrls(ImageUrls::CARD_WIDTH)[0] ?? null,
             'description' => $this->description,
             'farmer_id' => $this->farmer_id,
             'category_id' => $this->category_id,
@@ -59,16 +61,16 @@ class ProductResource extends JsonResource
     /**
      * @return array<int, string>
      */
-    private function absoluteImageUrls(): array
+    private function sizedImageUrls(int $width): array
     {
         return collect($this->image_url ?? [])
             ->filter(fn ($url): bool => is_string($url) && $url !== '')
-            ->map(function (string $url): string {
-                if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
-                    return $url;
+            ->map(function (string $url) use ($width): string {
+                if (! str_starts_with($url, 'http://') && ! str_starts_with($url, 'https://')) {
+                    $url = url($url);
                 }
 
-                return url($url);
+                return ImageUrls::resize($url, $width);
             })
             ->values()
             ->all();
