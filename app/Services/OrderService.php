@@ -38,6 +38,8 @@ class OrderService
             $keyword = $request->keyword;
             $query->where(function ($q) use ($keyword) {
                 $q->where('delivery_address', 'LIKE', "%{$keyword}%")
+                    ->orWhere('city', 'LIKE', "%{$keyword}%")
+                    ->orWhere('ward', 'LIKE', "%{$keyword}%")
                     ->orWhere('status', 'LIKE', "%{$keyword}%");
             });
         }
@@ -210,6 +212,9 @@ class OrderService
                 'customer_id' => $order->customer_id,
                 'farmer_id' => $farmerId,
                 'delivery_address' => $order->delivery_address,
+                'city' => $order->city,
+                'district' => $order->district,
+                'ward' => $order->ward,
                 'status' => 'PENDING',
                 'payment_method' => $order->payment_method,
                 'total_price' => $items->sum('line_total'),

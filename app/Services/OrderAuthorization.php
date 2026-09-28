@@ -106,7 +106,7 @@ class OrderAuthorization
      */
     private function assertCustomerUpdate(Order $order, array $data): void
     {
-        $contentKeys = array_intersect(array_keys($data), ['delivery_address', 'items', 'total_price']);
+        $contentKeys = array_intersect(array_keys($data), ['delivery_address', 'city', 'district', 'ward', 'items', 'total_price']);
         if ($contentKeys !== [] && $order->status !== 'CART') {
             $this->deny('Only cart orders can be edited.');
         }

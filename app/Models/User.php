@@ -25,6 +25,7 @@ class User extends Authenticatable implements FilamentUser, HasName, JWTSubject
         'address',
         'city',
         'district',
+        'ward',
         'capital',
         'avatar_url',
         'role',

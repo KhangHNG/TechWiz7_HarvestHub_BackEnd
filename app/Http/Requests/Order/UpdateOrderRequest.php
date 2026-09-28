@@ -26,6 +26,9 @@ class UpdateOrderRequest extends ApiFormRequest
     {
         return [
             'delivery_address' => ['nullable', 'string'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'district' => ['nullable', 'string', 'max:255'],
+            'ward' => ['nullable', 'string', 'max:255'],
             'status' => ['sometimes', 'in:CART,PENDING,CONFIRMED,READY_FOR_PICKUP,COMPLETED,CANCELLED'],
             'payment_method' => ['sometimes', 'in:COD,BANK_TRANSFER'],
             'total_price' => ['nullable', 'numeric', 'min:0'],
@@ -42,6 +45,9 @@ class UpdateOrderRequest extends ApiFormRequest
     {
         return [
             'delivery_address' => 'Delivery address',
+            'city' => 'City',
+            'district' => 'District',
+            'ward' => 'Ward',
             'status' => 'Status',
             'payment_method' => 'Payment method',
             'total_price' => 'Total',

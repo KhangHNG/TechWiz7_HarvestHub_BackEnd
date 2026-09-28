@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Auth;
 
 use App\Http\Requests\ApiFormRequest;
+use App\Support\LocationValidator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class RegisterRequest extends ApiFormRequest
@@ -23,6 +25,7 @@ class RegisterRequest extends ApiFormRequest
             'address' => ['required', 'string'],
             'city' => ['required', 'string', 'max:255'],
             'district' => ['required', 'string', 'max:255'],
+            'ward' => ['required', 'string', 'max:255'],
             'capital' => ['required', 'string', 'max:255'],
             'role' => ['sometimes', Rule::in(['CUSTOMER', 'FARMER'])],
         ];
@@ -38,6 +41,7 @@ class RegisterRequest extends ApiFormRequest
             'address' => 'Address',
             'city' => 'City',
             'district' => 'District',
+            'ward' => 'Ward',
             'capital' => 'Province / city',
             'role' => 'Role',
         ];
@@ -51,5 +55,21 @@ class RegisterRequest extends ApiFormRequest
             'phone.digits' => 'The phone number must be numeric and exactly 10 digits.',
             'password.confirmed' => 'The password confirmation does not match.',
         ]);
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            LocationValidator::assert(
+                $validator,
+                $this->input('city'),
+                $this->input('district'),
+                $this->input('ward'),
+            );
+        });
     }
 }

@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
     {
         Model::withoutEvents(function () {
             $this->call([
+                CitySeeder::class,
                 UserSeeder::class,
                 MarketSeeder::class,
                 FarmerSeeder::class,

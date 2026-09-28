@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Http\Requests\ApiFormRequest;
 use App\Models\User;
+use App\Support\LocationValidator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
@@ -28,6 +29,7 @@ class UpdateUserRequest extends ApiFormRequest
             'address' => ['sometimes', 'required', 'string'],
             'city' => ['sometimes', 'nullable', 'string', 'max:255'],
             'district' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'ward' => ['sometimes', 'nullable', 'string', 'max:255'],
             'capital' => ['sometimes', 'nullable', 'string', 'max:255'],
             'role' => ['sometimes', Rule::in(['CUSTOMER', 'FARMER', 'ADMIN'])],
         ];
@@ -43,6 +45,7 @@ class UpdateUserRequest extends ApiFormRequest
             'address' => 'Address',
             'city' => 'City',
             'district' => 'District',
+            'ward' => 'Ward',
             'capital' => 'Province / city',
             'role' => 'Role',
         ];
@@ -70,6 +73,7 @@ class UpdateUserRequest extends ApiFormRequest
             foreach ([
                 'city' => 'The city field is required.',
                 'district' => 'The district field is required.',
+                'ward' => 'The ward field is required.',
                 'capital' => 'The province/city field is required.',
             ] as $field => $message) {
                 $value = $this->exists($field) ? $this->input($field) : $user?->{$field};
@@ -78,6 +82,17 @@ class UpdateUserRequest extends ApiFormRequest
                     $validator->errors()->add($field, $message);
                 }
             }
+
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            LocationValidator::assert(
+                $validator,
+                $this->exists('city') ? $this->input('city') : $user?->city,
+                $this->exists('district') ? $this->input('district') : $user?->district,
+                $this->exists('ward') ? $this->input('ward') : $user?->ward,
+            );
         });
     }
 }

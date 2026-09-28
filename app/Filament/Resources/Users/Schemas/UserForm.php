@@ -39,6 +39,10 @@ class UserForm
                     ->label('District')
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
+                TextInput::make('ward')
+                    ->label('Ward')
+                    ->maxLength(255)
+                    ->required(fn (Get $get): bool => $get('role') !== 'ADMIN'),
                 TextInput::make('capital')
                     ->label('Province / city')
                     ->maxLength(255)

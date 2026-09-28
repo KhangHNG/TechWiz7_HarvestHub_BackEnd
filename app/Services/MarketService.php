@@ -16,7 +16,9 @@ class MarketService
             $keyword = $request->keyword;
             $query->where(function ($q) use ($keyword) {
                 $q->where('name', 'LIKE', "%{$keyword}%")
-                    ->orWhere('address', 'LIKE', "%{$keyword}%");
+                    ->orWhere('address', 'LIKE', "%{$keyword}%")
+                    ->orWhere('city', 'LIKE', "%{$keyword}%")
+                    ->orWhere('ward', 'LIKE', "%{$keyword}%");
             });
         }
 
