@@ -17,6 +17,15 @@ class MarketInfolist
                 TextEntry::make('address')
                     ->placeholder('-')
                     ->columnSpanFull(),
+                TextEntry::make('city')
+                    ->label('City')
+                    ->placeholder('-'),
+                TextEntry::make('district')
+                    ->label('District')
+                    ->placeholder('-'),
+                TextEntry::make('ward')
+                    ->label('Ward')
+                    ->placeholder('-'),
                 TextEntry::make('latitude')
                     ->numeric()
                     ->placeholder('-'),

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AiChatController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FarmerController;
 use App\Http\Controllers\Api\FarmerFollowController;
@@ -21,6 +22,10 @@ Route::post('/resend-verification', [AuthController::class, 'resendVerification'
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/cities', [CityController::class, 'index']);
+Route::get('/cities/{id}/districts', [CityController::class, 'districts']);
+Route::get('/districts/{id}/wards', [CityController::class, 'wards']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);

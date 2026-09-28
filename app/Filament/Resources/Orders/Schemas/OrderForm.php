@@ -50,6 +50,9 @@ class OrderForm
         $payload = [
             'customer_id' => $data['customer_id'],
             'delivery_address' => $data['delivery_address'] ?? null,
+            'city' => $data['city'] ?? null,
+            'district' => $data['district'] ?? null,
+            'ward' => $data['ward'] ?? null,
             'status' => $data['status'] ?? 'CART',
         ];
 
@@ -105,6 +108,15 @@ class OrderForm
                 Textarea::make('delivery_address')
                     ->label('Delivery address')
                     ->columnSpanFull(),
+                TextInput::make('city')
+                    ->label('City')
+                    ->maxLength(255),
+                TextInput::make('district')
+                    ->label('District')
+                    ->maxLength(255),
+                TextInput::make('ward')
+                    ->label('Ward')
+                    ->maxLength(255),
                 Select::make('status')
                     ->label('Status')
                     ->options(fn (?Order $record): array => self::statusOptions($record?->status))

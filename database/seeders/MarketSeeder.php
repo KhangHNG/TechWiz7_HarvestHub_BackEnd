@@ -12,24 +12,27 @@ class MarketSeeder extends Seeder
     public function run(): void
     {
         $markets = [
-            ['Ben Thanh Market', 'Le Loi Street, Ben Thanh Ward, District 1, Ho Chi Minh City, Vietnam', 10.77254000, 106.69801300, '06:00 - 18:00'],
-            ['Binh Tay Market', '57A Thap Muoi Street, District 6, Ho Chi Minh City, Vietnam', 10.74940000, 106.65120000, '06:00 - 18:00'],
-            ['Dong Xuan Market', 'Dong Xuan Street, Hoan Kiem District, Hanoi, Vietnam', 21.03820000, 105.84950000, '06:00 - 18:00'],
-            ['Hom Market', '81 Hue Street, Hai Ba Trung District, Hanoi, Vietnam', 21.01680000, 105.85120000, '06:00 - 19:00'],
-            ['Han Market', '119 Tran Phu Street, Hai Chau District, Da Nang, Vietnam', 16.06780000, 108.22340000, '06:00 - 18:00'],
-            ['Dam Market', 'Tran Phu Street, Nha Trang, Khanh Hoa, Vietnam', 12.23880000, 109.19670000, '05:00 - 18:00'],
-            ['Crawford Market', 'Dr Dadabhai Naoroji Road, Fort, Mumbai, Maharashtra 400001, India', 18.94770000, 72.83470000, '10:00 - 20:00'],
-            ['Khari Baoli', 'Khari Baoli Road, Chandni Chowk, Delhi 110006, India', 28.65620000, 77.21670000, '09:00 - 20:00'],
-            ['KR Market', 'Kalasipalya, Bengaluru, Karnataka 560002, India', 12.96560000, 77.57760000, '06:00 - 21:00'],
-            ['Koyambedu Market', 'Koyambedu, Chennai, Tamil Nadu 600107, India', 13.06940000, 80.19480000, '04:00 - 14:00'],
-            ['New Market', 'Lindsay Street, Kolkata, West Bengal 700087, India', 22.56000000, 88.35250000, '10:00 - 20:00'],
-            ['Laad Bazaar', 'Charminar, Hyderabad, Telangana 500002, India', 17.36160000, 78.47470000, '11:00 - 22:00'],
+            ['Ben Thanh Market', 'Lê Lợi, Phường Bến Thành, Quận 1, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận 1', 'Phường Bến Thành', 10.77254000, 106.69801300, '06:00 - 18:00'],
+            ['Binh Tay Market', 'Tháp Mười, Phường 1, Quận 6, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận 6', 'Phường 1', 10.74940000, 106.65120000, '06:00 - 18:00'],
+            ['Dong Xuan Market', 'Hàng Đào, Phường Hàng Đào, Quận Hoàn Kiếm, Hà Nội', 'Hà Nội', 'Quận Hoàn Kiếm', 'Phường Hàng Đào', 21.03820000, 105.84950000, '06:00 - 18:00'],
+            ['Hom Market', 'Huế, Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội', 'Hà Nội', 'Quận Hai Bà Trưng', 'Phường Nguyễn Du', 21.01680000, 105.85120000, '06:00 - 19:00'],
+            ['Han Market', 'Trần Phú, Phường Hải Châu 1, Quận Hải Châu, Đà Nẵng', 'Đà Nẵng', 'Quận Hải Châu', 'Phường Hải Châu 1', 16.06780000, 108.22340000, '06:00 - 18:00'],
+            ['Dam Market', 'Võ Nguyên Giáp, Phường Mân Thái, Quận Sơn Trà, Đà Nẵng', 'Đà Nẵng', 'Quận Sơn Trà', 'Phường Mân Thái', 16.07820000, 108.24510000, '05:00 - 18:00'],
+            ['Crawford Market', 'Lạch Tray, Phường Lê Lợi, Quận Ngô Quyền, Hải Phòng', 'Hải Phòng', 'Quận Ngô Quyền', 'Phường Lê Lợi', 20.86080000, 106.68810000, '10:00 - 20:00'],
+            ['Khari Baoli', 'Trần Nguyên Hãn, Phường An Biên, Quận Lê Chân, Hải Phòng', 'Hải Phòng', 'Quận Lê Chân', 'Phường An Biên', 20.84820000, 106.68040000, '09:00 - 20:00'],
+            ['KR Market', 'Hòa Bình, Phường Cái Khế, Quận Ninh Kiều, Cần Thơ', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường Cái Khế', 10.04520000, 105.74690000, '06:00 - 21:00'],
+            ['Koyambedu Market', 'Hưng Phú, Phường Hưng Phú, Quận Cái Răng, Cần Thơ', 'Cần Thơ', 'Quận Cái Răng', 'Phường Hưng Phú', 10.00180000, 105.76040000, '04:00 - 14:00'],
+            ['New Market', 'Quốc lộ 22, Thị trấn Củ Chi, Huyện Củ Chi, Hồ Chí Minh', 'Hồ Chí Minh', 'Huyện Củ Chi', 'Thị trấn Củ Chi', 10.97340000, 106.49330000, '04:00 - 12:00'],
+            ['Laad Bazaar', 'Nguyên Khê, Xã Nguyên Khê, Huyện Đông Anh, Hà Nội', 'Hà Nội', 'Huyện Đông Anh', 'Xã Nguyên Khê', 21.14020000, 105.84980000, '05:00 - 13:00'],
         ];
 
-        foreach ($markets as [$name, $address, $latitude, $longitude, $hours]) {
+        foreach ($markets as [$name, $address, $city, $district, $ward, $latitude, $longitude, $hours]) {
             $this->createAudited(Market::class, [
                 'name' => $name,
                 'address' => $address,
+                'city' => $city,
+                'district' => $district,
+                'ward' => $ward,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'operating_hours' => $hours,

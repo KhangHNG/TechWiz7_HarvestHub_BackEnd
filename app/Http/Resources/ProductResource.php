@@ -40,6 +40,9 @@ class ProductResource extends JsonResource
                         'id' => $market->id,
                         'name' => $market->name,
                         'address' => $market->address,
+                        'city' => $market->city,
+                        'district' => $market->district,
+                        'ward' => $market->ward,
                     ],
                 ];
             }),

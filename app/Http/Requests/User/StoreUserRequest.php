@@ -3,6 +3,8 @@
 namespace App\Http\Requests\User;
 
 use App\Http\Requests\ApiFormRequest;
+use App\Support\LocationValidator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends ApiFormRequest
@@ -23,6 +25,7 @@ class StoreUserRequest extends ApiFormRequest
             'address' => ['required', 'string'],
             'city' => ['required_unless:role,ADMIN', 'nullable', 'string', 'max:255'],
             'district' => ['required_unless:role,ADMIN', 'nullable', 'string', 'max:255'],
+            'ward' => ['required_unless:role,ADMIN', 'nullable', 'string', 'max:255'],
             'capital' => ['required_unless:role,ADMIN', 'nullable', 'string', 'max:255'],
             'role' => ['sometimes', Rule::in(['CUSTOMER', 'FARMER', 'ADMIN'])],
         ];
@@ -38,6 +41,7 @@ class StoreUserRequest extends ApiFormRequest
             'address' => 'Address',
             'city' => 'City',
             'district' => 'District',
+            'ward' => 'Ward',
             'capital' => 'Province / city',
             'role' => 'Role',
         ];
@@ -51,7 +55,24 @@ class StoreUserRequest extends ApiFormRequest
             'phone.digits' => 'The phone number must be numeric and exactly 10 digits.',
             'city.required_unless' => 'The city field is required.',
             'district.required_unless' => 'The district field is required.',
+            'ward.required_unless' => 'The ward field is required.',
             'capital.required_unless' => 'The province/city field is required.',
         ]);
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->isNotEmpty() || $this->input('role') === 'ADMIN') {
+                return;
+            }
+
+            LocationValidator::assert(
+                $validator,
+                $this->input('city'),
+                $this->input('district'),
+                $this->input('ward'),
+            );
+        });
     }
 }

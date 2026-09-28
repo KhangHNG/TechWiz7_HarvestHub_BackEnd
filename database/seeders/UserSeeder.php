@@ -20,10 +20,11 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
             'phone' => '0900000001',
             'password_hash' => $password,
-            'address' => '1 Le Duan Street, District 1, Ho Chi Minh City',
-            'city' => 'Ho Chi Minh City',
-            'district' => 'District 1',
-            'capital' => 'Ho Chi Minh City',
+            'address' => '1 Lê Duẩn, Phường Bến Nghé, Quận 1, Hồ Chí Minh',
+            'city' => 'Hồ Chí Minh',
+            'district' => 'Quận 1',
+            'ward' => 'Phường Bến Nghé',
+            'capital' => 'Hồ Chí Minh',
             'avatar_url' => '/seed/products/rau-cu-1.jpg',
             'role' => 'ADMIN',
             'email_verified_at' => $verifiedAt,
@@ -34,21 +35,21 @@ class UserSeeder extends Seeder
         ])->save();
 
         $customers = [
-            ['Liam Nguyen', '12 Le Loi Street, Ben Thanh Ward, District 1, Ho Chi Minh City', 'Ho Chi Minh City', 'District 1', 'Ho Chi Minh City'],
-            ['Emma Tran', '34 Thap Muoi Street, District 6, Ho Chi Minh City', 'Ho Chi Minh City', 'District 6', 'Ho Chi Minh City'],
-            ['Noah Pham', '18 Dong Xuan Street, Hoan Kiem District, Hanoi', 'Hanoi', 'Hoan Kiem', 'Hanoi'],
-            ['Olivia Le', '81 Hue Street, Hai Ba Trung District, Hanoi', 'Hanoi', 'Hai Ba Trung', 'Hanoi'],
-            ['Ethan Vo', '119 Tran Phu Street, Hai Chau District, Da Nang', 'Da Nang', 'Hai Chau', 'Da Nang'],
-            ['Sophia Dinh', '10 Tran Phu Street, Nha Trang, Khanh Hoa', 'Nha Trang', 'Nha Trang', 'Khanh Hoa'],
-            ['Arjun Mehta', '12 Dadabhai Naoroji Road, Fort, Mumbai, Maharashtra 400001', 'Mumbai', 'Fort', 'Maharashtra'],
-            ['Priya Sharma', '45 Khari Baoli Road, Chandni Chowk, Delhi 110006', 'Delhi', 'Chandni Chowk', 'Delhi'],
-            ['Rahul Nair', '8 Kalasipalya Main Road, Bengaluru, Karnataka 560002', 'Bengaluru', 'Kalasipalya', 'Karnataka'],
-            ['Ananya Iyer', '22 Koyambedu Market Road, Chennai, Tamil Nadu 600107', 'Chennai', 'Koyambedu', 'Tamil Nadu'],
-            ['Dev Patel', '15 Lindsay Street, Kolkata, West Bengal 700087', 'Kolkata', 'Lindsay Street', 'West Bengal'],
-            ['Fatima Khan', '7 Charminar Road, Hyderabad, Telangana 500002', 'Hyderabad', 'Charminar', 'Telangana'],
+            ['Liam Nguyen', '12 Lê Lợi, Phường Bến Thành, Quận 1, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận 1', 'Hồ Chí Minh', 'Phường Bến Thành'],
+            ['Emma Tran', '34 Tháp Mười, Phường 1, Quận 6, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận 6', 'Hồ Chí Minh', 'Phường 1'],
+            ['Noah Pham', '18 Hàng Đào, Phường Hàng Đào, Quận Hoàn Kiếm, Hà Nội', 'Hà Nội', 'Quận Hoàn Kiếm', 'Hà Nội', 'Phường Hàng Đào'],
+            ['Olivia Le', '81 Huế, Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội', 'Hà Nội', 'Quận Hai Bà Trưng', 'Hà Nội', 'Phường Nguyễn Du'],
+            ['Ethan Vo', '119 Trần Phú, Phường Hải Châu 1, Quận Hải Châu, Đà Nẵng', 'Đà Nẵng', 'Quận Hải Châu', 'Đà Nẵng', 'Phường Hải Châu 1'],
+            ['Sophia Dinh', '10 Võ Nguyên Giáp, Phường Mân Thái, Quận Sơn Trà, Đà Nẵng', 'Đà Nẵng', 'Quận Sơn Trà', 'Đà Nẵng', 'Phường Mân Thái'],
+            ['Arjun Mehta', '12 Lạch Tray, Phường Lê Lợi, Quận Ngô Quyền, Hải Phòng', 'Hải Phòng', 'Quận Ngô Quyền', 'Hải Phòng', 'Phường Lê Lợi'],
+            ['Priya Sharma', '45 Trần Nguyên Hãn, Phường An Biên, Quận Lê Chân, Hải Phòng', 'Hải Phòng', 'Quận Lê Chân', 'Hải Phòng', 'Phường An Biên'],
+            ['Rahul Nair', '8 Hòa Bình, Phường Cái Khế, Quận Ninh Kiều, Cần Thơ', 'Cần Thơ', 'Quận Ninh Kiều', 'Cần Thơ', 'Phường Cái Khế'],
+            ['Ananya Iyer', '22 Hưng Phú, Phường Hưng Phú, Quận Cái Răng, Cần Thơ', 'Cần Thơ', 'Quận Cái Răng', 'Cần Thơ', 'Phường Hưng Phú'],
+            ['Dev Patel', '15 Điện Biên Phủ, Phường 1, Quận Bình Thạnh, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận Bình Thạnh', 'Hồ Chí Minh', 'Phường 1'],
+            ['Fatima Khan', '7 Đội Cấn, Phường Điện Biên, Quận Ba Đình, Hà Nội', 'Hà Nội', 'Quận Ba Đình', 'Hà Nội', 'Phường Điện Biên'],
         ];
 
-        foreach ($customers as $index => [$name, $address, $city, $district, $capital]) {
+        foreach ($customers as $index => [$name, $address, $city, $district, $capital, $ward]) {
             $n = $index + 1;
             $this->createAudited(User::class, [
                 'full_name' => $name,
@@ -58,6 +59,7 @@ class UserSeeder extends Seeder
                 'address' => $address,
                 'city' => $city,
                 'district' => $district,
+                'ward' => $ward,
                 'capital' => $capital,
                 'avatar_url' => '/seed/products/trai-cay-'.(($index % 2) + 1).'.jpg',
                 'role' => 'CUSTOMER',
@@ -66,21 +68,21 @@ class UserSeeder extends Seeder
         }
 
         $farmers = [
-            ['Minh Le', '25 Le Loi Street, District 1, Ho Chi Minh City', 'Ho Chi Minh City', 'District 1', 'Ho Chi Minh City'],
-            ['Hoa Pham', '57 Thap Muoi Street, District 6, Ho Chi Minh City', 'Ho Chi Minh City', 'District 6', 'Ho Chi Minh City'],
-            ['Anh Tran', '4 Dong Xuan Street, Hoan Kiem District, Hanoi', 'Hanoi', 'Hoan Kiem', 'Hanoi'],
-            ['Lan Nguyen', '90 Hue Street, Hai Ba Trung District, Hanoi', 'Hanoi', 'Hai Ba Trung', 'Hanoi'],
-            ['Khoa Vo', '130 Tran Phu Street, Hai Chau District, Da Nang', 'Da Nang', 'Hai Chau', 'Da Nang'],
-            ['Mai Dinh', '16 Tran Phu Street, Nha Trang, Khanh Hoa', 'Nha Trang', 'Nha Trang', 'Khanh Hoa'],
-            ['Rohan Desai', '30 Dadabhai Naoroji Road, Fort, Mumbai, Maharashtra 400001', 'Mumbai', 'Fort', 'Maharashtra'],
-            ['Neha Gupta', '12 Khari Baoli Road, Chandni Chowk, Delhi 110006', 'Delhi', 'Chandni Chowk', 'Delhi'],
-            ['Vikram Rao', '19 Kalasipalya Main Road, Bengaluru, Karnataka 560002', 'Bengaluru', 'Kalasipalya', 'Karnataka'],
-            ['Meera Krishnan', '40 Koyambedu Market Road, Chennai, Tamil Nadu 600107', 'Chennai', 'Koyambedu', 'Tamil Nadu'],
-            ['Amit Banerjee', '6 Lindsay Street, Kolkata, West Bengal 700087', 'Kolkata', 'Lindsay Street', 'West Bengal'],
-            ['Aisha Qureshi', '3 Charminar Road, Hyderabad, Telangana 500002', 'Hyderabad', 'Charminar', 'Telangana'],
+            ['Minh Le', '25 Lê Lợi, Phường Bến Thành, Quận 1, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận 1', 'Hồ Chí Minh', 'Phường Bến Thành'],
+            ['Hoa Pham', '57 Tháp Mười, Phường 1, Quận 6, Hồ Chí Minh', 'Hồ Chí Minh', 'Quận 6', 'Hồ Chí Minh', 'Phường 1'],
+            ['Anh Tran', '4 Hàng Đào, Phường Hàng Đào, Quận Hoàn Kiếm, Hà Nội', 'Hà Nội', 'Quận Hoàn Kiếm', 'Hà Nội', 'Phường Hàng Đào'],
+            ['Lan Nguyen', '90 Huế, Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội', 'Hà Nội', 'Quận Hai Bà Trưng', 'Hà Nội', 'Phường Nguyễn Du'],
+            ['Khoa Vo', '130 Trần Phú, Phường Hải Châu 1, Quận Hải Châu, Đà Nẵng', 'Đà Nẵng', 'Quận Hải Châu', 'Đà Nẵng', 'Phường Hải Châu 1'],
+            ['Mai Dinh', '16 Võ Nguyên Giáp, Phường Mân Thái, Quận Sơn Trà, Đà Nẵng', 'Đà Nẵng', 'Quận Sơn Trà', 'Đà Nẵng', 'Phường Mân Thái'],
+            ['Rohan Desai', '30 Lạch Tray, Phường Lê Lợi, Quận Ngô Quyền, Hải Phòng', 'Hải Phòng', 'Quận Ngô Quyền', 'Hải Phòng', 'Phường Lê Lợi'],
+            ['Neha Gupta', '12 Trần Nguyên Hãn, Phường An Biên, Quận Lê Chân, Hải Phòng', 'Hải Phòng', 'Quận Lê Chân', 'Hải Phòng', 'Phường An Biên'],
+            ['Vikram Rao', '19 Hòa Bình, Phường Cái Khế, Quận Ninh Kiều, Cần Thơ', 'Cần Thơ', 'Quận Ninh Kiều', 'Cần Thơ', 'Phường Cái Khế'],
+            ['Meera Krishnan', '40 Hưng Phú, Phường Hưng Phú, Quận Cái Răng, Cần Thơ', 'Cần Thơ', 'Quận Cái Răng', 'Cần Thơ', 'Phường Hưng Phú'],
+            ['Amit Banerjee', 'Ấp 2, Thị trấn Củ Chi, Huyện Củ Chi, Hồ Chí Minh', 'Hồ Chí Minh', 'Huyện Củ Chi', 'Hồ Chí Minh', 'Thị trấn Củ Chi'],
+            ['Aisha Qureshi', 'Thôn Nguyên Khê, Xã Nguyên Khê, Huyện Đông Anh, Hà Nội', 'Hà Nội', 'Huyện Đông Anh', 'Hà Nội', 'Xã Nguyên Khê'],
         ];
 
-        foreach ($farmers as $index => [$name, $address, $city, $district, $capital]) {
+        foreach ($farmers as $index => [$name, $address, $city, $district, $capital, $ward]) {
             $n = $index + 1;
             $this->createAudited(User::class, [
                 'full_name' => $name,
@@ -90,6 +92,7 @@ class UserSeeder extends Seeder
                 'address' => $address,
                 'city' => $city,
                 'district' => $district,
+                'ward' => $ward,
                 'capital' => $capital,
                 'avatar_url' => '/seed/products/huu-co-'.(($index % 2) + 1).'.jpg',
                 'role' => 'FARMER',

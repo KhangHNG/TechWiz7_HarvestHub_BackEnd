@@ -10,7 +10,7 @@ class Market extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'address', 'latitude', 'longitude', 'operating_hours', 'is_active'];
+    protected $fillable = ['name', 'address', 'city', 'district', 'ward', 'latitude', 'longitude', 'operating_hours', 'is_active'];
 
     public function farmers()
     {

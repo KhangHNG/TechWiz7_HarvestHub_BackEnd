@@ -18,6 +18,18 @@ class MarketForm
                 Textarea::make('address')
                     ->default(null)
                     ->columnSpanFull(),
+                TextInput::make('city')
+                    ->label('City')
+                    ->maxLength(255)
+                    ->required(),
+                TextInput::make('district')
+                    ->label('District')
+                    ->maxLength(255)
+                    ->required(),
+                TextInput::make('ward')
+                    ->label('Ward')
+                    ->maxLength(255)
+                    ->required(),
                 TextInput::make('latitude')
                     ->numeric()
                     ->default(null),

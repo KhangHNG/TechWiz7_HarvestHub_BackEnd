@@ -203,6 +203,8 @@ class AiToolResolver
                     'farmer_name' => $farmer->business_name,
                     'market_name' => $farmer->market->name ?? null,
                     'address' => $farmer->market->address ?? null,
+                    'city' => $farmer->market->city ?? null,
+                    'ward' => $farmer->market->ward ?? null,
                     'operating_hours' => $farmer->market->operating_hours ?? null,
                 ];
             })->all(),
