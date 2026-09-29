@@ -255,7 +255,7 @@ TXT
      */
     private function post(array $payload): Response
     {
-        $model = config('services.gemini.model', 'gemini-3.5-flash-lite');
+        $model = config('services.gemini.model', 'gemini-3.8-flash');
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
         $response = null;
