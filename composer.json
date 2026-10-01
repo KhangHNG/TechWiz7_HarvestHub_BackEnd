@@ -7,7 +7,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-bcmath": "*",
         "ext-intl": "*",
+        "ext-pdo_mysql": "*",
         "ext-zip": "*",
         "cloudinary/cloudinary_php": "^3.1",
         "filament/filament": "^4.0",
