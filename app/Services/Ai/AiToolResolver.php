@@ -68,9 +68,78 @@ class AiToolResolver
         ];
     }
 
+    /**
+     * Tools declaration compatible with OpenAI / DeepSeek format.
+     *
+     * @return array<int, array{type: string, function: array{name: string, description: string, parameters: array<string, mixed>}}>
+     */
+    public function getOpenAiToolsDeclaration(): array
+    {
+        return [
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'list_products',
+                    'description' => 'List HarvestHub products in the catalog. Use for questions about which products exist, including products of a named farmer. Optional keyword filters by product name or description. Optional farmer filters by farm name.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'keyword' => [
+                                'type' => 'string',
+                                'description' => 'Optional English product keyword. Omit it to list the catalog.',
+                            ],
+                            'farmer' => [
+                                'type' => 'string',
+                                'description' => 'Optional English farm or farmer name. Omit it when the user does not name a farmer.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_product_stock',
+                    'description' => 'Look up HarvestHub product price and stock by English catalog name and, if given, farm name.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'product' => [
+                                'type' => 'string',
+                                'description' => 'English catalog name, for example cherry tomato, water spinach, mango.',
+                            ],
+                            'farmer' => [
+                                'type' => 'string',
+                                'description' => 'Farm or farmer name, only when the user mentions one.',
+                            ],
+                        ],
+                        'required' => ['product'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_pickup_slots',
+                    'description' => 'Look up the market, address, and opening hours for picking up goods from a farm.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'farmer' => [
+                                'type' => 'string',
+                                'description' => 'English farm or farmer name to look up pickup hours.',
+                            ],
+                        ],
+                        'required' => ['farmer'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function execute(string $functionName, array $args): array
     {
-        Log::info("Gemini function: {$functionName}", $args);
+        Log::info("AI function: {$functionName}", $args);
 
         return match ($functionName) {
             'list_products' => $this->listProducts($args['keyword'] ?? null, $args['farmer'] ?? null),

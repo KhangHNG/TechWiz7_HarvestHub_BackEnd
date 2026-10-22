@@ -11,8 +11,9 @@ class ChatRequest extends ApiFormRequest
         return [
             'message' => ['required', 'string', 'max:2000'],
             'history' => ['sometimes', 'array', 'max:20'],
-            'history.*.role' => ['required', 'in:user,model'],
+            'history.*.role' => ['required', 'in:user,model,assistant'],
             'history.*.text' => ['required', 'string', 'max:4000'],
+            'provider' => ['sometimes', 'string', 'in:gemini,deepseek'],
         ];
     }
 

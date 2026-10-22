@@ -6,7 +6,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class GeminiService
+class GeminiService implements AiServiceInterface
 {
     public function __construct(private AiToolResolver $toolResolver) {}
 
