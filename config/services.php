@@ -53,7 +53,7 @@ return [
     ],
 
     'ai' => [
-        'default_provider' => env('AI_PROVIDER', 'gemini'),
+        'default_provider' => env('AI_PROVIDER', 'free_ai'),
     ],
 
     'cloudinary' => [
