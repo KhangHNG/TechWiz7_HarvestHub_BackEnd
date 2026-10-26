@@ -46,6 +46,12 @@ return [
         'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
     ],
 
+    'free_ai' => [
+        'api_key' => env('FREE_AI_API_KEY'),
+        'model' => env('FREE_AI_MODEL', 'qwen7b'),
+        'base_url' => env('FREE_AI_BASE_URL', 'https://api.free.ai/v1'),
+    ],
+
     'ai' => [
         'default_provider' => env('AI_PROVIDER', 'gemini'),
     ],

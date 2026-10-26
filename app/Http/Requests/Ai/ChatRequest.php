@@ -13,7 +13,7 @@ class ChatRequest extends ApiFormRequest
             'history' => ['sometimes', 'array', 'max:20'],
             'history.*.role' => ['required', 'in:user,model,assistant'],
             'history.*.text' => ['required', 'string', 'max:4000'],
-            'provider' => ['sometimes', 'string', 'in:gemini,deepseek'],
+            'provider' => ['sometimes', 'string', 'in:gemini,deepseek,free_ai,freeai'],
         ];
     }
 
