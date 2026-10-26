@@ -47,7 +47,7 @@ return [
     ],
 
     'ai' => [
-        'default_provider' => env('AI_PROVIDER', 'deepseek'),
+        'default_provider' => env('AI_PROVIDER', 'gemini'),
     ],
 
     'cloudinary' => [
