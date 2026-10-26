@@ -11,6 +11,7 @@ class LoginRequest extends ApiFormRequest
         return [
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:6'],
+            'role' => ['sometimes', 'nullable', 'string', 'in:CUSTOMER,FARMER,ADMIN,customer,farmer,admin'],
         ];
     }
 

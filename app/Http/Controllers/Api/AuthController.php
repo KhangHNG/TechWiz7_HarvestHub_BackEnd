@@ -103,7 +103,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validated();
+        $credentials = $request->only('email', 'password');
 
         if (! $token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([
@@ -125,6 +125,30 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Email is not verified. Please open the link in the verification email.',
             ], 403);
+        }
+
+        if ($request->filled('role')) {
+            $expectedRole = strtoupper((string) $request->input('role'));
+            $userRole = strtoupper((string) $user->role);
+
+            $allowed = ($userRole === $expectedRole) || ($expectedRole === 'CUSTOMER' && $userRole === 'ADMIN');
+
+            if (! $allowed) {
+                try {
+                    Auth::guard('api')->logout();
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+
+                $message = $expectedRole === 'FARMER'
+                    ? 'This account is not a farmer account. Please log in as a customer.'
+                    : 'This account is a farmer account. Please log in as a farmer.';
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 403);
+            }
         }
 
         return response()->json([
