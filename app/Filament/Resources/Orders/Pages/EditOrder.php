@@ -44,6 +44,7 @@ class EditOrder extends EditRecord
             return app(OrderService::class)->updateOrder(
                 $record,
                 OrderForm::serviceData($data, $record->status === 'CART'),
+                false,
             );
         } catch (InsufficientStockException $e) {
             Notification::make()->title($e->getMessage())->danger()->send();

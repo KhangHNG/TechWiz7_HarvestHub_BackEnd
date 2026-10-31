@@ -63,7 +63,7 @@ class OrderService
         return $query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 10));
     }
 
-    public function createOrder(array $data)
+    public function createOrder(array $data, bool $notify = true)
     {
         $this->assertFarmersAcceptingOrders(collect($data['items'] ?? [])->pluck('product_id'));
 
@@ -93,12 +93,14 @@ class OrderService
             return $order->fresh('items');
         });
 
-        $this->notifications->orderCreated($order);
+        if ($notify) {
+            $this->notifications->orderCreated($order);
+        }
 
         return $order;
     }
 
-    public function updateOrder(Order $order, array $data)
+    public function updateOrder(Order $order, array $data, bool $notify = true)
     {
         $previousStatus = $order->status;
         $nextStatus = array_key_exists('status', $data) ? (string) $data['status'] : (string) $previousStatus;
@@ -162,16 +164,18 @@ class OrderService
 
         $this->placedOrders = $placedOrders;
 
-        foreach ($stockChanges as [$product, $previous, $current]) {
-            $this->notifications->stockChanged($product, $previous, $current);
-        }
-
-        if ($previousStatus === 'CART' && $order->status === 'PENDING') {
-            foreach ($placedOrders as $placed) {
-                $this->notifications->orderStatusChanged($placed, 'CART');
+        if ($notify) {
+            foreach ($stockChanges as [$product, $previous, $current]) {
+                $this->notifications->stockChanged($product, $previous, $current);
             }
-        } elseif (array_key_exists('status', $data) && $order->status !== $previousStatus) {
-            $this->notifications->orderStatusChanged($order, $previousStatus);
+
+            if ($previousStatus === 'CART' && $order->status === 'PENDING') {
+                foreach ($placedOrders as $placed) {
+                    $this->notifications->orderStatusChanged($placed, 'CART');
+                }
+            } elseif (array_key_exists('status', $data) && $order->status !== $previousStatus) {
+                $this->notifications->orderStatusChanged($order, $previousStatus);
+            }
         }
 
         return $order;

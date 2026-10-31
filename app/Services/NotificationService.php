@@ -19,7 +19,7 @@ class NotificationService
 {
     public function orderCreated(Order $order): void
     {
-        if ($order->status !== 'PENDING') {
+        if ($order->status !== 'PENDING' || $this->isAdminActor()) {
             return;
         }
 
@@ -34,7 +34,7 @@ class NotificationService
 
     public function orderStatusChanged(Order $order, string $previousStatus): void
     {
-        if ($order->status === $previousStatus || $order->status === 'CART') {
+        if ($order->status === $previousStatus || $order->status === 'CART' || $this->isAdminActor()) {
             return;
         }
 
@@ -78,7 +78,7 @@ class NotificationService
 
     public function stockChanged(Product $product, int $previous, int $current): void
     {
-        if ($previous === $current) {
+        if ($previous === $current || $this->isAdminActor()) {
             return;
         }
 
@@ -252,14 +252,24 @@ class NotificationService
         return [null, null, null, null];
     }
 
+    private function isAdminActor(): bool
+    {
+        return $this->actor()?->role === 'ADMIN';
+    }
+
     private function actor(): ?User
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            return $user instanceof User ? $user : null;
+            if ($user instanceof User) {
+                return $user;
+            }
         } catch (Throwable) {
-            return null;
         }
+
+        $authUser = auth()->user();
+
+        return $authUser instanceof User ? $authUser : null;
     }
 }

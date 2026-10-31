@@ -19,14 +19,14 @@ class CreateOrder extends CreateRecord
         $status = $data['status'] ?? 'CART';
         $data['status'] = 'CART';
         $service = app(OrderService::class);
-        $order = $service->createOrder(OrderForm::serviceData($data, true));
+        $order = $service->createOrder(OrderForm::serviceData($data, true), false);
 
         if ($status !== 'PENDING') {
             return $order;
         }
 
         try {
-            return $service->updateOrder($order, ['status' => 'PENDING']);
+            return $service->updateOrder($order, ['status' => 'PENDING'], false);
         } catch (InsufficientStockException $e) {
             $service->deleteOrder($order);
             Notification::make()->title($e->getMessage())->danger()->send();
