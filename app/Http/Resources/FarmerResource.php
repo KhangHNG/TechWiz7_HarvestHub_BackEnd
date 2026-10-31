@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\SeedImages;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,8 +18,8 @@ class FarmerResource extends JsonResource
             'description' => $this->description,
             'rating' => $this->rating,
             'is_accepting_orders' => (bool) $this->is_accepting_orders,
-            'avatar_url' => $this->user?->avatar_url,
-            'cover_url' => $this->cover_url,
+            'avatar_url' => SeedImages::absoluteUrl($this->user?->avatar_url),
+            'cover_url' => SeedImages::absoluteUrl($this->cover_url),
             'address' => $this->user?->address,
             'city' => $this->user?->city,
             'district' => $this->user?->district,

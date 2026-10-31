@@ -52,7 +52,7 @@ class ProductForm
                             'name' => basename(parse_url($file, PHP_URL_PATH) ?: $file),
                             'size' => 0,
                             'type' => null,
-                            'url' => str_starts_with($file, 'http') ? $file : $component->getDisk()->url($file),
+                            'url' => str_starts_with($file, 'http') ? $file : url($file),
                         ];
                     })
                     ->deleteUploadedFileUsing(function (string $file): void {
