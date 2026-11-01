@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Products\Tables;
 
 use App\Filament\Tables\Filters\CreatedBetweenFilter;
+use App\Models\Product;
+use App\Support\SeedImages;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -37,7 +39,8 @@ class ProductsTable
                 TextColumn::make('stock_qty')
                     ->numeric()
                     ->sortable(),
-                ImageColumn::make('image_url'),
+                ImageColumn::make('image_url')
+                    ->getStateUsing(fn (Product $record): array => SeedImages::absoluteUrls($record->image_url)),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

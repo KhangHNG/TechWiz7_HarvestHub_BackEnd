@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Farmer;
 use App\Models\Market;
 use App\Models\User;
+use App\Support\SeedImages;
 use Illuminate\Database\Seeder;
 
 class FarmerSeeder extends Seeder
@@ -39,7 +40,7 @@ class FarmerSeeder extends Seeder
                 'description' => $description,
                 'rating' => $rating,
                 'is_accepting_orders' => true,
-                'cover_url' => null,
+                'cover_url' => SeedImages::forFarmCover($businessName),
             ]);
         }
     }

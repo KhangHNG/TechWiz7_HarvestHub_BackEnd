@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\SeedImages;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,7 @@ class UserResource extends JsonResource
             'ward' => $this->ward,
             'capital' => $this->capital,
             'role' => $this->role,
-            'avatar_url' => $this->avatar_url,
+            'avatar_url' => SeedImages::absoluteUrl($this->avatar_url),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'deleted_at' => $this->deleted_at?->toIso8601String(),

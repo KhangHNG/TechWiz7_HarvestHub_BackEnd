@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Product;
+use App\Support\SeedImages;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
@@ -27,6 +28,7 @@ class ProductInfolist
                     ->numeric(),
                 ImageEntry::make('image_url')
                     ->label('Product image')
+                    ->getStateUsing(fn (Product $record): array => SeedImages::absoluteUrls($record->image_url))
                     ->limit(10)
                     ->placeholder('-'),
                 TextEntry::make('created_at')
